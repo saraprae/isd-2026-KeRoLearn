@@ -1,0 +1,8 @@
+[project]
+name = "ocr-system"
+version = "0.1.0"
+description = "Production-style OCR pipeline for single/multi-page Thai-English documents"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]

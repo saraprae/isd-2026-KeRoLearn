@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: ocr-system
+Version: 0.1.0
+Summary: Production-style OCR pipeline for single/multi-page Thai-English documents
+Requires-Python: >=3.10
