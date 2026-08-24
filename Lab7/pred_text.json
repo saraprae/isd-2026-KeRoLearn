@@ -1,0 +1,1082 @@
+{
+  "program": null,
+  "plan": null,
+  "courses": [
+    {
+      "code": "0",
+      "name_th": "Management Information System",
+      "credits": "3 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "1",
+      "name_th": "Data mining",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "2",
+      "name_th": "Management Information System",
+      "credits": "3 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "3",
+      "name_th": "Business Intelligence & Big Data",
+      "credits": "3 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "4",
+      "name_th": "Special Topics in Information Technology 2: Big Data Analysis",
+      "credits": "3 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "5",
+      "name_th": "Business Data Analysis",
+      "credits": "4 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "6",
+      "name_th": "Data Visualization",
+      "credits": "4 ซ.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "7",
+      "name_th": "Intelligent Transportation",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "8",
+      "name_th": "Vehicular Networks",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "9",
+      "name_th": "Wireless Sensor Networks",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "10",
+      "name_th": "Human Computer Interaction",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "11",
+      "name_th": "Learning Technology",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "12",
+      "name_th": "Multimedia Security and Privacy",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0",
+      "name_th": "Computer Network",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "1",
+      "name_th": "Computer and Network Security",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "2",
+      "name_th": "Multimedia Networking",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "3",
+      "name_th": "Performance Evaluation",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "4",
+      "name_th": "Simulation Modeling",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "5",
+      "name_th": "Information Systems and Databases",
+      "credits": "3 ชม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "6",
+      "name_th": "Database Systems Concepts",
+      "credits": "3 ชม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "7",
+      "name_th": "Information Systems, Databases And Application",
+      "credits": "3 ชม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "8",
+      "name_th": "Data Mining, Data Science",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "9",
+      "name_th": "Data Warehousing",
+      "credits": "4ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "10",
+      "name_th": "Data Mining and Big Data Analytics",
+      "credits": "4ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "11",
+      "name_th": "Fundamenttals Of Data Science And Applied Machine Learning",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "12",
+      "name_th": "General Business",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "13",
+      "name_th": "Fundamentals of Business",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "14",
+      "name_th": "Information Technology Project Management",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "15",
+      "name_th": "Wireless Sensor Networks",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "16",
+      "name_th": "Computer Networking And Cloud Computing",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "17",
+      "name_th": "Internet Of Things",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "18",
+      "name_th": "Practical Computer Networking",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "19",
+      "name_th": "Natural Language Processing",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "20",
+      "name_th": "Social and Web Data Analysis and Visualization",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "21",
+      "name_th": "Artificial Intelligence",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "22",
+      "name_th": "Computational Intelligence",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "23",
+      "name_th": "Machine Learning",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "24",
+      "name_th": "Data Mining",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "25",
+      "name_th": "Neural Network",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "26",
+      "name_th": "Fuzzy Systems",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "27",
+      "name_th": "Evolutionary Algorithms",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "28",
+      "name_th": "Swarm Intelligence",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "29",
+      "name_th": "Optimization",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "30",
+      "name_th": "Operations Management",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "0",
+      "name_th": "Probability and Statistics",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "1",
+      "name_th": "Enterprise Information Systems",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "2",
+      "name_th": "Elements of Artificial Intelligence",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "3",
+      "name_th": "Text Processing Application",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "4",
+      "name_th": "Information Technology Fundamentals",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "5",
+      "name_th": "Mathematics For Information Technology",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "6",
+      "name_th": "Computer Programming",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "7",
+      "name_th": "Microprocessors",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "8",
+      "name_th": "INTERNET OF THINGS",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "9",
+      "name_th": "Requirement Engineering",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "10",
+      "name_th": "Information Systems Analysis And Design",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "11",
+      "name_th": "Image Processing",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "12",
+      "name_th": "Computer Vision",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "13",
+      "name_th": "Human-Computer Interface",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "14",
+      "name_th": "Visual Navigation",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "15",
+      "name_th": "Visual Simultaneous Localization and Mapping",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "16",
+      "name_th": "C ++ Programming for Image Processing and Computer Vision",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "17",
+      "name_th": "Object-Oriented Concepts",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "18",
+      "name_th": "Virtual Reality",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "19",
+      "name_th": "C++ GUI Programming",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "20",
+      "name_th": "Software Verification and Validation",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "21",
+      "name_th": "Wireless And Mobile Networks",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "22",
+      "name_th": "Opportunistic Networks",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "23",
+      "name_th": "Software Defined Networks",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "24",
+      "name_th": "Network Management And Traffic Engineering",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "25",
+      "name_th": "Cybersecurity",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "26",
+      "name_th": "Software Engineering",
+      "credits": "6 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "27",
+      "name_th": "Data Science For Business",
+      "credits": "4 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "28",
+      "name_th": "Information System Analysis And Design",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "29",
+      "name_th": "Robotic Process Automation",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "30",
+      "name_th": "Information Retrieval",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "0001",
+      "name_th": "Introduction To Computer Networks",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0002",
+      "name_th": "Information Systems Security And It Laws",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0003",
+      "name_th": "Network Performance",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0004",
+      "name_th": "Interconnected Communication Networks",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0005",
+      "name_th": "Practical Computer Networking",
+      "credits": "4 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0006",
+      "name_th": "Image Processing",
+      "credits": "3 ชม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0007",
+      "name_th": "Signal Processing",
+      "credits": "3 ชม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0008",
+      "name_th": "Machine Learning/Deep Learning",
+      "credits": "3 ชม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0009",
+      "name_th": "Computer Vision",
+      "credits": "3 ชม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0010",
+      "name_th": "Data Compression",
+      "credits": "3 ชม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0011",
+      "name_th": "Web Technology",
+      "credits": "12 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0012",
+      "name_th": "Business Information System Analysis And Design",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0013",
+      "name_th": "Optimization",
+      "credits": "2 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0014",
+      "name_th": "Machine learning",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0015",
+      "name_th": "Artificial Intelligent",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0016",
+      "name_th": "Big data analytic",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0017",
+      "name_th": "Text Mining",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0018",
+      "name_th": "Data Mining",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0019",
+      "name_th": "Information Technology Project Management",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0020",
+      "name_th": "Web Programming",
+      "credits": "4 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0021",
+      "name_th": "Python for Data Science and Machine Learning",
+      "credits": "3 ช.ม./ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "0022",
+      "name_th": "Computer Networks",
+      "credits": "3 ชม /สัปดาห มี 3 กลุ่ม/รับผิดชอบสอน 7",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "note": "หมวดวิชาเฉพาะ"
+    },
+    {
+      "code": "INTRODUCTION TO CLOUD TECHNOLOGY",
+      "name_th": "Introduction to cloud technology",
+      "credits": "4 ชม ตอ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "INTERCONNECTED COMMUNICATION NETWORKS",
+      "name_th": "Interconnected Communication Networks",
+      "credits": "Sec ละ 3 ชม ตอสัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "PRACTICAL COMPUTER NETWORKS",
+      "name_th": "Practical Computer Networks",
+      "credits": "Sec ละ 4 ชม ตอ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "CLOUD -BASED ENTERPRISE APPLICATION DEVELOPMENT",
+      "name_th": "Cloud -Based Enterprise Application Development",
+      "credits": "Sec ละ 4 ชม ตอ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "INTRODUCTION TO NETWORK DESIGN",
+      "name_th": "Introduction to network design",
+      "credits": "Sec ละ 3 ชม ตอ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "NPA (SPECIAL TOPIC IN NETWORK)",
+      "name_th": "NPA (special topic in network)",
+      "credits": "Sec ละ 4 ชม ตอ สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "COMPUTER SYSTEMS ORGANIZATION AND OPERATING SYSTEM",
+      "name_th": "Computer Systems Organization And Operating System",
+      "credits": "9 ช.ม./สัปดาห",
+      "year": 0,
+      "semester": 0,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "0",
+      "name_th": "Database System Concepts",
+      "credits": "8 ช.ม./สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "1",
+      "name_th": "Financial Accounting",
+      "credits": "3 ช.ม./สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "2",
+      "name_th": "Software Engineering",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "3",
+      "name_th": "Health Informatics",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "4",
+      "name_th": "Database System",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "5",
+      "name_th": "Cloud-Based Enterprise Application Development",
+      "credits": "4 ช.ม. / สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "6",
+      "name_th": "Semantic Technology",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "7",
+      "name_th": "Service Retrieval",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "8",
+      "name_th": "Community Annotation",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "9",
+      "name_th": "Intelligent System/ Application",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "10",
+      "name_th": "Data Structures And Algorithm",
+      "credits": "3 ชม./สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "11",
+      "name_th": "Mobile Device Programming",
+      "credits": "3 ชม./สัปดาห",
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    },
+    {
+      "code": "12",
+      "name_th": "UX/UI Design and Analysis",
+      "credits": null,
+      "year": null,
+      "semester": null,
+      "flexible_year_semester": null,
+      "note": "ไม่มี"
+    }
+  ],
+  "_meta": {
+    "pipeline": "text",
+    "elapsed_sec": 2356.5,
+    "models": {
+      "ocr": "scb10x/typhoon-ocr1.5-3b",
+      "text": "qwen3:4b"
+    },
+    "dpi": 150,
+    "pages_per_chunk": 3
+  }
+}
