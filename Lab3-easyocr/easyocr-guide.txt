@@ -1,0 +1,4 @@
+1. รันคำสั่ง pip install easyocr opencv-python (ต้องขึ้น .venv ก่อน)
+2. pip install pypdfium2 (แปลง pdf เป็นรูป)
+3. สร้างไฟล์ run_easyocr.py
+4. รัน python run_easyocr.py

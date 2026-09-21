@@ -1,0 +1,186 @@
+{
+  "program": null,
+  "plan": null,
+  "courses": [
+    {
+      "code": "06026204",
+      "name_th": "เครือข่ายและความมั่นคงทางไซเบอร์เบื้องต้น",
+      "credits": "3 (3-0-6)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026207",
+      "name_th": "ระบบฐานข้อมูลแบบโนเวสคิวแอล",
+      "credits": "3 (2-2-5)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026208",
+      "name_th": "พื้นฐานวิทยาการข้อมูล",
+      "credits": "3 (3-0-6)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026209",
+      "name_th": "การแสดงข้อมูลด้วยแผนภาพ",
+      "credits": "3 (2-2-5)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026210",
+      "name_th": "การหาค่าที่เหมาะที่สุด",
+      "credits": "3 (3-0-6)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06066102",
+      "name_th": "ระบบสารสนเทศเพื่อการจัดการ",
+      "credits": "3 (3-0-6)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06066301",
+      "name_th": "โครงสร้างข้อมูลและอัลกอริทึม",
+      "credits": "3 (2-2-5)",
+      "year": 2,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026213",
+      "name_th": "ระบบข้อมูลมหัต",
+      "credits": "3 (2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026214",
+      "name_th": "โครงงานวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ 1",
+      "credits": "3 (0-9-0)",
+      "year": 3,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 3",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 3",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 3",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 4",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 4",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 4",
+      "credits": "3 (3-0-6)",
+      "year": 0,
+      "semester": 0,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": "3/1, 3/2",
+      "note": "เลือก"
+    },
+    {
+      "code": "06066100",
+      "name_th": "การบริหารโครงการเทคโนโลยีสารสนเทศ",
+      "credits": "3 (3-0-6)",
+      "year": 3,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    },
+    {
+      "code": "90643021",
+      "name_th": "กลุ่มวิชาที่กำหนดโดยคณะ\\* ผู้ประกอบการสมัยใหม่",
+      "credits": "3 (3-0-6)",
+      "year": 3,
+      "semester": 2,
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "บังคับ"
+    }
+  ],
+  "_meta": {
+    "pipeline": "vlm",
+    "elapsed_sec": 1884.0,
+    "models": {
+      "ocr": "scb10x/typhoon-ocr1.5-3b",
+      "text": "qwen3:4b"
+    },
+    "dpi": 150,
+    "pages_per_chunk": 3
+  }
+}
