@@ -1,0 +1,243 @@
+{
+  "markdown": {
+    "tokenizer": "whitespace (fallback)",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 115,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 920,
+        "error_samples": []
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 115,
+        "cer": 0.002745,
+        "wer": 0.044118,
+        "exact_match_acc": 0.947826,
+        "n_sub": 4,
+        "n_del": 5,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3279,
+        "error_samples": [
+          {
+            "key": "06066301",
+            "gt": "โครงสร้างข้อมูลและอัลกอรึทึม",
+            "pred": "โครงสร้างข้อมูลและอัลกอริทึม"
+          },
+          {
+            "key": "06016409",
+            "gt": "การประมวลผลทางกายภาพ",
+            "pred": "การประมวลทางกายภาพ"
+          },
+          {
+            "key": "06016412",
+            "gt": "โครงสร้างระบบคอมพิวเตอร์และระบบปฎิบัติการ",
+            "pred": "โครงสร้างระบบคอมพิวเตอร์และระบบปฏิบัติการ"
+          },
+          {
+            "key": "06016443",
+            "gt": "การวิเคราะห์ข้อมูลและแอปพลิเคชันสำหรับอินเตอร์เน็ตแห่งสรรพสิ่ง",
+            "pred": "การวิเคราะห์ข้อมูลและแอปพลิเคชันสำหรับอินเทอร์เน็ตแห่งสรรพสิ่ง"
+          },
+          {
+            "key": "06016462",
+            "gt": "เทคโนโลยีสื่อสารการเคลื่อนที่",
+            "pred": "เทคโนโลยีสื่อสารเคลื่อนที่"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 115,
+        "cer": 0.0,
+        "wer": 0.0,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3245,
+        "error_samples": []
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 115,
+        "cer": 0.002941,
+        "wer": null,
+        "exact_match_acc": 0.991304,
+        "n_sub": 3,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1020,
+        "error_samples": [
+          {
+            "key": "06016425",
+            "gt": "3(3-0-6)",
+            "pred": "3(2-2-5)"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 115,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 345,
+        "error_samples": []
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 115,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1585,
+        "error_samples": []
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 115,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 625,
+        "error_samples": []
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 115,
+        "cer": 0.032258,
+        "wer": null,
+        "exact_match_acc": 0.973913,
+        "n_sub": 14,
+        "n_del": 0,
+        "n_ins": 6,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 620,
+        "error_samples": [
+          {
+            "key": "06016418",
+            "gt": "ไม่มี",
+            "pred": "06016408"
+          },
+          {
+            "key": "06016421",
+            "gt": "ไม่มี",
+            "pred": "06016413"
+          },
+          {
+            "key": "06016432",
+            "gt": "06016413",
+            "pred": "06066304"
+          }
+        ]
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 115,
+        "cer": 1.333333,
+        "wer": null,
+        "exact_match_acc": 0.53913,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 212,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 159,
+        "error_samples": [
+          {
+            "key": "06016428",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016429",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016430",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016431",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016432",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          }
+        ]
+      }
+    },
+    "overall_micro_cer": 0.020681,
+    "alignment": {
+      "matched": 115,
+      "missed": 0,
+      "spurious": 1,
+      "precision": 0.9914,
+      "recall": 1.0,
+      "f1": 0.9957,
+      "gt_total": 115,
+      "pred_total": 116,
+      "missed_codes": [],
+      "spurious_codes": [
+        "06016418"
+      ]
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 116,
+      "n_duplicate_keys": 1,
+      "credits_by_term": {
+        "1/1": 18,
+        "1/2": 18,
+        "2/1": 18,
+        "2/2": 27,
+        "3/1": 18,
+        "3/2": 21,
+        "4/1": 21,
+        "4/2": 18
+      },
+      "total_credits_fixed_terms": 159,
+      "issues": [
+        "06016481: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016482: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "ภาค 2/2 มีถึง 27 หน่วยกิต — น่าจะมีวิชาซ้ำ"
+      ]
+    }
+  }
+}

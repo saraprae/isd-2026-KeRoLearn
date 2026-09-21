@@ -1,0 +1,358 @@
+{
+  "n_gt_courses": 61,
+  "n_pred_courses": 61,
+  "per_field": {
+    "code": {
+      "tp": 59,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.9672,
+      "recall": 0.9672,
+      "f1": 0.9672
+    },
+    "name_th": {
+      "tp": 54,
+      "fp": 7,
+      "fn": 7,
+      "precision": 0.8852,
+      "recall": 0.8852,
+      "f1": 0.8852
+    },
+    "name_en": {
+      "tp": 52,
+      "fp": 9,
+      "fn": 9,
+      "precision": 0.8525,
+      "recall": 0.8525,
+      "f1": 0.8525
+    },
+    "credits": {
+      "tp": 45,
+      "fp": 6,
+      "fn": 15,
+      "precision": 0.8824,
+      "recall": 0.75,
+      "f1": 0.8108
+    },
+    "year": {
+      "tp": 59,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.9672,
+      "recall": 0.9672,
+      "f1": 0.9672
+    },
+    "semester": {
+      "tp": 59,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.9672,
+      "recall": 0.9672,
+      "f1": 0.9672
+    },
+    "category": {
+      "tp": 58,
+      "fp": 3,
+      "fn": 3,
+      "precision": 0.9508,
+      "recall": 0.9508,
+      "f1": 0.9508
+    },
+    "type": {
+      "tp": 59,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.9672,
+      "recall": 0.9672,
+      "f1": 0.9672
+    },
+    "prerequisite": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "micro": {
+    "tp": 448,
+    "fp": 33,
+    "fn": 42,
+    "precision": 0.9314,
+    "recall": 0.9143,
+    "f1": 0.9228
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "06036147",
+        "gt": "06036147",
+        "pred": null
+      },
+      {
+        "code": "06036148",
+        "gt": "06036148",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "PLACEHOLDER_XXXXXXXX_2"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": "PLACEHOLDER_06036XXX_2"
+      }
+    ],
+    "name_th": [
+      {
+        "code": "06036143",
+        "gt": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยูไอ",
+        "pred": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยู่ไอ"
+      },
+      {
+        "code": "06036148",
+        "gt": "สหกิจศึกษาต่างประเทศ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "วิชาเลือกเสรี 1"
+      },
+      {
+        "code": "96643021",
+        "gt": "ผู้ประกอบการสมัยใหม่",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* ผู้ประกอบการสมัยใหม่"
+      },
+      {
+        "code": "06036103",
+        "gt": "บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ",
+        "pred": "ปูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ กลุ่มวิชาที่ 1-4"
+      },
+      {
+        "code": "96644042",
+        "gt": "การสื่อสารและการนำเสนออย่างมืออาชีพ",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* การสื่อสารและการนำเสนอย่างมืออาชีพ"
+      },
+      {
+        "code": "96642033",
+        "gt": "กฎหมายสำหรับคนรุ่นใหม่",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* กฎหมายสำหรับคนรุ่นใหม่"
+      },
+      {
+        "code": "06036147",
+        "gt": "สหกิจศึกษา",
+        "pred": null
+      }
+    ],
+    "name_en": [
+      {
+        "code": "06036135",
+        "gt": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY2",
+        "pred": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 2"
+      },
+      {
+        "code": "06036144",
+        "gt": "EVALUATING USERINTERFACE",
+        "pred": "EVALUATING USER INTERFACE"
+      },
+      {
+        "code": "06036148",
+        "gt": "OVERSEA COOPERATIVE EDUCATION",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "FREE ELECTIVE COURSE 1"
+      },
+      {
+        "code": "06036134",
+        "gt": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY1",
+        "pred": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 1"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX",
+        "gt": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY1 OR COURSE GROUP1-4",
+        "pred": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4"
+      },
+      {
+        "code": "06036133",
+        "gt": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY2",
+        "pred": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 2"
+      },
+      {
+        "code": "06036132",
+        "gt": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY1",
+        "pred": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1"
+      },
+      {
+        "code": "06036136",
+        "gt": "ROBOTIC PROCESS AUTOMATION FORBUSINESS",
+        "pred": "ROBOTIC PROCESS AUTOMATION FOR BUSINESS"
+      }
+    ],
+    "credits": [
+      {
+        "code": "06036142",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036135",
+        "gt": "3(2-2-5)",
+        "pred": null
+      },
+      {
+        "code": "06036128",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036144",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036143",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036148",
+        "gt": "6(0-35-0)",
+        "pred": null
+      },
+      {
+        "code": "06036116",
+        "gt": null,
+        "pred": "3(2-2-5)"
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "3(3-0-6)"
+      },
+      {
+        "code": "PLACEHOLDER_96644XXX",
+        "gt": "3(3-0-6) หรือ 3(2-2-5)",
+        "pred": "3(3-0-6)"
+      },
+      {
+        "code": "06036134",
+        "gt": "3(2-2-5)",
+        "pred": null
+      }
+    ],
+    "year": [
+      {
+        "code": "06036148",
+        "gt": 0,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": 4
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": 4
+      },
+      {
+        "code": "06036147",
+        "gt": 0,
+        "pred": null
+      }
+    ],
+    "semester": [
+      {
+        "code": "06036148",
+        "gt": 0,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": 2
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": 2
+      },
+      {
+        "code": "06036147",
+        "gt": 0,
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "06036148",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "หมวดวิชาเสรี"
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "หมวดวิชาเลือกเสรี",
+        "pred": "หมวดวิชาเสรี"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036147",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      }
+    ],
+    "type": [
+      {
+        "code": "06036148",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": null,
+        "pred": "เลือก"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX_2",
+        "gt": null,
+        "pred": "เลือก"
+      },
+      {
+        "code": "06036147",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "BIT_academic_plan_no_coop.json"
+  ]
+}

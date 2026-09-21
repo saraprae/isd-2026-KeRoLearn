@@ -1,0 +1,386 @@
+{
+  "markdown": {
+    "tokenizer": "whitespace (fallback)",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 266,
+        "cer": 0.180451,
+        "wer": null,
+        "exact_match_acc": 0.819549,
+        "n_sub": 0,
+        "n_del": 384,
+        "n_ins": 0,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2128,
+        "error_samples": [
+          {
+            "key": "90641001 [ตกแถว]",
+            "gt": "90641001",
+            "pred": ""
+          },
+          {
+            "key": "90641002 [ตกแถว]",
+            "gt": "90641002",
+            "pred": ""
+          },
+          {
+            "key": "90641003 [ตกแถว]",
+            "gt": "90641003",
+            "pred": ""
+          },
+          {
+            "key": "90642004 [ตกแถว]",
+            "gt": "90642004",
+            "pred": ""
+          },
+          {
+            "key": "90642005 [ตกแถว]",
+            "gt": "90642005",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 266,
+        "cer": 0.145272,
+        "wer": 0.307692,
+        "exact_match_acc": 0.733083,
+        "n_sub": 13,
+        "n_del": 883,
+        "n_ins": 15,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 6271,
+        "error_samples": [
+          {
+            "key": "90642054",
+            "gt": "สิ่งพิทักษ์ร่างกาย",
+            "pred": "สิ่งพีทักษ์ร่างกาย"
+          },
+          {
+            "key": "90642057",
+            "gt": "ภูมิคุ้มกาย",
+            "pred": "ภูมิคุ้มกัน"
+          },
+          {
+            "key": "90642083",
+            "gt": "ศิลปะแห่งภาพยนต์",
+            "pred": "ศิลปะแห่งภาพยนตร์"
+          },
+          {
+            "key": "90642122",
+            "gt": "การใช้แอพลิเคชัน ไมโครคอมพิวเตอร์",
+            "pred": "การใช้แอปพลิเคชันไมโครคอมพิวเตอร์"
+          },
+          {
+            "key": "90642125",
+            "gt": "การดำรงชีวิตท่ามกลางภัยพิบัติและวิกฤตในอนาคต",
+            "pred": "การดำรงชีพท่ามกลางภัยพิบัติและวิกฤติในอนาคต"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 266,
+        "cer": 0.146411,
+        "wer": 0.144273,
+        "exact_match_acc": 0.781955,
+        "n_sub": 4,
+        "n_del": 867,
+        "n_ins": 6,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 5990,
+        "error_samples": [
+          {
+            "key": "90642001",
+            "gt": "PRACTICE UNDER PERSONAL AND PROFESSIONAL SKILLS 1",
+            "pred": "PRACTICE UNDER PERSONAL AND PROFESSIONAL SKILLS"
+          },
+          {
+            "key": "90642030",
+            "gt": "ENGINEERING ETHICS AND LAWS",
+            "pred": "ENGINEERING ETHICS AND LAW"
+          },
+          {
+            "key": "90642046",
+            "gt": "RICE-SARA",
+            "pred": "RICE-SARAB"
+          },
+          {
+            "key": "90642095",
+            "gt": "NATIONAL SECURITY DEVELOPMENT",
+            "pred": "NATIONAL SECURITY DEVELOPMENTMENT"
+          },
+          {
+            "key": "90642118",
+            "gt": "APPLICATION SOFTWARE FOR BUSSINESS",
+            "pred": "APPLICATION SOFTWARE FOR BUSINESS"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 266,
+        "cer": 0.219822,
+        "wer": null,
+        "exact_match_acc": 0.778195,
+        "n_sub": 3,
+        "n_del": 465,
+        "n_ins": 0,
+        "n_missing": 58,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2129,
+        "error_samples": [
+          {
+            "key": "90642033",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "90642034",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "90642035",
+            "gt": "3(0-18-0)",
+            "pred": "None"
+          },
+          {
+            "key": "90642084",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "90642103",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 266,
+        "cer": 0.180451,
+        "wer": null,
+        "exact_match_acc": 0.819549,
+        "n_sub": 0,
+        "n_del": 48,
+        "n_ins": 0,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 266,
+        "error_samples": [
+          {
+            "key": "90641001 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90641002 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90641003 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90642004 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90642005 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 266,
+        "cer": 0.180451,
+        "wer": null,
+        "exact_match_acc": 0.819549,
+        "n_sub": 0,
+        "n_del": 912,
+        "n_ins": 0,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 5054,
+        "error_samples": [
+          {
+            "key": "90641001 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90641002 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90641003 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90642004 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90642005 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 266,
+        "cer": 0.180451,
+        "wer": null,
+        "exact_match_acc": 0.819549,
+        "n_sub": 0,
+        "n_del": 240,
+        "n_ins": 0,
+        "n_missing": 48,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1330,
+        "error_samples": [
+          {
+            "key": "90641001 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90641002 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90641003 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90642004 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90642005 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 218,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 0.995413,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 41,
+        "n_missing": 0,
+        "n_hallucinated": 1,
+        "n_ref_chars": 0,
+        "error_samples": [
+          {
+            "key": "90642020",
+            "gt": "None",
+            "pred": "การออกแบบสะเต็มอย่างสร้างสรรค์ขั้นพื้นฐาน"
+          }
+        ]
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 218,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 0,
+        "error_samples": []
+      }
+    },
+    "overall_micro_cer": 0.167516,
+    "alignment": {
+      "matched": 218,
+      "missed": 48,
+      "spurious": 66,
+      "precision": 0.7676,
+      "recall": 0.8195,
+      "f1": 0.7927,
+      "gt_total": 266,
+      "pred_total": 284,
+      "missed_codes": [
+        "90641001",
+        "90641002",
+        "90641003",
+        "90642004",
+        "90642005",
+        "90642006",
+        "90642007",
+        "90642008",
+        "90642009",
+        "90642010",
+        "90642016",
+        "90642023",
+        "90642027",
+        "90642053",
+        "90642064",
+        "90642065",
+        "90642066",
+        "90642067",
+        "90642068",
+        "90642069"
+      ],
+      "spurious_codes": [
+        "90641004",
+        "90641005",
+        "90641006",
+        "90641007",
+        "90641008",
+        "90641009",
+        "90641010",
+        "90642160",
+        "90642161",
+        "90642162",
+        "90642163",
+        "90642164",
+        "90642167",
+        "90642168",
+        "90642169",
+        "90642170",
+        "90642175",
+        "90642176",
+        "90642177",
+        "90642178"
+      ]
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 284,
+      "n_duplicate_keys": 0,
+      "credits_by_term": {},
+      "total_credits_fixed_terms": 0,
+      "issues": [
+        "90642124: name_th อาจมีคำอังกฤษปนอยู่: 'เทคโนโลยีและนวัตกรรมทางวิทยาศาสตร์สำหรับ SDGs'"
+      ]
+    }
+  }
+}

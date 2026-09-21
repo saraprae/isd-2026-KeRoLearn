@@ -1,0 +1,17 @@
+opencv-python
+pillow
+numpy
+pandas
+pdf2image
+pytesseract
+paddleocr
+paddlepaddle
+transformers
+torch
+torchvision
+jiwer
+python-Levenshtein
+rapidfuzz
+pydantic
+PyYAML
+rich

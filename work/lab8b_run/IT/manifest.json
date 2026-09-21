@@ -1,0 +1,39 @@
+{
+  "program": "IT",
+  "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\IT\\pred_vlm.json",
+  "split_by_plan": true,
+  "split_stats": {
+    "rows": 116,
+    "only_one_plan": 15,
+    "in_both_plans": 46,
+    "unclassified_kept_in_both": 55,
+    "no_page_info": 0
+  },
+  "warnings": [],
+  "programs": [
+    {
+      "program_id": "IT_nocoop",
+      "section": "nocoop",
+      "dir": "nocoop",
+      "curriculum": "nocoop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 109,
+      "courses": 104,
+      "plan_items": 52,
+      "elective_slots": 55,
+      "courses_with_source_page": 104
+    },
+    {
+      "program_id": "IT_coop",
+      "section": "coop",
+      "dir": "coop",
+      "curriculum": "coop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 108,
+      "courses": 103,
+      "plan_items": 51,
+      "elective_slots": 55,
+      "courses_with_source_page": 103
+    }
+  ]
+}

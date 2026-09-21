@@ -1,0 +1,21 @@
+{
+  "program": "AIT",
+  "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\AIT\\pred_vlm.json",
+  "split_by_plan": false,
+  "split_stats": null,
+  "warnings": [],
+  "programs": [
+    {
+      "program_id": "AIT",
+      "section": null,
+      "dir": ".",
+      "curriculum": "curriculum.json",
+      "status": "ok",
+      "source_courses": 57,
+      "courses": 51,
+      "plan_items": 36,
+      "elective_slots": 16,
+      "courses_with_source_page": 51
+    }
+  ]
+}

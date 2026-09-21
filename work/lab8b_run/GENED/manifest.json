@@ -1,0 +1,21 @@
+{
+  "program": "GENED",
+  "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\GENED\\pred_vlm.json",
+  "split_by_plan": false,
+  "split_stats": null,
+  "warnings": [],
+  "programs": [
+    {
+      "program_id": "GENED",
+      "section": null,
+      "dir": ".",
+      "curriculum": "curriculum.json",
+      "status": "ok",
+      "source_courses": 284,
+      "courses": 284,
+      "plan_items": 0,
+      "elective_slots": 284,
+      "courses_with_source_page": 284
+    }
+  ]
+}

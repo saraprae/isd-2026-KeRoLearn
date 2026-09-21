@@ -1,0 +1,311 @@
+{
+  "n_gt_courses": 287,
+  "n_pred_courses": 284,
+  "per_field": {
+    "code": {
+      "tp": 284,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9895,
+      "f1": 0.9947
+    },
+    "name_th": {
+      "tp": 265,
+      "fp": 19,
+      "fn": 22,
+      "precision": 0.9331,
+      "recall": 0.9233,
+      "f1": 0.9282
+    },
+    "name_en": {
+      "tp": 275,
+      "fp": 9,
+      "fn": 12,
+      "precision": 0.9683,
+      "recall": 0.9582,
+      "f1": 0.9632
+    },
+    "credits": {
+      "tp": 263,
+      "fp": 1,
+      "fn": 24,
+      "precision": 0.9962,
+      "recall": 0.9164,
+      "f1": 0.9546
+    },
+    "year": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "semester": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "category": {
+      "tp": 284,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9895,
+      "f1": 0.9947
+    },
+    "type": {
+      "tp": 284,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9895,
+      "f1": 0.9947
+    },
+    "prerequisite": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  },
+  "micro": {
+    "tp": 1655,
+    "fp": 31,
+    "fn": 67,
+    "precision": 0.9816,
+    "recall": 0.9611,
+    "f1": 0.9712
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "90642127",
+        "gt": "90642127",
+        "pred": null
+      },
+      {
+        "code": "90642053",
+        "gt": "90642053",
+        "pred": null
+      },
+      {
+        "code": "90642199",
+        "gt": "90642199",
+        "pred": null
+      }
+    ],
+    "name_th": [
+      {
+        "code": "90644055",
+        "gt": "ไวยากรณ์ภาษาจีนพื้นฐาน และสำนวนและสุภาษิตภาษาจีน",
+        "pred": "ไวยากรณ์ภาษาจีนพื้นฐานและสำนวนและสุภาษิตภาษาจีน"
+      },
+      {
+        "code": "90644044",
+        "gt": "พูดได้ พูดดี พูดเป็น",
+        "pred": "พูดได้พูดดีพูดเป็น"
+      },
+      {
+        "code": "90642057",
+        "gt": "ภูมิคุ้มกาย",
+        "pred": "ภูมิคุ้มกัน"
+      },
+      {
+        "code": "90642127",
+        "gt": "รักษ์โลก",
+        "pred": null
+      },
+      {
+        "code": "90643003",
+        "gt": "ปฏิบัติงานตามทักษะด้านการจัดการ 3",
+        "pred": "ปฏิบัติงานตามทักษะด้านการจัดการ"
+      },
+      {
+        "code": "90643016",
+        "gt": "สนุกกับธุรกิจออนไลน์",
+        "pred": "สนุกกับธุรกิจอ่อนไลน์"
+      },
+      {
+        "code": "90643042",
+        "gt": "ฮาร์ดเพาเวอร์และซอฟท์เพาเวอร์",
+        "pred": "ฮาร์ดเพาเวอร์และซอฟต์เพาเวอร์"
+      },
+      {
+        "code": "90643027",
+        "gt": "มนุษย์ เงิน และคณิตศาสตร์",
+        "pred": "มนุษย์เงินและคณิตศาสตร์"
+      },
+      {
+        "code": "90642053",
+        "gt": "สาระน่ารู้อณูพันธุศาสตร์",
+        "pred": null
+      },
+      {
+        "code": "90643002",
+        "gt": "ปฏิบัติงานตามทักษะด้านการจัดการ 2",
+        "pred": "ปฏิบัติงานตามทักษะด้านการจัดการ"
+      }
+    ],
+    "name_en": [
+      {
+        "code": "90642210",
+        "gt": "MY CAT’S MY BOSS",
+        "pred": "MY CAT'S MY BOSS"
+      },
+      {
+        "code": "90642127",
+        "gt": "THINK EARTH",
+        "pred": null
+      },
+      {
+        "code": "90642053",
+        "gt": "INTERESTING MOLECULAR GENETICS",
+        "pred": null
+      },
+      {
+        "code": "90643002",
+        "gt": "PRACTICE UNDER MANAGEMENT SKILLS 2",
+        "pred": "PRACTICE UNDER MANAGEMENT SKILLS"
+      },
+      {
+        "code": "90642095",
+        "gt": "NATIONAL SECURITY DEVELOPMENT",
+        "pred": "NATIONAL SECURITY DEVELOPMENTMENT"
+      },
+      {
+        "code": "90642199",
+        "gt": "INTEGRATED CREATIVE ART AND DESIGN",
+        "pred": null
+      },
+      {
+        "code": "90642154",
+        "gt": "FAIL-ABLE",
+        "pred": "FAIRABLE"
+      },
+      {
+        "code": "90642209",
+        "gt": "MY DOG’S MY BOSS",
+        "pred": "MY DOG'S MY BOSS"
+      },
+      {
+        "code": "90642046",
+        "gt": "RICE-SARA",
+        "pred": "RICE-SARAB"
+      },
+      {
+        "code": "90642118",
+        "gt": "APPLICATION SOFTWARE FOR BUSSINESS",
+        "pred": "APPLICATION SOFTWARE FOR BUSINESS"
+      }
+    ],
+    "credits": [
+      {
+        "code": "90643041",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90643038",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90642127",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90643042",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90643047",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90644002",
+        "gt": "2(0-4-2)",
+        "pred": null
+      },
+      {
+        "code": "90643046",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90642034",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90642033",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90643040",
+        "gt": "3(3-0-6)",
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "90642127",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90642053",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90642199",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      }
+    ],
+    "type": [
+      {
+        "code": "90642127",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90642053",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90642199",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ],
+    "prerequisite": [
+      {
+        "code": "90641006",
+        "gt": null,
+        "pred": "90641005"
+      },
+      {
+        "code": "90641005",
+        "gt": null,
+        "pred": "90641004"
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "general_education_ground_truth.json"
+  ]
+}

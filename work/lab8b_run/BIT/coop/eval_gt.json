@@ -1,0 +1,300 @@
+{
+  "n_gt_courses": 61,
+  "n_pred_courses": 59,
+  "per_field": {
+    "code": {
+      "tp": 59,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9672,
+      "f1": 0.9833
+    },
+    "name_th": {
+      "tp": 55,
+      "fp": 4,
+      "fn": 6,
+      "precision": 0.9322,
+      "recall": 0.9016,
+      "f1": 0.9167
+    },
+    "name_en": {
+      "tp": 51,
+      "fp": 8,
+      "fn": 10,
+      "precision": 0.8644,
+      "recall": 0.8361,
+      "f1": 0.85
+    },
+    "credits": {
+      "tp": 45,
+      "fp": 4,
+      "fn": 15,
+      "precision": 0.9184,
+      "recall": 0.75,
+      "f1": 0.8257
+    },
+    "year": {
+      "tp": 59,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9672,
+      "f1": 0.9833
+    },
+    "semester": {
+      "tp": 59,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9672,
+      "f1": 0.9833
+    },
+    "category": {
+      "tp": 58,
+      "fp": 1,
+      "fn": 3,
+      "precision": 0.9831,
+      "recall": 0.9508,
+      "f1": 0.9667
+    },
+    "type": {
+      "tp": 59,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9672,
+      "f1": 0.9833
+    },
+    "prerequisite": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8
+    }
+  },
+  "micro": {
+    "tp": 447,
+    "fp": 17,
+    "fn": 43,
+    "precision": 0.9634,
+    "recall": 0.9122,
+    "f1": 0.9371
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "06036145",
+        "gt": "06036145",
+        "pred": null
+      },
+      {
+        "code": "06036146",
+        "gt": "06036146",
+        "pred": null
+      }
+    ],
+    "name_th": [
+      {
+        "code": "96643021",
+        "gt": "ผู้ประกอบการสมัยใหม่",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* ผู้ประกอบการสมัยใหม่"
+      },
+      {
+        "code": "96642033",
+        "gt": "กฎหมายสำหรับคนรุ่นใหม่",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* กฎหมายสำหรับคนรุ่นใหม่"
+      },
+      {
+        "code": "96644042",
+        "gt": "การสื่อสารและการนำเสนออย่างมืออาชีพ",
+        "pred": "กลุ่มวิชาที่กำหนดโดยคณะ* การสื่อสารและการนำเสนออย่างมืออาชีพ"
+      },
+      {
+        "code": "06036146",
+        "gt": "โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2",
+        "pred": null
+      },
+      {
+        "code": "06036143",
+        "gt": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยูไอ",
+        "pred": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยู่ไอ"
+      },
+      {
+        "code": "06036145",
+        "gt": "โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 1",
+        "pred": null
+      }
+    ],
+    "name_en": [
+      {
+        "code": "06036135",
+        "gt": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY2",
+        "pred": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 2"
+      },
+      {
+        "code": "06036133",
+        "gt": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY2",
+        "pred": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 2"
+      },
+      {
+        "code": "06036148",
+        "gt": "OVERSEA COOPERATIVE EDUCATION",
+        "pred": "OVERSEA COOPERPATE EDUCATION"
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX",
+        "gt": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY1 OR COURSE GROUP1-4",
+        "pred": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4"
+      },
+      {
+        "code": "06036146",
+        "gt": "PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2",
+        "pred": null
+      },
+      {
+        "code": "06036122",
+        "gt": "VISUAL COMMUNICATION FORBUSINESS",
+        "pred": "VISUAL COMMUNICATION FOR BUSINESS"
+      },
+      {
+        "code": "06036145",
+        "gt": "PROJECT IN BUSINESS INFORMATION TECHNOLOGY 1",
+        "pred": null
+      },
+      {
+        "code": "06036144",
+        "gt": "EVALUATING USERINTERFACE",
+        "pred": "EVALUATING USER INTERFACE"
+      },
+      {
+        "code": "06036132",
+        "gt": "SPECIALTOPICS IN BUSINESS INFORMATION TECHNOLOGY1",
+        "pred": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1"
+      },
+      {
+        "code": "06036134",
+        "gt": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY1",
+        "pred": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 1"
+      }
+    ],
+    "credits": [
+      {
+        "code": "06036140",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036135",
+        "gt": "3(2-2-5)",
+        "pred": null
+      },
+      {
+        "code": "06036128",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_06036XXX",
+        "gt": "3(3-0-6) หรือ 3(2-2-5)",
+        "pred": "3(3-0-6)"
+      },
+      {
+        "code": "06036146",
+        "gt": "3(0-9-0)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_96644XXX",
+        "gt": "3(3-0-6) หรือ 3(2-2-5)",
+        "pred": "3(3-0-6)"
+      },
+      {
+        "code": "06036143",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036116",
+        "gt": null,
+        "pred": "3(2-2-5)"
+      },
+      {
+        "code": "06036136",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06036145",
+        "gt": "3(0-9-0)",
+        "pred": null
+      }
+    ],
+    "year": [
+      {
+        "code": "06036146",
+        "gt": 0,
+        "pred": null
+      },
+      {
+        "code": "06036145",
+        "gt": 0,
+        "pred": null
+      }
+    ],
+    "semester": [
+      {
+        "code": "06036146",
+        "gt": 0,
+        "pred": null
+      },
+      {
+        "code": "06036145",
+        "gt": 0,
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "06036146",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "06036145",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "หมวดวิชาเลือกเสรี",
+        "pred": "หมวดวิชาเสรี"
+      }
+    ],
+    "type": [
+      {
+        "code": "06036146",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "06036145",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ],
+    "prerequisite": [
+      {
+        "code": "06036146",
+        "gt": "06036145",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "BIT_academic_plan_coop.json"
+  ]
+}

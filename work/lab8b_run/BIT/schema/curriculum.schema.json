@@ -1,0 +1,446 @@
+{
+  "$defs": {
+    "Course": {
+      "description": "รายวิชาหนึ่งวิชา ตามที่ปรากฏในหมวดคำอธิบายรายวิชา",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "name_th": {
+          "title": "Name Th",
+          "type": "string"
+        },
+        "name_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name En"
+        },
+        "credits": {
+          "anyOf": [
+            {
+              "maximum": 12,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credits"
+        },
+        "lecture_h": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lecture H"
+        },
+        "lab_h": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lab H"
+        },
+        "self_h": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Self H"
+        },
+        "description_th": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Th"
+        },
+        "source_page": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Page"
+        }
+      },
+      "required": [
+        "code",
+        "name_th"
+      ],
+      "title": "Course",
+      "type": "object"
+    },
+    "ElectiveSlot": {
+      "description": "วิชาที่เล่มไม่ผูกไว้กับปี/เทอมเดียว แต่บอกว่า \"เรียนได้ปีไหนบ้าง\"\n\nเล่มจริงเขียน year: 0, semester: 0 พร้อม flexible_year_semester\nเช่น \"3/1, 3/2, 4/1\"\nถ้าโยนทิ้งเพราะปี/เทอมไม่อยู่ในช่วง 1..8 / 1..3 ข้อมูลจะหายเงียบ\nแล้วระบบจะตอบ \"ไม่พบข้อมูลนี้ในเล่มหลักสูตร\" ทั้งที่เล่มมีคำตอบอยู่",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "allowed_terms": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allowed Terms"
+        },
+        "name_th": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name Th"
+        },
+        "name_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name En"
+        },
+        "credits": {
+          "anyOf": [
+            {
+              "maximum": 12,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credits"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "source_page": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Page"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "ElectiveSlot",
+      "type": "object"
+    },
+    "PlanItem": {
+      "description": "หนึ่งบรรทัดในแผนการศึกษา\n\nalt_group คือกลไกจัดการ \"วิชาเลือกอย่างใดอย่างหนึ่ง\"\nเล่มหลักสูตรเขียนว่า  06026259 หรือ 06026260\nเราแตกเป็นสองแถวที่มี alt_group เดียวกัน\nเวลานับหน่วยกิตจึงนับ alt_group ละครั้งเดียว ไม่นับซ้ำ\n\nนี่คือบทเรียนตรงจาก Lab 7B: กฎตรวจที่ไม่รู้จักกรณีนี้\nจะเตือนผิดทุกครั้งที่เจอวิชาเลือก จนนักศึกษาเลิกอ่านคำเตือน\n\ncategory / type แยกเป็นคอลัมน์จริง ไม่ยัดรวมใน note\n    category = \"หมวดวิชาเฉพาะ\" / \"หมวดวิชาศึกษาทั่วไป\" / \"หมวดวิชาเลือกเสรี\"\n    type     = \"บังคับ\" / \"เลือก\"\nเหตุผล: คำถามจริงคือ \"วิชาบังคับมีกี่วิชา\" \"หน่วยกิตวิชาเลือกรวมเท่าไร\"\nถ้าเก็บรวมเป็นข้อความเดียว ต้องพึ่ง LIKE '%บังคับ%' ซึ่งพังทันที\nที่เล่มเขียนว่า \"ไม่บังคับ\" หรือ \"วิชาบังคับก่อน\"",
+      "properties": {
+        "year": {
+          "maximum": 8,
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        },
+        "semester": {
+          "maximum": 3,
+          "minimum": 1,
+          "title": "Semester",
+          "type": "integer"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "credits": {
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Credits",
+          "type": "integer"
+        },
+        "alt_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alt Group"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "source_page": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Page"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        }
+      },
+      "required": [
+        "year",
+        "semester",
+        "code",
+        "credits"
+      ],
+      "title": "PlanItem",
+      "type": "object"
+    },
+    "Prerequisite": {
+      "description": "ความสัมพันธ์วิชาบังคับก่อน / วิชาเรียนควบ",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "requires": {
+          "title": "Requires",
+          "type": "string"
+        },
+        "kind": {
+          "default": "pre",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "requires"
+      ],
+      "title": "Prerequisite",
+      "type": "object"
+    },
+    "Program": {
+      "description": "ข้อมูลหลักสูตรระดับบนสุด",
+      "properties": {
+        "program_id": {
+          "title": "Program Id",
+          "type": "string"
+        },
+        "name_th": {
+          "title": "Name Th",
+          "type": "string"
+        },
+        "name_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name En"
+        },
+        "degree": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Degree"
+        },
+        "total_credits": {
+          "maximum": 300,
+          "minimum": 0,
+          "title": "Total Credits",
+          "type": "integer"
+        },
+        "years": {
+          "maximum": 8,
+          "minimum": 1,
+          "title": "Years",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "program_id",
+        "name_th",
+        "total_credits",
+        "years"
+      ],
+      "title": "Program",
+      "type": "object"
+    }
+  },
+  "description": "เอกสารทั้งเล่มหนึ่งฉบับ",
+  "properties": {
+    "program": {
+      "$ref": "#/$defs/Program"
+    },
+    "courses": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Course"
+      },
+      "title": "Courses",
+      "type": "array"
+    },
+    "plan": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PlanItem"
+      },
+      "title": "Plan",
+      "type": "array"
+    },
+    "prerequisites": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Prerequisite"
+      },
+      "title": "Prerequisites",
+      "type": "array"
+    },
+    "elective_slots": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ElectiveSlot"
+      },
+      "title": "Elective Slots",
+      "type": "array"
+    }
+  },
+  "required": [
+    "program"
+  ],
+  "title": "Curriculum",
+  "type": "object"
+}

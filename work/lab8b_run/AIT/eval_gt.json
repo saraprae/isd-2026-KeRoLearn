@@ -1,0 +1,388 @@
+{
+  "n_gt_courses": 58,
+  "n_pred_courses": 51,
+  "per_field": {
+    "code": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "name_th": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "name_en": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "credits": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "year": {
+      "tp": 35,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8333,
+      "f1": 0.9091
+    },
+    "semester": {
+      "tp": 35,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8333,
+      "f1": 0.9091
+    },
+    "category": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "type": {
+      "tp": 51,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.8793,
+      "f1": 0.9358
+    },
+    "prerequisite": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "micro": {
+    "tp": 379,
+    "fp": 0,
+    "fn": 56,
+    "precision": 1.0,
+    "recall": 0.8713,
+    "f1": 0.9312
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "PLACEHOLDER_060464XX_2",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "PLACEHOLDER_XXXXXXXX_2",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "PLACEHOLDER_XXXXXXXX",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "PLACEHOLDER_9064XXXX",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "PLACEHOLDER_90644XXX",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "06016401",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "PLACEHOLDER_9064XXXX_2",
+        "pred": null
+      }
+    ],
+    "name_th": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "วิชาเลือกด้านภาษาและการสื่อสาร",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "วิชาเลือกหมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "วิชาเลือกหมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "คณิตศาสตร์สำหรับเทคโนโลยีสารสนเทศ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "วิชาเลือกเสรี 1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "วิชาเลือกเสรี 2",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "วิชาเลือกเทคโนโลยีปัญญาประดิษฐ์เฉพาะทาง",
+        "pred": null
+      }
+    ],
+    "name_en": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "LANGUAGE AND COMMUNICATION COURSES",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "GENERAL EDUCATION COURSES",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "GENERAL EDUCATION COURSES",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "MATHEMATICS FOR INFORMATION TECHNOLOGY",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "FREE ELECTIVE COURSE 1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "FREE ELECTIVE COURSE 2",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "ELECTIVE IN ARTIFICIAL INTELLIGENCE SPECIALIZATION",
+        "pred": null
+      }
+    ],
+    "credits": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "3(x-x-x)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "3(x-x-x)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "3(x-x-x)",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "3(x-x-x)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "3(x-x-x)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "6(3-0-6)",
+        "pred": null
+      }
+    ],
+    "year": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": 4,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": 4,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": 1,
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": 3,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": 4,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": 3,
+        "pred": null
+      }
+    ],
+    "semester": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": 1,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": 1,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": 2,
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": 2,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": 1,
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": 2,
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "หมวดวิชาเสรี",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "หมวดวิชาเสรี",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      }
+    ],
+    "type": [
+      {
+        "code": "PLACEHOLDER_90644XXX",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX_2",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_9064XXXX",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "06016401",
+        "gt": "บังคับ",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_060464XX_2",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "AIT_academic_plan.json"
+  ]
+}
