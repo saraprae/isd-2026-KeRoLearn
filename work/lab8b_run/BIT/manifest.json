@@ -3,10 +3,10 @@
   "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\BIT\\pred_vlm.json",
   "split_by_plan": true,
   "split_stats": {
-    "rows": 70,
-    "only_one_plan": 16,
-    "in_both_plans": 35,
-    "unclassified_kept_in_both": 19,
+    "rows": 79,
+    "only_one_plan": 26,
+    "in_both_plans": 21,
+    "unclassified_kept_in_both": 32,
     "no_page_info": 0
   },
   "warnings": [],
@@ -17,11 +17,11 @@
       "dir": "nocoop",
       "curriculum": "nocoop\\curriculum.json",
       "status": "ok",
-      "source_courses": 62,
-      "courses": 61,
-      "plan_items": 43,
-      "elective_slots": 19,
-      "courses_with_source_page": 61
+      "source_courses": 64,
+      "courses": 63,
+      "plan_items": 32,
+      "elective_slots": 32,
+      "courses_with_source_page": 63
     },
     {
       "program_id": "BIT_coop",
@@ -29,11 +29,11 @@
       "dir": "coop",
       "curriculum": "coop\\curriculum.json",
       "status": "ok",
-      "source_courses": 62,
-      "courses": 59,
-      "plan_items": 43,
-      "elective_slots": 19,
-      "courses_with_source_page": 59
+      "source_courses": 68,
+      "courses": 61,
+      "plan_items": 36,
+      "elective_slots": 32,
+      "courses_with_source_page": 61
     }
   ]
 }

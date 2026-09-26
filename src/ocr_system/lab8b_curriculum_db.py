@@ -664,15 +664,46 @@ def cmd_extract(args) -> None:
 
 # ── นำ JSON จาก Lab 7B มาใช้ต่อโดยไม่เรียก LLM ซ้ำ ─────────────────────────
 
+# นำหน้าชื่อวิชาบางรายวิชา (กลุ่มวิชาเลือกที่คณะกำหนด) ด้วยข้อความคงที่นี้ในเล่ม
+# แต่ Lab 7B OCR/VLM ดันดึงติดมาเป็นส่วนหนึ่งของ name_th แทนที่จะแยกออก —
+# ตัดออกตรงนี้เพื่อให้ name_th ตรงกับชื่อวิชาจริงตามเฉลย (GT ไม่มีข้อความนี้)
+_FACULTY_ELECTIVE_PREFIX_RE = re.compile(r"^กลุ่มวิชาที่กำหนดโดยคณะ\*?\s*")
+
+# ชื่อย่อหมวดวิชาที่ Lab 7B อ่านมาไม่ตรงกับชื่อเต็มที่ใช้ในเฉลย (GT) — แม็ปให้ตรงกัน
+_CATEGORY_ALIASES = {
+    "หมวดวิชาเสรี": "หมวดวิชาเลือกเสรี",
+}
+
+
+def _normalize_name_th(name_th: str | None) -> str | None:
+    """ตัดข้อความนำหน้าคงที่ (กลุ่มวิชาที่กำหนดโดยคณะ*) ออกจากชื่อวิชา ถ้ามี"""
+    if not name_th:
+        return name_th
+    return _FACULTY_ELECTIVE_PREFIX_RE.sub("", name_th).strip() or name_th
+
+
+def _normalize_category(category: str | None) -> str | None:
+    """แม็ปชื่อย่อหมวดวิชาที่ไม่ตรงเฉลยให้เป็นชื่อเต็มมาตรฐาน"""
+    if not category:
+        return category
+    return _CATEGORY_ALIASES.get(category, category)
+
+
 def _credit_parts(value: Any) -> tuple[int | None, int | None, int | None, int | None]:
-    """แปล 3(2-2-5) ของ Lab 7B เป็นคอลัมน์ตัวเลขของ Lab 8B"""
+    """แปล 3(2-2-5) ของ Lab 7B เป็นคอลัมน์ตัวเลขของ Lab 8B
+
+    บางวิชาในเล่ม (เช่น วิชาเลือกเสรี, สหกิจศึกษา, โครงงาน) เขียนเป็น 3(x-x-x)
+    แทนที่จะเป็นตัวเลข เพราะชั่วโมงบรรยาย-ปฏิบัติ-ศึกษาด้วยตนเองไม่คงที่/ไม่ระบุ
+    ไม่ใช่ข้อมูลอ่านผิด — ต้องรับได้ ไม่งั้นทั้งแถวจะถูกข้าม (ข้ามพร้อมทั้งวิชา ไม่ใช่แค่ชั่วโมง)
+    """
     text = str(value or "").strip()
-    m = re.search(r"(\d+)\s*\(\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*\)", text)
+    m = re.search(r"(\d+)\s*\(\s*(\d+|[xX]+)\s*-\s*(\d+|[xX]+)\s*-\s*(\d+|[xX]+)\s*\)", text)
     if m:
-        parts = tuple(map(int, m.groups()))
-        if parts[0] > 12:      # เกินขอบของ schema (credits <= 12) = อ่านผิด เช่น เลข "15 ชั่วโมง" ในคำอธิบายหลุดมา
-            raise ValueError(f"หน่วยกิต {parts[0]} เกิน 12 (น่าจะอ่านผิด): {value!r}")
-        return parts  # type: ignore[return-value]
+        credit = int(m.group(1))
+        if credit > 12:        # เกินขอบของ schema (credits <= 12) = อ่านผิด เช่น เลข "15 ชั่วโมง" ในคำอธิบายหลุดมา
+            raise ValueError(f"หน่วยกิต {credit} เกิน 12 (น่าจะอ่านผิด): {value!r}")
+        hours = tuple(int(g) if g.isdigit() else None for g in m.groups()[1:])
+        return (credit,) + hours  # type: ignore[return-value]
     # หน่วยกิตเดี่ยวต้องเป็นเลข 1-2 หลักล้วน ๆ — เลข 6 หลักขึ้นไปคือรหัสวิชาที่หลุดเข้าช่องหน่วยกิต
     m = re.fullmatch(r"(\d{1,2})(?:\s*หน่วยกิต)?", text)
     if not m:
@@ -733,9 +764,11 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
     """
     warnings: list[str] = []
     course_by_code: dict[str, dict] = {}
+    course_fingerprints: dict[str, tuple] = {}
     plan: list[dict] = []
     prerequisites: list[dict] = []
     slot_by_code: dict[str, dict] = {}
+    slot_fingerprints: dict[str, tuple] = {}
     seen_plan: set[tuple] = set()
     seen_pre: set[tuple] = set()
     wildcard_placeholders = 0
@@ -745,8 +778,8 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
         raw_code = str(src.get("code") or "").strip()
         codes = _lab7b_codes(raw_code)
         page = _lab7b_page(src)
-        category = (str(src.get("category")).strip()
-                    if src.get("category") else None)
+        category = _normalize_category(
+            str(src.get("category")).strip() if src.get("category") else None)
         ctype = str(src.get("type")).strip() if src.get("type") else None
         note = str(src.get("note")).strip() if src.get("note") else None
 
@@ -781,10 +814,24 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
         if "หรือ" in str(src.get("credits") or ""):
             warnings.append(f"{raw_code}: หน่วยกิตมีหลายแบบ; ใช้แบบแรก")
 
+        try:
+            year = int(src.get("year"))
+            semester = int(src.get("semester"))
+        except (TypeError, ValueError):
+            year = semester = 0
+
+        flexible = str(src.get("flexible_year_semester") or "").strip() or None
+
+        # รหัส wildcard เดียวกัน (เช่น 90644xxx) โผล่คนละปี/เทอมได้จริง = คนละวิชา
+        # ต้องเช็ค fingerprint (ชื่อ+ปี+เทอม) ก่อนรวม ไม่ใช่ dict merge ตรงๆ — ใช้ helper
+        # เดียวกับ _index_by_code() ที่ฝั่ง eval-gt ใช้ (ดูคอมเมนต์ที่ _dedup_insert)
+        # มิฉะนั้นวิชาที่ 2/3/4 จะถูกทับเงียบๆ ตั้งแต่ขั้น convert ก่อน eval จะได้เห็นด้วยซ้ำ
+        resolved_codes: list[str] = []
         for code in codes:
             candidate = {
                 "code": code,
-                "name_th": str(src.get("name_th") or raw_code or code).strip(),
+                "name_th": _normalize_name_th(
+                    str(src.get("name_th") or raw_code or code).strip()),
                 "name_en": (str(src["name_en"]).replace("\n", " ").strip()
                             if src.get("name_en") else None),
                 "credits": credit,
@@ -794,21 +841,9 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
                 "description_th": src.get("description_th"),
                 "source_page": page,
             }
-            old = course_by_code.get(code)
-            if old is None:
-                course_by_code[code] = candidate
-            else:
-                for key, value in candidate.items():
-                    if old.get(key) in (None, "") and value not in (None, ""):
-                        old[key] = value
-
-        try:
-            year = int(src.get("year"))
-            semester = int(src.get("semester"))
-        except (TypeError, ValueError):
-            year = semester = 0
-
-        flexible = str(src.get("flexible_year_semester") or "").strip() or None
+            fp = (candidate["name_th"], str(year), str(semester))
+            resolved_codes.append(
+                _dedup_insert(course_by_code, course_fingerprints, code, fp, candidate))
 
         if not (1 <= year <= 8 and 1 <= semester <= 3):
             # ── ปี/เทอมไม่ชัดเจน — เก็บเป็น elective_slot แทนการทิ้ง ──────
@@ -816,24 +851,20 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             #    30 วิชาหายไปทั้งกลุ่ม พอมีคนถาม "06026240 เรียนได้ตอนไหน"
             #    ระบบตอบว่าไม่พบ ทั้งที่เล่มเขียนไว้ว่า 3/1, 3/2 หรือ 4/1
             flexible_slots += 1
-            for code in codes:
+            for code in resolved_codes:
                 slot = {
                     "code": code,
                     "allowed_terms": flexible,
-                    "name_th": str(src.get("name_th") or "").strip() or None,
+                    "name_th": _normalize_name_th(
+                        str(src.get("name_th") or "").strip() or None),
                     "credits": credit,
                     "category": category,
                     "type": ctype,
                     "note": note,
                     "source_page": page,
                 }
-                old_slot = slot_by_code.get(code)
-                if old_slot is None:
-                    slot_by_code[code] = slot
-                else:
-                    for key, value in slot.items():
-                        if old_slot.get(key) in (None, "") and value not in (None, ""):
-                            old_slot[key] = value
+                fp = (slot["name_th"] or "", str(flexible or ""))
+                _dedup_insert(slot_by_code, slot_fingerprints, code, fp, slot)
             if not flexible:
                 warnings.append(
                     f"{raw_code}: ปี/เทอม={year}/{semester} และไม่มี "
@@ -842,8 +873,8 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             # alt_group จาก Lab 7B (สหกิจ "A หรือ B" ที่แยกเป็นสองแถวแล้ว) มาก่อน
             # ถ้าไม่มีค่อยใช้กฎเดิม: แถวเดียวที่มีหลายรหัส "A หรือ B"
             alt_group = (str(src["alt_group"]).strip() if src.get("alt_group")
-                         else (f"lab7b_alt_{index}" if len(codes) > 1 else None))
-            for code in codes:
+                         else (f"lab7b_alt_{index}" if len(resolved_codes) > 1 else None))
+            for code in resolved_codes:
                 key = (year, semester, code, alt_group)
                 if key not in seen_plan:
                     plan.append({"year": year, "semester": semester,
@@ -855,12 +886,22 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
                 elif is_slot:
                     # ช่องวิชาเดียวกันปรากฏซ้ำในภาคเดียวกัน (เช่น วิชาภาษา 2 ช่อง)
                     # ต้องแยกรหัสไม่ให้ชนกัน ไม่งั้น CHK6 จะเตือนว่าวิชาซ้ำ
+                    #
+                    # เดิมเช็คแค่ seen_plan (year,semester,code,alt_group) แต่ _dedup_insert()
+                    # ก็ใช้ suffix _2/_3/... เดียวกันนี้กับ course_by_code จากคนละเงื่อนไข (ต่างปี/เทอม)
+                    # ถ้าเช็คแค่ seen_plan อาจเลือก n ที่ _dedup_insert() จับจองไปแล้วใน course_by_code
+                    # แล้วเขียนทับวิชาคนละตัวเงียบๆ ตรงนี้ — ต้องเช็ค course_by_code ด้วยเสมอ
                     n = 2
-                    while (year, semester, f"{code}_{n}", alt_group) in seen_plan:
+                    while ((year, semester, f"{code}_{n}", alt_group) in seen_plan
+                           or f"{code}_{n}" in course_by_code):
                         n += 1
                     dup_code = f"{code}_{n}"
                     course_by_code[dup_code] = dict(course_by_code[code],
                                                     code=dup_code)
+                    # ลงทะเบียน fingerprint ของ dup_code ด้วย ไม่งั้น _dedup_insert() ในรอบถัดไป
+                    # จะเห็น fingerprints.get(dup_code) เป็น None แล้วเข้าใจว่า "ช่องว่าง" ยอมทับ/รวมได้
+                    course_fingerprints[dup_code] = (
+                        course_by_code[dup_code].get("name_th"), str(year), str(semester))
                     plan.append({"year": year, "semester": semester,
                                  "code": dup_code, "credits": credit,
                                  "alt_group": alt_group,
@@ -869,7 +910,7 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
                     seen_plan.add((year, semester, dup_code, alt_group))
 
         pre_codes = _lab7b_codes(src.get("prerequisite"))
-        for code in codes:
+        for code in resolved_codes:
             if is_placeholder(code):
                 continue            # ช่องวิชาไม่มีเงื่อนไขรายวิชาของตัวเอง
             for required in pre_codes:
@@ -1936,6 +1977,40 @@ def _norm_for_dup_check(c: dict) -> tuple:
             str(c.get("semester") or ""))
 
 
+def _dedup_insert(out: dict, fingerprints: dict, base_key: str,
+                   fp: tuple, record: dict) -> str:
+    """
+    แทรก record เข้า out โดยกัน wildcard code ชนกันข้ามหน้า/เทอม
+
+    ใช้ร่วมกันทั้ง _index_by_code() (ตอน eval-gt) และ convert_lab7b()
+    (ตอนแปลง Lab7B -> Lab8B) เดิมมีแค่ _index_by_code() ที่เช็ค fingerprint
+    ส่วน convert_lab7b() ยังทำ dict merge ตรงๆ ทำให้รหัส wildcard เดียวกัน
+    ที่จริงเป็นคนละวิชา (เช่น 90644xxx ที่ปี1/เทอม2 กับปี4/เทอม1) ทับกันเงียบๆ
+    ตั้งแต่ขั้น convert ก่อนที่ eval-gt บนไฟล์ curriculum.json ที่แปลงแล้วจะได้เห็นด้วยซ้ำ
+
+    ถือว่าเป็น "หน้าเดียวกันเจอซ้ำ" (รวมกัน) ก็ต่อเมื่อ fingerprint ตรงกันจริง
+    ถ้าไม่ตรง (คนละวิชา) จะแยก key ด้วยส่วนต่อท้าย _2, _3, ... แทนการทับ/ทิ้ง
+    คืนค่า key จริงที่ใช้เก็บ record นี้ (ผู้เรียกต้องใช้ค่านี้แทน base_key ต่อไป
+    เช่นตอนสร้างแถว plan/prerequisite ที่อ้างถึงวิชาเดียวกัน)
+    """
+    key = base_key
+    if is_placeholder(base_key):
+        # หา key ที่ว่าง หรือ key ที่ fingerprint ตรงกัน (แถวเดิมเจอซ้ำหน้า) เท่านั้น
+        n = 1
+        while key in out and fingerprints.get(key) not in (fp, None):
+            n += 1
+            key = f"{base_key}_{n}"
+    if key in out:
+        # วิชาเดียวกันปรากฏหลายหน้า — เติมช่องที่ยังว่างแทนการทับ
+        for f, v in record.items():
+            if out[key].get(f) in (None, "") and v not in (None, ""):
+                out[key][f] = v
+    else:
+        out[key] = dict(record, code=key)
+        fingerprints[key] = fp
+    return key
+
+
 def _index_by_code(courses: list[dict]) -> dict[str, dict]:
     """
     จัดทำดัชนีตามรหัสวิชา
@@ -1947,8 +2022,7 @@ def _index_by_code(courses: list[dict]) -> dict[str, dict]:
     "06026xxx" เจอ 4 ครั้ง = วิชาเลือกกลุ่มวิทยาการข้อมูล 1/2/3/4 คนละวิชากัน)
     โค้ดเดิม map ทุกตัวไปที่ key เดียวกันเสมอ (PLACEHOLDER_06026XXX) แล้ว "เติม
     เฉพาะฟิลด์ว่าง" ทำให้วิชาที่ 2/3/4 หายไปเงียบๆ เหลือวิชาเดียวในการเทียบผล
-    ตอนนี้: ถือว่าเป็น "หน้าเดียวกันเจอซ้ำ" (รวมกัน) ก็ต่อเมื่อชื่อ/ปี/เทอมตรงกันจริง
-    ถ้าไม่ตรง (คนละวิชา) จะแยก key ด้วยส่วนต่อท้าย _2, _3, ... แทนการทับ/ทิ้ง
+    ตอนนี้ใช้ _dedup_insert() ร่วมกับ convert_lab7b() (ดูคอมเมนต์ที่นั่น)
     """
     out: dict[str, dict] = {}
     fingerprints: dict[str, tuple] = {}
@@ -1963,21 +2037,7 @@ def _index_by_code(courses: list[dict]) -> dict[str, dict]:
         for k in keys:
             base_key = k.upper() if is_placeholder(k) else k
             fp = _norm_for_dup_check(c)
-            key = base_key
-            if is_placeholder(base_key):
-                # หา key ที่ว่าง หรือ key ที่ fingerprint ตรงกัน (แถวเดิมเจอซ้ำหน้า) เท่านั้น
-                n = 1
-                while key in out and fingerprints.get(key) not in (fp, None):
-                    n += 1
-                    key = f"{base_key}_{n}"
-            if key in out:
-                # วิชาเดียวกันปรากฏหลายหน้า — เติมช่องที่ยังว่างแทนการทับ
-                for f, v in c.items():
-                    if out[key].get(f) in (None, "") and v not in (None, ""):
-                        out[key][f] = v
-            else:
-                out[key] = dict(c, code=key)
-                fingerprints[key] = fp
+            _dedup_insert(out, fingerprints, base_key, fp, c)
     return out
 
 

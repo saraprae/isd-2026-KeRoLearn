@@ -2,3 +2,13 @@ data/input/*.pdf
 venv/
 __pycache__/
 *.pyc
+probe_stream.py
+probe.py
+program_meta.json
+splice_intermediate.py
+handoff.md
+work/lab8b_run/page29_retry
+work/lab8b_run/page35_retry
+work/lab8b_run/page255_retry
+work/lab7b_run/BIT_patch
+eval_gt.json

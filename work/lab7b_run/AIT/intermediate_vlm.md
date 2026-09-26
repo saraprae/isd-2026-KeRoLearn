@@ -54,11 +54,11 @@
 
 ปีที่ 4 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06046442</td><td>โครงงานเทคโนโลยีปัญญาประดิษฐ์ 2<br/>PROJECT IN ARTIFICIAL INTELLIGENCE TECHNOLOGY 2</td><td>3 (0-9-0)</td></tr><tr><td>9064xxxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป<br/>GENERAL EDUCATION COURSES</td><td>3 (x-x-x)</td></tr><tr><td>9064xxxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร<br/>LANGUAGE AND COMMUNICATION COURSES</td><td>3 (x-x-x)</td></tr><tr><td>xXXXXXXXX</td><td>วิชาเลือกเสรี 2<br/>FREE ELECTIVE COURSE 2</td><td>3 (x-x-x)</td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06046442</td><td>โครงงานเทคโนโลยีปัญญาประดิษฐ์ 2<br/>PROJECT IN ARTIFICIAL INTELLIGENCE TECHNOLOGY 2</td><td>3 (0-9-0)</td></tr><tr><td>9064xxxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป<br/>GENERAL EDUCATION COURSES</td><td>3 (x-x-x)</td></tr><tr><td>90644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร<br/>LANGUAGE AND COMMUNICATION COURSES</td><td>3 (x-x-x)</td></tr><tr><td>xXXXXXXXX</td><td>วิชาเลือกเสรี 2<br/>FREE ELECTIVE COURSE 2</td><td>3 (x-x-x)</td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
 
 ปีที่ 4 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="2">06046443 หรือ<br/>06046444</td><td>สหกิจศึกษาทางเทคโนโลยีปัญญาประดิษฐ์<br/>COOPERATIVE EDUCATION IN ARTIFICIAL INTELLIGENCE TECHNOLOGY หรือ</td><td rowspan="2">6 (0-45-0)</td></tr><tr><td>สหกิจศึกษาต่างประเทศทางเทคโนโลยีปัญญาประดิษฐ์<br/>OVERSEA COOPERPERATIVE EDUCATION IN ARTIFICIAL INTELLIGENCE TECHNOLOGY</td></tr><tr><td colspan="2">รวม</td><td>6</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06046443 หรือ<br/>06046444</td><td>สหกิจศึกษาทางเทคโนโลยีปัญญาประดิษฐ์<br/>COOPERATIVE EDUCATION IN ARTIFICIAL<br/>INTELLIGENCE TECHNOLOGY หรือ<br/>สหกิจศึกษาต่างประเทศทางเทคโนโลยีปัญญาประดิษฐ์<br/>OVERSEA COOPERPIANETIC EDUCATION IN<br/>ARTIFICIAL INTELLIGENCE TECHNOLOGY</td><td>6 (0-45-0)</td></tr><tr><td></td><td rowspan="2">6 (0-45-0)</td></tr><tr><td></td></tr><tr><td colspan="2">รวม</td><td>6</td></tr></table>
 
 รวมตลอดหลักสูตร 120 หน่วยกิต
 

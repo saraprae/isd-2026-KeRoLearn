@@ -1,0 +1,194 @@
+{
+  "program": null,
+  "plan": null,
+  "courses": [
+    {
+      "code": "06036106",
+      "name_th": "การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่",
+      "name_en": "MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES",
+      "credits": "3(3-0-6)",
+      "year": 3,
+      "semester": 2,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "06036116",
+      "name_th": "การตลาดเชิงดิจิทัล",
+      "name_en": "DIGITAL MARKETING",
+      "credits": "3(2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "06036145",
+      "name_th": "โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 1",
+      "name_en": "PROJECT IN BUSINESS INFORMATION TECHNOLOGY 1",
+      "credits": "3(0-9-0)",
+      "year": 3,
+      "semester": 2,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "96643021",
+      "name_th": "ผู้ประกอบการสมัยใหม่",
+      "name_en": "MODERN ENTREPRENEURS",
+      "credits": "3(3-0-6)",
+      "year": 3,
+      "semester": 2,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "06036115",
+      "name_th": "ความมั่นคงของระบบสารสนเทศ",
+      "name_en": "INFORMATION SYSTEM SECURITY",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "06036146",
+      "name_th": "โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2",
+      "name_en": "PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2",
+      "credits": "3(0-9-0)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "96642033",
+      "name_th": "กฎหมายสำหรับคนรุ่นใหม่",
+      "name_en": "LAW FOR NEW GENERATION",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    },
+    {
+      "code": "9664xxxx",
+      "name_th": "วิชาเลือกหมวดวิชาศึกษาทั่วไปสำหรับหลักสูตรนานาชาติ 2",
+      "name_en": "GE ELECTIVE COURSE REQUIREMENT 2",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
+      "source_page": 29
+    }
+  ],
+  "_meta": {
+    "pipeline": "vlm",
+    "extract_mode": "rules",
+    "elapsed_sec": 27.9,
+    "models": {
+      "ocr": "scb10x/typhoon-ocr1.5-3b",
+      "text": "qwen3:4b"
+    },
+    "dpi": 150,
+    "pages_per_chunk": 1,
+    "pages_spec": "29",
+    "ocr_failed_pages": [],
+    "rules": {
+      "term_checks": [
+        {
+          "page": 29,
+          "term": "3/2",
+          "rows": 4,
+          "sum": 12,
+          "declared": 12,
+          "plan": null,
+          "year": 3,
+          "sem": 2,
+          "ok": true
+        },
+        {
+          "page": 29,
+          "term": "4/1",
+          "rows": 4,
+          "sum": 12,
+          "declared": 12,
+          "plan": null,
+          "year": 4,
+          "sem": 1,
+          "ok": true
+        }
+      ],
+      "tables_ok": true,
+      "description_courses": 0,
+      "elective_only_courses": 0,
+      "codes_without_description": [
+        "06036106",
+        "06036115",
+        "06036116",
+        "06036145",
+        "06036146",
+        "96642033",
+        "96643021"
+      ],
+      "skipped_tables": []
+    }
+  }
+}

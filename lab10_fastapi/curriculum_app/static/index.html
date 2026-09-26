@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curriculum Assistant</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 18px; line-height: 1.6; }
+    textarea { width: 100%; min-height: 90px; padding: 10px; box-sizing: border-box; }
+    button { margin-top: 10px; padding: 9px 18px; cursor: pointer; }
+    section { margin-top: 22px; padding: 16px; background: #f4f4f4; }
+    pre { overflow-x: auto; white-space: pre-wrap; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Curriculum Book Assistant</h1>
+  <p>Qwen แปลงคำถามเป็น SQL, SQLite ค้นข้อมูล แล้ว Qwen สรุปคำตอบ</p>
+  <p class="muted">ตัวอย่าง: “ปี 1 เทอม 1 เรียนกี่หน่วยกิต”</p>
+
+  <form id="ask-form">
+    <textarea id="question" required>หลักสูตรนี้มีหน่วยกิตรวมทั้งหมดเท่าไร</textarea>
+    <button type="submit">ถาม</button>
+  </form>
+
+  <section>
+    <h2>คำตอบ</h2><div id="answer">รอคำถาม...</div>
+    <h3>ค่าที่ได้จากฐานข้อมูล</h3><pre id="rows">-</pre>
+    <h3>SQL ที่ใช้</h3><pre id="sql">-</pre>
+  </section>
+
+  <script>
+    document.getElementById("ask-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const answer = document.getElementById("answer");
+      answer.textContent = "กำลังประมวลผล...";
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({question: document.getElementById("question").value})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "เกิดข้อผิดพลาด");
+        answer.textContent = data.answer;
+        document.getElementById("rows").textContent = JSON.stringify(data.rows, null, 2);
+        document.getElementById("sql").textContent = data.sql;
+      } catch (error) {
+        answer.textContent = `ผิดพลาด: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
+

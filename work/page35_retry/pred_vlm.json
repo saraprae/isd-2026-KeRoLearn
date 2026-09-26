@@ -1,0 +1,177 @@
+{
+  "program": null,
+  "plan": null,
+  "courses": [
+    {
+      "code": "06036115",
+      "name_th": "ความมั่นคงของระบบสารสนเทศ",
+      "name_en": "INFORMATION SYSTEM SECURITY",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        35
+      ],
+      "source_page": 35
+    },
+    {
+      "code": "96642033",
+      "name_th": "กฎหมายสำหรับคนรุ่นใหม่",
+      "name_en": "LAW FOR NEW GENERATION",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        35
+      ],
+      "source_page": 35
+    },
+    {
+      "code": "06036xxx",
+      "name_th": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือกลุ่มวิชาที่ 1-4",
+      "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP 1-4",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        35
+      ],
+      "source_page": 35
+    },
+    {
+      "code": "xxxxxxxx",
+      "name_th": "วิชาเลือกเสรี 2",
+      "name_en": "FREE ELECTIVE COURSE 2",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเลือกเสรี",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        35
+      ],
+      "source_page": 35
+    },
+    {
+      "code": "9664xxxx",
+      "name_th": "วิชาเลือกหมวดวิชาศึกษาทั่วไปสำหรับหลักสูตรนานาชาติ 2",
+      "name_en": "GE ELECTIVE COURSE REQUIREMENT 2",
+      "credits": "3(3-0-6)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        35
+      ],
+      "source_page": 35
+    },
+    {
+      "code": "06036147",
+      "name_th": "สหกิจศึกษา",
+      "name_en": "COOPERATIVE EDUCATION",
+      "credits": "6(0-35-0)",
+      "year": 4,
+      "semester": 2,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "เลือกอย่างใดอย่างหนึ่ง: 06036147 หรือ 06036148",
+      "pages": [
+        35
+      ],
+      "alt_group": "alt_y4s2_1",
+      "source_page": 35
+    },
+    {
+      "code": "06036148",
+      "name_th": "สหกิจศึกษาต่างประเทศ",
+      "name_en": "OVERSEA COOPERPATE EDUCATION",
+      "credits": "6(0-35-0)",
+      "year": 4,
+      "semester": 2,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "บังคับ",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": "เลือกอย่างใดอย่างหนึ่ง: 06036147 หรือ 06036148",
+      "pages": [
+        35
+      ],
+      "alt_group": "alt_y4s2_1",
+      "source_page": 35
+    }
+  ],
+  "total_credits": 126,
+  "_meta": {
+    "pipeline": "vlm",
+    "extract_mode": "rules",
+    "elapsed_sec": 30.2,
+    "models": {
+      "ocr": "scb10x/typhoon-ocr1.5-3b",
+      "text": "qwen3:4b"
+    },
+    "dpi": 150,
+    "pages_per_chunk": 1,
+    "pages_spec": "35",
+    "ocr_failed_pages": [],
+    "rules": {
+      "term_checks": [
+        {
+          "page": 35,
+          "term": "4/1",
+          "rows": 5,
+          "sum": 15,
+          "declared": 15,
+          "plan": null,
+          "year": 4,
+          "sem": 1,
+          "ok": true
+        },
+        {
+          "page": 35,
+          "term": "4/2",
+          "rows": 2,
+          "sum": 6,
+          "declared": 6,
+          "plan": null,
+          "year": 4,
+          "sem": 2,
+          "ok": true
+        }
+      ],
+      "tables_ok": true,
+      "description_courses": 0,
+      "elective_only_courses": 0,
+      "codes_without_description": [
+        "06036115",
+        "06036147",
+        "06036148",
+        "96642033"
+      ],
+      "skipped_tables": []
+    }
+  }
+}

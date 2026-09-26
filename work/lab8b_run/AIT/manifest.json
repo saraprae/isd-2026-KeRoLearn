@@ -12,10 +12,10 @@
       "curriculum": "curriculum.json",
       "status": "ok",
       "source_courses": 57,
-      "courses": 51,
-      "plan_items": 36,
+      "courses": 57,
+      "plan_items": 41,
       "elective_slots": 16,
-      "courses_with_source_page": 51
+      "courses_with_source_page": 57
     }
   ]
 }

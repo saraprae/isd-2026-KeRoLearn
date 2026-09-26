@@ -1,0 +1,81 @@
+{
+  "program": null,
+  "plan": null,
+  "courses": [
+    {
+      "code": "06036142",
+      "name_th": "การตลาดเชิงดิจิทัลขั้นสูง",
+      "name_en": "ADVANCED DIGITAL MARKETING",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "เลือก",
+      "prerequisite": null,
+      "flexible_year_semester": null,
+      "note": null,
+      "description_th": "การผสมผสานช่องทางการตลาดดิจิทัล การนำดิจิทัลมิกซ์ไปใช้, ความสำคัญของการวิเคราะห์เชิงคาดการณ์สำหรับการตลาดดิจิทัล ข้อมูลเชิงลึกของลูกค้าด้วยการวิเคราะห์การตลาดดิจิทัล เทคนิคการวิเคราะห์เชิงคาดการณ์ การนำการตลาดเชิงคาดการณ์ไปใช้ในช่องทางต่างๆ การเพิ่มประสิทธิภาพผลตอบแทนจากการลงทุน (ROI), อนาคตของการตลาดดิจิทัลแบบบูรณาการ",
+      "pages": [
+        255
+      ],
+      "source_page": 255
+    },
+    {
+      "code": "06036143",
+      "name_th": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยู่ไอ",
+      "name_en": "UX/UI REQUIREMENT AND PROTOTYPING",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "เลือก",
+      "prerequisite": null,
+      "flexible_year_semester": null,
+      "note": null,
+      "description_th": "หลักการการเก็บความต้องการจากประสบการณ์ผู้ใช้ กระบวนการเก็บความต้องการ เครื่องมือ การเก็บความต้องการ ความสำคัญของต้นแบบ ประเภทของการสร้างต้นแบบ การออกแบบ และเครื่องมือการสร้างต้นแบบ",
+      "pages": [
+        255
+      ],
+      "source_page": 255
+    },
+    {
+      "code": "06036144",
+      "name_th": "การประเมินส่วนต่อประสานผู้ใช้",
+      "name_en": "EVALUATING USER INTERFACE",
+      "credits": null,
+      "year": 0,
+      "semester": 0,
+      "category": "หมวดวิชาเฉพาะ",
+      "type": "เลือก",
+      "prerequisite": null,
+      "flexible_year_semester": null,
+      "note": null,
+      "description_th": "หลักการการประเมินส่วนต่อประสานมนุษย์ ชนิดการประเมิน ขั้นตอนการประเมิน องค์ประกอบที่สำคัญเพื่อใช้ประเมินการออกแบบส่วนต่อประสานมนุษย์ เครื่องมือที่ใช้ประเมินส่วนต่อประสานมนุษย์ เทคโนโลยีการประเมินในปัจจุบันที่เป็นที่นิยมในองค์กร วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)",
+      "pages": [
+        255
+      ],
+      "source_page": 255
+    }
+  ],
+  "_meta": {
+    "pipeline": "vlm",
+    "extract_mode": "rules",
+    "elapsed_sec": 16.6,
+    "models": {
+      "ocr": "scb10x/typhoon-ocr1.5-3b",
+      "text": "qwen3:4b"
+    },
+    "dpi": 150,
+    "pages_per_chunk": 1,
+    "pages_spec": "255",
+    "ocr_failed_pages": [],
+    "rules": {
+      "term_checks": [],
+      "tables_ok": true,
+      "description_courses": 3,
+      "elective_only_courses": 3,
+      "codes_without_description": [],
+      "skipped_tables": []
+    }
+  }
+}

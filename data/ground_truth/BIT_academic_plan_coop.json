@@ -241,7 +241,7 @@
     {
       "code": "06036122",
       "name_th": "การสื่อสารด้วยภาพสำหรับธุรกิจ",
-      "name_en": "VISUAL COMMUNICATION FORBUSINESS",
+      "name_en": "VISUAL COMMUNICATION FOR BUSINESS",
       "credits": "3(2-2-5)",
       "year": 2,
       "semester": 1,
@@ -449,7 +449,7 @@
     {
       "code": "06036xxx",
       "name_th": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ กลุ่มวิชาที่ 1-4",
-      "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY1 OR COURSE GROUP1-4",
+      "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 2,
@@ -501,7 +501,7 @@
     {
       "code": "06036xxx",
       "name_th": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือ กลุ่มวิชาที่ 1-4",
-      "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP1-4",
+      "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP 1-4",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,
       "semester": 1,
@@ -644,7 +644,7 @@
     {
       "code": "06036132",
       "name_th": "หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 1",
-      "name_en": "SPECIALTOPICS IN BUSINESS INFORMATION TECHNOLOGY1",
+      "name_en": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1",
       "credits": "3(3-0-6)",
       "year": 0,
       "semester": 0,
@@ -657,7 +657,7 @@
     {
       "code": "06036133",
       "name_th": "หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 2",
-      "name_en": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY2",
+      "name_en": "SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 2",
       "credits": "3(3-0-6)",
       "year": 0,
       "semester": 0,
@@ -670,7 +670,7 @@
     {
       "code": "06036134",
       "name_th": "ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 1",
-      "name_en": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY1",
+      "name_en": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 1",
       "credits": "3(2-2-5)",
       "year": 0,
       "semester": 0,
@@ -683,7 +683,7 @@
     {
       "code": "06036135",
       "name_th": "ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 2",
-      "name_en": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY2",
+      "name_en": "SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 2",
       "credits": "3(2-2-5)",
       "year": 0,
       "semester": 0,
@@ -800,7 +800,7 @@
     {
       "code": "06036144",
       "name_th": "การประเมินส่วนต่อประสานผู้ใช้",
-      "name_en": "EVALUATING USERINTERFACE",
+      "name_en": "EVALUATING USER INTERFACE",
       "credits": "3(3-0-6)",
       "year": 0,
       "semester": 0,

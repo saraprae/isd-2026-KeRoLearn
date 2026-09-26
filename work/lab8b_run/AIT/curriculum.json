@@ -141,6 +141,17 @@
       "source_page": 23
     },
     {
+      "code": "PLACEHOLDER_9064XXXX",
+      "name_th": "วิชาเลือกหมวดวิชาศึกษาทั่วไป",
+      "name_en": "GENERAL EDUCATION COURSES",
+      "credits": 3,
+      "lecture_h": null,
+      "lab_h": null,
+      "self_h": null,
+      "description_th": null,
+      "source_page": 23
+    },
+    {
       "code": "06066300",
       "name_th": "แนวคิดระบบฐานข้อมูล",
       "name_en": "DATABASE SYSTEM CONCEPTS",
@@ -339,6 +350,17 @@
       "source_page": 25
     },
     {
+      "code": "PLACEHOLDER_060464XX_2",
+      "name_th": "วิชาเลือกเทคโนโลยีปัญญาประดิษฐ์เฉพาะทาง",
+      "name_en": "ELECTIVE IN ARTIFICIAL INTELLIGENCE SPECIALIZATION",
+      "credits": 6,
+      "lecture_h": 3,
+      "lab_h": 0,
+      "self_h": 6,
+      "description_th": null,
+      "source_page": 25
+    },
+    {
       "code": "06046441",
       "name_th": "โครงงานเทคโนโลยีปัญญาประดิษฐ์ 1",
       "name_en": "PROJECT IN ARTIFICIAL INTELLIGENCE TECHNOLOGY 1",
@@ -361,6 +383,17 @@
       "source_page": 25
     },
     {
+      "code": "PLACEHOLDER_XXXXXXXX",
+      "name_th": "วิชาเลือกเสรี 1",
+      "name_en": "FREE ELECTIVE COURSE 1",
+      "credits": 3,
+      "lecture_h": null,
+      "lab_h": null,
+      "self_h": null,
+      "description_th": null,
+      "source_page": 25
+    },
+    {
       "code": "06046442",
       "name_th": "โครงงานเทคโนโลยีปัญญาประดิษฐ์ 2",
       "name_en": "PROJECT IN ARTIFICIAL INTELLIGENCE TECHNOLOGY 2",
@@ -369,6 +402,39 @@
       "lab_h": 9,
       "self_h": 0,
       "description_th": "ศึกษาค้นคว้าหรือวิจัยในหัวข้อปัจจุบันที่น่าสนใจเทคโนโลยีปัญญาประดิษฐ์ในรูปแบบโครงการ ที่สามารถประยุกต์ใช้ทฤษฎีที่เกี่ยวข้องทางการศึกษาด้านเทคโนโลยีสารสนเทศภายใต้การดูแลและแนะนำของอาจารย์ที่ปรึกษา สามารถนำเสนอหัวข้อ และผลการทดลองเบื้องต้นที่ได้จากการแก้ปัญหาเชิงปฏิบัติการ หรือจากการวิเคราะห์เชิงวิชาการ",
+      "source_page": 26
+    },
+    {
+      "code": "PLACEHOLDER_9064XXXX_2",
+      "name_th": "วิชาเลือกหมวดวิชาศึกษาทั่วไป",
+      "name_en": "GENERAL EDUCATION COURSES",
+      "credits": 3,
+      "lecture_h": null,
+      "lab_h": null,
+      "self_h": null,
+      "description_th": null,
+      "source_page": 26
+    },
+    {
+      "code": "PLACEHOLDER_90644XXX",
+      "name_th": "วิชาเลือกด้านภาษาและการสื่อสาร",
+      "name_en": "LANGUAGE AND COMMUNICATION COURSES",
+      "credits": 3,
+      "lecture_h": null,
+      "lab_h": null,
+      "self_h": null,
+      "description_th": null,
+      "source_page": 26
+    },
+    {
+      "code": "PLACEHOLDER_XXXXXXXX_2",
+      "name_th": "วิชาเลือกเสรี 2",
+      "name_en": "FREE ELECTIVE COURSE 2",
+      "credits": 3,
+      "lecture_h": null,
+      "lab_h": null,
+      "self_h": null,
+      "description_th": null,
       "source_page": 26
     },
     {
@@ -704,6 +770,17 @@
       "type": "บังคับ"
     },
     {
+      "year": 1,
+      "semester": 2,
+      "code": "PLACEHOLDER_9064XXXX",
+      "credits": 3,
+      "alt_group": null,
+      "note": null,
+      "source_page": 23,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "เลือก"
+    },
+    {
       "year": 2,
       "semester": 1,
       "code": "06066300",
@@ -904,7 +981,7 @@
     {
       "year": 3,
       "semester": 2,
-      "code": "PLACEHOLDER_060464XX",
+      "code": "PLACEHOLDER_060464XX_2",
       "credits": 6,
       "alt_group": null,
       "note": null,
@@ -935,6 +1012,17 @@
       "type": "บังคับ"
     },
     {
+      "year": 3,
+      "semester": 2,
+      "code": "PLACEHOLDER_XXXXXXXX",
+      "credits": 3,
+      "alt_group": null,
+      "note": null,
+      "source_page": 25,
+      "category": "หมวดวิชาเสรี",
+      "type": "เลือก"
+    },
+    {
       "year": 4,
       "semester": 1,
       "code": "06046442",
@@ -944,6 +1032,39 @@
       "source_page": 26,
       "category": "หมวดวิชาเฉพาะ",
       "type": "บังคับ"
+    },
+    {
+      "year": 4,
+      "semester": 1,
+      "code": "PLACEHOLDER_9064XXXX_2",
+      "credits": 3,
+      "alt_group": null,
+      "note": null,
+      "source_page": 26,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "เลือก"
+    },
+    {
+      "year": 4,
+      "semester": 1,
+      "code": "PLACEHOLDER_90644XXX",
+      "credits": 3,
+      "alt_group": null,
+      "note": null,
+      "source_page": 26,
+      "category": "หมวดวิชาศึกษาทั่วไป",
+      "type": "เลือก"
+    },
+    {
+      "year": 4,
+      "semester": 1,
+      "code": "PLACEHOLDER_XXXXXXXX_2",
+      "credits": 3,
+      "alt_group": null,
+      "note": null,
+      "source_page": 26,
+      "category": "หมวดวิชาเสรี",
+      "type": "เลือก"
     },
     {
       "year": 4,

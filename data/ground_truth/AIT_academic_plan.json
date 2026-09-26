@@ -5,19 +5,6 @@
   "plan": null,
   "courses": [
     {
-      "code": "06016401",
-      "name_th": "คณิตศาสตร์สำหรับเทคโนโลยีสารสนเทศ",
-      "name_en": "MATHEMATICS FOR INFORMATION TECHNOLOGY",
-      "credits": "3(3-0-6)",
-      "year": "1",
-      "semester": "1",
-      "category": "หมวดวิชาเฉพาะ",
-      "type": "บังคับ",
-      "prerequisite": "ไม่มี",
-      "flexible_year_semester": null,
-      "note": null
-    },
-    {
       "code": "06046400",
       "name_th": "แคลคูลัส 1",
       "name_en": "CALCULUS 1",

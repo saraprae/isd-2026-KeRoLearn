@@ -74,8 +74,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-import Lab3_ocr_system.ocr_system.src.lab7_metrics as M  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+import src.lab7_metrics as M
 
 
 # ==============================================================================
@@ -93,7 +93,7 @@ REQUEST_TIMEOUT = 900
 NUM_CTX = int(os.getenv("LAB7B_NUM_CTX", "8192"))
 NUM_PREDICT = int(os.getenv("LAB7B_NUM_PREDICT", "4096"))
 OCR_NUM_CTX = int(os.getenv("LAB7B_OCR_NUM_CTX", "4096"))
-OCR_NUM_PREDICT = int(os.getenv("LAB7B_OCR_NUM_PREDICT", "1200"))
+OCR_NUM_PREDICT = int(os.getenv("LAB7B_OCR_NUM_PREDICT", "3000"))
 
 # ⭐ ค่าเฉพาะของกลุ่ม B
 # เล่มหลักสูตรมี 50-150 หน้า ส่งเข้าโมเดลทีเดียวไม่ได้แน่นอน
@@ -619,6 +619,40 @@ EXTRACT_PROMPT = """ต่อไปนี้คือข้อความจา
       หน่วยกิตในบรรทัดเดียวกัน (หรือบรรทัดที่ตัดคำต่อกันของแถวเดียวกัน)
       ก่อนประกอบเป็นหนึ่งรายการเสมอ
 
+[1.6] ⭐ หนึ่งหน้ากระดาษอาจมี "หลายตาราง" ที่แยกกัน (เช่น ตาราง
+      ปีที่ 4 ภาคการศึกษาที่ 1 ตามด้วยตาราง ปีที่ 4 ภาคการศึกษาที่ 2 บนหน้า
+      เดียวกัน) ให้สกัดทุกตารางบนหน้านั้นให้ครบ ห้ามหยุดหลังจบตารางแรกแล้ว
+      คิดว่าจบหน้าแล้ว ให้ดูจนถึงบรรทัดสุดท้ายของข้อความที่ได้รับมาเสมอ
+      ก่อนตอบ ถ้าเห็นหัวข้อ "ปีที่ X ภาคการศึกษาที่ Y" ปรากฏซ้ำมากกว่าหนึ่ง
+      ครั้ง แปลว่ามีหลายตารางแน่นอน ต้องสกัดวิชาจากทุกตารางนั้น
+
+[1.7] ⭐ ค่าทางเลือกคู่ ("หรือ"/"OR") ในหนึ่งแถว — ต้องคงไว้ **ทุกฟิลด์** ที่ปรากฏ
+      บางแถวในตารางมี "สองทางเลือกเต็ม" สำหรับช่องเดียวกัน คั่นด้วยคำว่า
+      "หรือ" (ไทย) หรือ "OR" (อังกฤษ) — ทางเลือกคู่แบบนี้อาจปรากฏใน
+      name_th, name_en, และ/หรือ credits ของ "แถวเดียวกัน" พร้อมกันได้
+      กฎ: ถ้าพบคำว่า "หรือ"/"OR" เชื่อมสองทางเลือกในฟิลด์ใดฟิลด์หนึ่งของแถว
+      ให้ตรวจ "ทุกฟิลด์" ของแถวเดียวกันว่ามีทางเลือกที่สองอยู่ในข้อความ
+      ต้นฉบับของฟิลด์นั้นด้วยหรือไม่ — ถ้ามี ต้องคงคำว่า "หรือ"/"OR" และ
+      ทางเลือกที่สองไว้ครบในฟิลด์นั้น ห้ามเก็บเฉพาะทางเลือกแรกแล้วตัด
+      ทางเลือกที่สองทิ้งเด็ดขาด แม้ทางเลือกที่สองจะดูซ้ำหรือดูไม่จำเป็น
+      อย่าหยุดแค่เพราะฟิลด์หนึ่ง (เช่น name_en) ดูถูกต้องแล้ว — ต้องเช็คครบ
+      ทั้งสามฟิลด์ (name_th / name_en / credits) ของแถวนั้นทุกครั้ง
+
+      ตัวอย่าง (แถวเดียว มีทางเลือกคู่ทั้งในชื่อวิชาและหน่วยกิต):
+        ต้นฉบับ name_en: "...OR COURSE GROUP 1-4"
+        ต้นฉบับ name_th: "...2 หรือ กลุ่มวิชาที่ 1-4"
+        ต้นฉบับ credits: "3(3-0-6) หรือ 3(2-2-5)"
+      ต้องตอบ (คงไว้ครบทั้งสามฟิลด์ ไม่ตัดฟิลด์ไหนทิ้ง):
+        name_en = "...OR COURSE GROUP 1-4"
+        name_th = "...2 หรือ กลุ่มวิชาที่ 1-4"     ⚠️ ห้ามเหลือแค่ "...2"
+        credits = "3(3-0-6) หรือ 3(2-2-5)"        ⚠️ ห้ามเหลือค่าเดียว
+
+      ⚠️ กฎนี้คนละเรื่องกับข้อ [7.8] (ตัด footnote "กลุ่มวิชาที่กำหนดโดยคณะ*")
+      [7.8] ตัดเฉพาะวลีที่มีคำว่า "กำหนดโดยคณะ" เท่านั้น ส่วนคำว่า "หรือ"
+      และทางเลือกที่สองที่ตามมา (เช่น "กลุ่มวิชาที่ 1-4" ซึ่งไม่มีคำว่า
+      "กำหนดโดยคณะ") ไม่ใช่ footnote — ต้องคงไว้เสมอตามกฎข้อนี้ ห้ามสับสน
+      ว่าเป็นข้อความประเภทเดียวกัน
+
 [2] ปี/ภาคการศึกษา — อ่านให้ดี ตรงนี้ผิดกันบ่อย
     - วิชาบังคับที่ตารางแผนการศึกษาระบุปี/ภาคชัดเจน
         --> ใส่ year = 1..4 และ semester = 1..3 ตามที่ระบุ
@@ -642,8 +676,8 @@ EXTRACT_PROMPT = """ต่อไปนี้คือข้อความจา
       ด้วยค่าที่ดึงจากหน้า "คำอธิบายรายวิชา" อยู่แล้ว ซึ่งเป็นแหล่งข้อมูลที่ถูกต้องจริง)
 
 [4] credits ให้คัดลอกตามที่พิมพ์ เช่น "3(3-0-6)" หรือ "3(2-2-5)"
-    ห้ามแปลงเป็นตัวเลขเดี่ยว  ถ้าเอกสารเขียนสองแบบ ให้คงไว้ทั้งสอง
-    เช่น "3(3-0-6) หรือ 3(2-2-5)"
+    ห้ามแปลงเป็นตัวเลขเดี่ยว — ถ้าเอกสารเขียนสองแบบคั่นด้วย "หรือ" ให้คงไว้
+    ทั้งสองค่าเสมอ ดูรายละเอียดและตัวอย่างที่ข้อ [1.7] (กฎทางเลือกคู่)
 
 [5] category ต้องเป็นหนึ่งใน 3 ค่านี้เท่านั้น:
     "หมวดวิชาศึกษาทั่วไป" | "หมวดวิชาเฉพาะ" | "หมวดวิชาเลือกเสรี"
@@ -671,6 +705,20 @@ EXTRACT_PROMPT = """ต่อไปนี้คือข้อความจา
       ต้องเก็บตัวเลขลำดับนั้นไว้เสมอ ห้ามตัดออกเด็ดขาด แม้ตัวเลขจะดูเหมือน
       ไม่มีความหมาย — มันคือส่วนหนึ่งของชื่อวิชาที่ใช้แยกวิชาคนละรายการออกจากกัน
       (เช่น "หัวข้อพิเศษ... 1" กับ "หัวข้อพิเศษ... 2" คือคนละวิชา ห้ามรวมเป็นชื่อเดียว)
+
+[7.8] ⭐ ข้อความ "กลุ่มวิชาที่กำหนดโดยคณะ*" (หรือคล้ายกัน เช่น ไม่มีดอกจัน)
+      ที่ขึ้นบรรทัดแรกในช่องชื่อวิชา คือป้ายกำกับหมวดวิชา (footnote) ไม่ใช่
+      ส่วนหนึ่งของชื่อวิชา ห้ามใส่ข้อความนี้ปนใน name_th เด็ดขาด ให้ตัดออก
+      แล้วใช้เฉพาะบรรทัดชื่อวิชาจริงที่ตามมา เช่น เจอ
+        "กลุ่มวิชาที่กำหนดโดยคณะ*
+         ผู้ประกอบการสมัยใหม่"
+      ให้ตอบ name_th = "ผู้ประกอบการสมัยใหม่" เท่านั้น
+
+      ⚠️ ระวังสับสนกับข้อ [1.7]: กฎนี้ตัดเฉพาะวลี "กลุ่มวิชาที่กำหนดโดยคณะ*"
+      (มีคำว่า "กำหนดโดยคณะ" เสมอ) เท่านั้น ส่วนวลี "กลุ่มวิชาที่ 1-4" หรือ
+      "กลุ่มวิชาที่ 1" ฯลฯ (ไม่มีคำว่า "กำหนดโดยคณะ") เป็นคนละความหมาย
+      ไม่ใช่ footnote และห้ามตัดทิ้งเด็ดขาด — เป็นทางเลือกคู่ที่ต้องคงไว้
+      ตามกฎข้อ [1.7]
 
 [8] ⭐ แถว "ช่องวิชาเลือก" ที่ยังไม่ระบุวิชาเจาะจง
     ในตารางแผนการศึกษา บางแถวไม่ได้ระบุรหัสวิชาจริง แต่เขียนว่า
@@ -709,7 +757,8 @@ Describe the image's main elements (people, objects, text), note any contextual 
 </figure>
 
 - Page Numbers: Wrap page numbers in <page_number>...</page_number> (e.g., <page_number>14</page_number>).
-- Checkboxes: Use ☐ for unchecked and ☑ for checked boxes."""
+- Checkboxes: Use ☐ for unchecked and ☑ for checked boxes.
+- Wildcard course codes (a code containing one or more "x" characters, e.g. "9064xxxx", "90644xxx", "060464xx"): read every non-"x" digit individually, one at a time, directly from the image. Never copy the digits from a course code you read in a previous row just because the two codes look similar or the row appears next to it — two adjacent rows can have genuinely different codes that differ by only one digit (e.g. "9064xxxx" vs "90644xxx"). If a digit is unclear, look again rather than assuming it repeats the pattern of a neighboring row."""
 
 
 # ==============================================================================
@@ -1049,17 +1098,26 @@ def _clean_cell(raw: str) -> str:
 
 
 _BROKEN_HEAD_RE = re.compile(
-    r"<tr[^>]*>\s*<th[^>]*>\s*รหัสวิชา\s*<th[^>]*>\s*ชื่อวิชา\s*"
+    # (ค) <th colspan="2" rowspan="2"><td>ชื่อวิชา</td><td>หน่วยกิต</td></th></th>
+    #     ("ชื่อวิชา" ห่อด้วย <td> ของตัวเองอีกชั้น แทนที่จะเป็นข้อความลอยในเซลล์ <th> โดยตรง)
+    #     เจอจริง: BIT coop ปีที่ 4 ภาค 2 — เป็นแบบพังที่ 3 ต่างจาก (ก)/(ข) ที่ซ่อมไว้ก่อนหน้า
+    #     06036147/06036148 หายไปอีกครั้งเพราะ regex เดิมคาดว่า "ชื่อวิชา" เป็นข้อความลอย ไม่ใช่ <td> ซ้อน
+    r"<tr[^>]*>\s*<th[^>]*>\s*รหัสวิชา\s*<t[dh][^>]*>\s*(?:<td[^>]*>\s*)?ชื่อวิชา\s*(?:</td>\s*)?(?:</t[dh]>\s*)?"
     r"<t[dh][^>]*>(?P<cred>.*?)</t[dh]>(?:\s*</t[dh]>)*\s*</tr>",
     re.DOTALL | re.IGNORECASE)
 
 
 def _repair_table_html(table_html: str) -> str:
     """
-    VLM บางครั้งเขียน header ตารางแผนแบบ <th>รหัสวิชา<th>ชื่อวิชา<td>หน่วยกิต</td></th></th>
-    (th ซ้อน th + rowspan=2) ทำให้ regex แตกเซลล์ได้ช่องเดียว -> i_code = i_name = i_cred = 0
-    (หน่วยกิต/ชื่อวิชาถูกเขียนทับด้วยรหัสวิชา) และ rowspan รั่วไปทับแถวข้อมูลแถวแรก
-    ซ่อมให้เป็นแถว header ปกติ 3 ช่อง ไม่มี rowspan
+    VLM บางครั้งเขียน header ตารางแผนพัง 2 แบบที่เจอจริง:
+      (ก) <th>รหัสวิชา<th>ชื่อวิชา<td>หน่วยกิต</td></th></th>          (th ซ้อน th ไม่มี td ปิด "ชื่อวิชา")
+      (ข) <th rowspan="2">รหัสวิชา<td>ชื่อวิชา</td><td>หน่วยกิต</td></th>  (th เดียว แต่ครอบ td "ชื่อวิชา" ที่ปิดถูกต้อง)
+    ทั้งสองแบบทำให้ regex แตกเซลล์ของแถว header ได้ไม่ครบ 3 ช่อง (ช่อง "รหัสวิชา"/"ชื่อวิชา"
+    ถูกยุบรวมเป็นช่องเดียว) และ rowspan="2" ที่ยังติดอยู่จะรั่วไปทับคอลัมน์แรกของแถวข้อมูล
+    แถวถัดไป ทำให้ข้อความ "รหัสวิชาชื่อวิชา" ที่มีคำว่า "รหัส" ปนอยู่ไปหลอกเช็ค header-skip
+    ("if any('รหัส' in c ...)") ทำให้แถวข้อมูลจริงถูกมองว่าเป็น header แล้วถูกข้ามทั้งแถว
+    (วิชาทั้งแถวหายไปจากผลลัพธ์ — เจอจริง: ตาราง ปีที่ 4 ภาค 2 ของ BIT, 06036147/06036148 หายทั้งคู่)
+    ซ่อมให้เป็นแถว header ปกติ 3 ช่อง ไม่มี rowspan ทั้งสองแบบ
     """
     def fix(m: re.Match) -> str:
         cred = re.sub(r"^\s*-\s*", "", m.group("cred"))
@@ -1218,16 +1276,44 @@ def _name_from_cell(cell: str) -> tuple[str, str | None]:
     ป้ายแบบ "...คณะ*" ที่ติดบรรทัดเดียวกับชื่อวิชาจริง (ไม่ใช่บรรทัดหัวกลุ่มเดี่ยวๆ)
     ตัดเฉพาะป้ายส่วนหน้าออก ไม่ลบทั้งบรรทัด (เจอจริง: 90644042/90643021 ชื่อหายทั้งวิชา)
     """
-    for ln in cell.split("\n"):
+    lines = cell.split("\n")
+
+    # ⚠️ ถ้าบรรทัดหนึ่งลงท้ายด้วย "หรือ" แล้วขึ้นบรรทัดใหม่เป็นทางเลือกที่สอง (เจอจริง: BIT
+    # "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือ" ตามด้วยบรรทัด "กลุ่มวิชาที่ 1-4")
+    # ให้รวมสองบรรทัดเป็นบรรทัดเดียวก่อนประมวลผลอื่นใดเสมอ ไม่งั้นจะพังสองต่อ:
+    #   (ก) _GROUP_LABEL_LINE_RE (ป้ายกำกับ "กลุ่มวิชา...") จะเข้าใจผิดว่าบรรทัดที่สองที่
+    #       ขึ้นต้นด้วย "กลุ่มวิชา" เป็นป้ายกำกับเดี่ยว ๆ แล้วลบทิ้งทั้งบรรทัด
+    #   (ข) ต่อให้ไม่ถูกลบ _split_th_en ก็จะตัดคำว่า "หรือ" ท้ายบรรทัดแรกทิ้งอยู่ดี (เพราะ
+    #       เข้าใจว่าเป็น "หรือ" ห้อยท้ายเซลล์เฉย ๆ) ทำให้ตัวเชื่อม "หรือ" หายไปจากผลลัพธ์
+    # การรวมบรรทัดก่อน ทำให้ "หรือ" อยู่กลางข้อความ ไม่ใช่ท้ายบรรทัด ตัวตรวจทั้งสองด้านจึง
+    # ไม่ไปแตะมันอีก
+    merged: list[str] = []
+    skip_next = False
+    for i, ln in enumerate(lines):
+        if skip_next:
+            skip_next = False
+            continue
+        plain = ln.replace("**", "").strip()
+        if plain.endswith("หรือ") and i + 1 < len(lines) and lines[i + 1].strip():
+            merged.append(f"{ln.rstrip()} {lines[i + 1].strip()}")
+            skip_next = True
+        else:
+            merged.append(ln)
+    lines = merged
+
+    clean_lines: list[str] = []
+    for ln in lines:
         plain_ln = ln.replace("**", "").strip()
         if _GROUP_LABEL_PREFIX_RE.match(plain_ln):
-            stripped_ln = _GROUP_LABEL_PREFIX_RE.sub("", plain_ln, count=1)
-            cell = cell.replace(ln, stripped_ln, 1)
+            clean_lines.append(_GROUP_LABEL_PREFIX_RE.sub("", plain_ln, count=1))
         elif _GROUP_LABEL_LINE_RE.match(plain_ln):
-            cell = cell.replace(ln, "", 1)
+            continue
+        else:
+            clean_lines.append(ln)
+
     th_parts: list[str] = []
     en_parts: list[str] = []
-    for ln in cell.split("\n"):
+    for ln in clean_lines:
         if not ln.strip():
             continue
         th, en = _split_th_en(ln)
@@ -1241,6 +1327,33 @@ def _name_from_cell(cell: str) -> tuple[str, str | None]:
     th_name = re.sub(r"\s+", " ", _join_th_parts(th_parts)).strip()
     en_name = re.sub(r"\s+", " ", " ".join(en_parts)).strip() or None
     return th_name, en_name
+
+
+def _split_cell_by_thai_runs(cell: str, n: int) -> list[str] | None:
+    """เซลล์ชื่อวิชาเดียวที่จริง ๆ มีหลายวิชาปนกัน (รหัสหลายตัวจาก rowspan เดียวแต่ OCR
+    ไม่ได้แยกชื่อคนละแถว) ลองแบ่งเป็น n ชิ้นตามจุดเริ่มบรรทัดภาษาไทยใหม่ (แต่ละวิชาเริ่ม
+    ด้วยบรรทัดไทย 1 บรรทัด ตามด้วยบรรทัดอังกฤษ 0 บรรทัดขึ้นไปของวิชานั้น) คืน None ถ้า
+    แบ่งได้ไม่ครบ n ชิ้นพอดี (แปลว่ารูปแบบไม่ตรงตามที่คาด อย่าเดา ให้ผู้เรียกถอยไปใช้วิธีอื่น)
+    """
+    lines = cell.split("\n")
+    chunks: list[list[str]] = []
+    current: list[str] = []
+    seen_thai = False
+    for ln in lines:
+        is_thai = bool(_THAI_RE.search(ln))
+        if is_thai and seen_thai:
+            if current:
+                chunks.append(current)
+            current = []
+            seen_thai = False
+        current.append(ln)
+        if is_thai:
+            seen_thai = True
+    if current:
+        chunks.append(current)
+    if len(chunks) != n:
+        return None
+    return ["\n".join(c) for c in chunks]
 
 
 def _table_page_credit(text: str) -> int | None:
@@ -1343,6 +1456,16 @@ def parse_plan_tables(pages: list[tuple[int, str]]
     term_cells: dict[tuple, list[tuple[str, str]]] = defaultdict(list)   # (ช่องชื่อ, ช่องหน่วยกิต) รายแถวของตาราง
 
     for pg, text in pages:
+        # ⚠ ตาราง "<table>" ที่เปิดแล้วไม่ปิด (</table> ขาด) มักเกิดตอน OCR ถูกตัดกลางคัน
+        # เพราะโควตา token การสร้างข้อความ (LAB7B_OCR_NUM_PREDICT) ไม่พอสำหรับหน้าที่มี
+        # สองตารางเต็ม ๆ ต่อกัน (เจอจริง: BIT หน้า 27/28/32/33 — ตารางที่สองของหน้าโดนตัด
+        # กลางแถว) ผลคือ _TABLE_OR_HEAD_RE ไม่ match อะไรเลยสำหรับตารางนั้น (ไม่ใช่แค่ header
+        # พัง) ทั้งภาค/ปีนั้นจึงหายไปแบบไม่มีร่องรอยใน term_checks/skipped_tables เลย —
+        # เตือนไว้ตรงนี้เพื่อให้เห็นทันทีแทนที่จะต้องไล่เทียบ eval_gt.json ทีหลัง
+        if text.count("<table>") != text.count("</table>"):
+            print(f"    ⚠⚠ หน้า {pg}: เจอ <table> ที่เปิดแล้วไม่ปิด — OCR น่าจะถูกตัดกลางตาราง "
+                  f"(ลอง LAB7B_OCR_NUM_PREDICT ให้สูงขึ้น) ตารางที่ตัดจะหายไปทั้งยวงโดยไม่ขึ้น "
+                  f"'[ข้ามตาราง]' เลย เพราะไม่มี </table> ให้จับคู่ตั้งแต่แรก")
         for m in _TABLE_OR_HEAD_RE.finditer(text):
             if m.group("plan"):
                 plan = "nocoop" if m.group("neg") else "coop"
@@ -1511,6 +1634,21 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     alt_key = None
                 elif len(codes) > 1 and len(parsed) == len(codes):
                     entries = [(c, p[0], p[1]) for c, p in zip(codes, parsed)]
+                elif len(codes) > 1 and len(names) == 1:
+                    # รหัสหลายตัวจาก rowspan เดียว (คนละวิชากันจริง) แต่ OCR ยุบชื่อวิชา
+                    # ทั้งหมดลงเซลล์เดียว (ไม่ได้แยกแถวต่อวิชา) — เจอจริง: BIT ตาราง 4/2
+                    # "06036147\nหรือ 06036148" คู่กับเซลล์ชื่อเดียว "สหกิจศึกษา/COOPERATIVE
+                    # EDUCATION/สหกิจศึกษาต่างประเทศ/OVERSEA COOPERATIVE EDUCATION" (4 บรรทัด
+                    # = 2 วิชา) ถ้าใช้ else เดิม ทั้งสองรหัสจะได้ชื่อที่ถูกยำรวมกันเป็นก้อนเดียว
+                    # เหมือนกันทั้งคู่ (ผิด) — ลองแบ่งตามจุดเริ่มบรรทัดไทยใหม่ก่อน ถ้าแบ่งได้
+                    # พอดีจำนวนรหัส ค่อยจับคู่ทีละวิชา ถ้าแบ่งไม่ได้ ค่อยถอยไปใช้ชื่อเดียวกันทั้งคู่
+                    split_cells = _split_cell_by_thai_runs(names[0], len(codes))
+                    if split_cells:
+                        parsed_split = [_name_from_cell(s) for s in split_cells]
+                        entries = [(c, p[0], p[1]) for c, p in zip(codes, parsed_split)]
+                    else:
+                        th, en = parsed[0]
+                        entries = [(c, th, en) for c in codes]
                 elif len(codes) == 1 and len(parsed) > 1:
                     # รหัสเดียวแต่มีหลายชื่อ (rowspan ของ OCR): ชื่อแรกเป็นของรหัสนี้
                     # ชื่อที่เหลือ = แถวที่ OCR ทำ "รหัส" หาย/ยุบรวม -> ค่อยหารหัสจากชื่อทีหลัง (code=None)
@@ -1522,9 +1660,17 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     entries = [(c, th, en) for c in codes]
                 for k_e, (code, th, en) in enumerate(entries):
                     cred_e = credits
-                    if len(codes) == 1 and len(parsed) > 1 and k_e > 0:
-                        own = _norm_credits((g.get("ncred") or {}).get(k_e) or "")
-                        cred_e = own or credits
+                    # ⚠️ ก่อนแก้: เงื่อนไขนี้จำกัดแค่ "len(codes) == 1" ทำให้กรณีรหัสหลายตัว
+                    # ที่มาจาก rowspan เดียวกัน (เช่น "96642033\n06036xxx" -> คนละวิชากันจริง)
+                    # แล้วแถวที่สองมีหน่วยกิตของตัวเองแยกต่างหาก (ncred[k_e]) ถูกมองข้ามไปเสมอ
+                    # ทุกรหัสในกลุ่มเดียวกันเลยได้หน่วยกิตของรหัสแรก (g["credits"]) ซ้ำกันหมด
+                    # ทั้งที่ ncred เก็บค่าต่อแถว/ต่อรหัสไว้ถูกต้องแล้ว — เจอจริง: BIT "06036xxx"
+                    # (วิชาเลือก 2 หรือ กลุ่มวิชาที่ 1-4) ได้ credits="3(3-0-6)" เฉย ๆ ทั้งที่ตาราง
+                    # เขียนไว้ "3(3-0-6) หรือ 3(2-2-5)" — แก้โดยเช็ค ncred ทุกครั้งที่มีค่า
+                    # ไม่ผูกกับ len(codes) == 1 อีกต่อไป
+                    own = _norm_credits((g.get("ncred") or {}).get(k_e) or "")
+                    if own:
+                        cred_e = own
                     row = {
                         "code": code, "name_th": th, "name_en": en,
                         "credits": cred_e, "year": year, "semester": sem,
