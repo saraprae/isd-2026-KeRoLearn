@@ -191,11 +191,39 @@ python -m uvicorn lab10_fastapi.transcript_app.main:app --reload --host 127.0.0.
 
 | Method | Path | หน้าที่ |
 |---|---|---|
-| GET | `/api/health` | ตรวจ DB และ Ollama |
-| GET | `/api/program` | อ่านข้อมูลหลักสูตร |
-| GET | `/api/courses` | อ่าน/ค้นหารายวิชา |
-| POST | `/api/courses` | เพิ่มรายวิชาลง SQLite |
-| POST | `/api/ask` | ให้ Qwen สร้าง SQL และตอบคำถาม |
+| GET | `/api/health` | ตรวจความพร้อมของฐานข้อมูลและ Ollama พร้อมแสดงชื่อโมเดลที่ตั้งค่าไว้ |
+| GET | `/api/curricula` | อ่านรายชื่อหลักสูตรและแผนจาก config เพื่อเติมตัวเลือกหน้าเว็บ |
+| GET | `/api/program` | อ่านข้อมูลหลักสูตรจากฐานข้อมูลค่าเริ่มต้น |
+| GET | `/api/courses` | อ่าน/ค้นหารายวิชาด้วย `search` โดยต้องระบุ `program` และระบุ `track` สำหรับ IT, DSBA, BIT |
+| GET | `/api/descriptions` | อ่านคำอธิบายรายวิชาจากรหัสวิชา 8 หลัก โดยต้องระบุ `courseid` |
+| GET | `/api/study-plan` | อ่านรายวิชาตามแผนการเรียน โดยต้องระบุ `program`, `track`, `year` (1–4) และ `semester` (1–3) |
+| POST | `/api/courses` | เพิ่มรายวิชาลงฐานข้อมูล SQLite ค่าเริ่มต้น โดยส่งข้อมูลรายวิชาเป็น JSON body |
+| POST | `/api/ask` | รับ `question`, `program`, `track` ให้โมเดลสร้าง SQL อ่านฐานข้อมูลตามหลักสูตร/แผนที่เลือกแบบ read-only และคืน `question`, `sql`, `rows`, `answer` |
+
+`program` รองรับ `IT`, `DSBA`, `BIT`, `AIT`; `track` ใช้ `coop` หรือ `nocoop` ตามหลักสูตร และใช้ `default` สำหรับ AIT `/api/courses` ต้องระบุ `program` เสมอ และต้องระบุ `track` สำหรับ IT, DSBA, BIT
+
+### `GET /api/curricula` — รายการหลักสูตรและแผน
+
+อ่านรายชื่อหลักสูตรและแผนจาก `settings.db_paths` ใน `config.py` ไม่ต้องส่ง query parameters หรือ request body และไม่เรียกโมเดลหรือเปิดฐานข้อมูล
+
+เปิด <http://127.0.0.1:8000/api/curricula> หรือทดลองใน Swagger ที่ `/docs` ตัวอย่าง response HTTP `200` ตาม config ปัจจุบัน:
+
+```json
+{
+  "programs": [
+    {"program": "IT", "tracks": ["coop", "nocoop"]},
+    {"program": "DSBA", "tracks": ["coop", "nocoop"]},
+    {"program": "BIT", "tracks": ["coop", "nocoop"]},
+    {"program": "AIT", "tracks": ["default"]}
+  ]
+}
+```
+
+หน้าเว็บเรียก API นี้เมื่อเปิดหน้า เพื่อนำข้อมูลมาเติม dropdown หลักสูตรและแผน เมื่อเปลี่ยนหลักสูตรจะปรับรายการแผนให้ตรงกัน จากนั้นส่งค่าที่เลือกเป็น `program` และ `track` ไปยัง `POST /api/ask` ระหว่างโหลดตัวเลือกหรือโหลดไม่สำเร็จ ปุ่มถามจะถูกปิดไว้
+
+เมื่อเพิ่มหรือเปลี่ยน mapping ใน `settings.db_paths` ให้รีสตาร์ต backend และรีเฟรชหน้าเว็บ รายการใหม่จะปรากฏโดยไม่ต้องแก้รายชื่อใน JavaScript ผลจาก API นี้แสดงรายการที่ตั้งค่าไว้ ไม่ได้ยืนยันว่าไฟล์ DB ของทุกแผนพร้อมใช้งาน
+
+`GET /api/curricula` ส่งรายการหลักสูตร/แผนสำหรับเลือก ส่วน `GET /api/program` อ่านรายละเอียดหลักสูตรจากฐานข้อมูลค่าเริ่มต้น
 
 ### Transcript API
 
@@ -207,7 +235,7 @@ python -m uvicorn lab10_fastapi.transcript_app.main:app --reload --host 127.0.0.
 ทดลอง GET:
 
 ```text
-http://127.0.0.1:8000/api/courses?search=06026200
+http://127.0.0.1:8000/api/courses?program=IT&track=nocoop&search=06026200
 ```
 
 ทดลอง POST แนะนำให้เปิด `/docs`, เลือก endpoint แล้วกด **Try it out**
@@ -216,9 +244,26 @@ http://127.0.0.1:8000/api/courses?search=06026200
 
 ```json
 {
-  "question": "ปี 1 เทอม 1 เรียนกี่หน่วยกิต"
+  "question": "ปี 1 เทอม 1 เรียนกี่หน่วยกิต",
+  "program": "DSBA",
+  "track": "nocoop"
 }
 ```
+
+### การเลือกฐานข้อมูลของ `/api/ask`
+
+ระบบเลือกฐานข้อมูลจาก `program` และ `track` ที่ส่งมาใน request ซึ่งหน้าเว็บส่งจากตัวเลือกหลักสูตรและแผนการเรียน โดยใช้ `settings.db_paths` ใน `config.py` (โฟลเดอร์ฐานข้อมูลกำหนดด้วย `CURRICULUM_DB_ROOT`)
+
+| program | track | ไฟล์ภายใต้ DB_ROOT |
+|---|---|---|
+| `IT`, `DSBA`, `BIT` | `coop` หรือ `nocoop` | `<program>/<track>/curriculum.db` |
+| `AIT` | `default` | `AIT/curriculum.db` |
+
+ต้องระบุ `program` ทุกครั้ง ส่วน IT, DSBA และ BIT ต้องระบุ `track` ด้วย สำหรับ AIT สามารถส่ง `"track": "default"` หรือละ `track` เพื่อใช้แผนเดียวที่มีได้ หากไม่ส่งค่าที่จำเป็นหรือส่งหลักสูตร/แผนที่ไม่รองรับ ระบบตอบ HTTP `422`
+
+ตัวอย่างข้างต้นใช้ DSBA แผน nocoop ถ้าเปลี่ยนเป็น `"program": "IT", "track": "coop"` จะค้นจาก IT แผน coop โดยค่าเริ่มต้น `settings.db_path` ไม่ทับตัวเลือกนี้ ข้อความใน `question` ไม่ได้เปลี่ยนฐานข้อมูลอัตโนมัติ เช่น เลือก IT แต่พิมพ์ถาม DSBA ระบบยังค้นจาก IT และปัจจุบันยังไม่ตรวจความขัดแย้งนี้
+
+`/api/ask` คืน `question`, `sql`, `rows` และ `answer` เหมือนเดิม โดย SQL ยังผ่าน `guard_sql` และอ่านฐานข้อมูลแบบ read-only
 
 ตัวอย่าง body ของ `/api/courses`:
 
@@ -255,8 +300,8 @@ QwenTextToSQL._chat()
 
 ## 11. ลำดับการทำงานของ `/api/ask`
 
-1. `index.html` ส่ง `POST /api/ask`
-2. FastAPI ตรวจ request ด้วย Pydantic
+1. `index.html` ส่ง `POST /api/ask` พร้อม `question`, `program` และ `track`
+2. FastAPI ตรวจ request ด้วย Pydantic และเลือกฐานข้อมูลด้วย `select_database(program, track)`
 3. Qwen สร้าง `SELECT` SQL
 4. `database.py` ปฏิเสธ SQL ที่แก้ข้อมูล
 5. เปิด SQLite แบบ read-only แล้วรัน query

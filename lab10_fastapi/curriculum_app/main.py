@@ -57,6 +57,17 @@ def health() -> dict:
         "lab8b_module": str(Path(lab8b.__file__).resolve()),
     }
 
+@app.get("/api/curricula")
+def get_programs() -> dict:
+    return {
+        "programs": [
+            {
+                "program": program,
+                "tracks": list(tracks.keys()),
+            }
+            for program, tracks in settings.db_paths.items()
+        ]
+    }
 
 @app.get("/api/program")
 def get_program() -> dict:
@@ -64,19 +75,84 @@ def get_program() -> dict:
         program = database.program()
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
     if program is None:
         raise HTTPException(status_code=404, detail="ไม่พบข้อมูลหลักสูตร")
     return program
 
+# ให้ทุก endpoint ที่ต้องอ่านหลักสูตรเรียก select_database() ฟังก์ชันนี้เลือก path ตาม program และ track แล้วสร้าง adapter สำหรับ DB นั้น
+# main.py แทนฟังก์ชัน select_database() เดิมที่อยู่ถัดจาก endpoint /api/program ครับ.
+def select_database(
+    program: str,
+    track: str | None = None,
+) -> CurriculumDatabase:
+    program = program.strip().upper()
+    tracks = settings.db_paths.get(program)
 
+    if tracks is None:
+        raise HTTPException(status_code=422, detail="ไม่รู้จักหลักสูตรนี้")
+
+    if track is None:
+        if len(tracks) != 1:
+            raise HTTPException(
+                status_code=422,
+                detail="กรุณาระบุ track เป็น coop หรือ nocoop",
+            )
+        track = next(iter(tracks))
+
+    track = track.strip().lower()
+    path = tracks.get(track)
+    if path is None:
+        raise HTTPException(
+            status_code=422,
+            detail=f"ไม่พบแผน {track} สำหรับ {program}",
+        )
+
+    return CurriculumDatabase(lab8b, path, settings.max_rows)
+
+# บังคับ program ของ /api/courses ให้ตรงกับ select_database()
+# หลังแก้
+#  → 422 แจ้งว่าต้องระบุ program
+# /api/courses?program=DSBA&track=nocoop
+#  → อ่านรายวิชา DSBA แผนปกติ
+# /api/courses?program=AIT
+#  → ใช้แผน default
 @app.get("/api/courses", response_model=list[CourseResponse])
 def get_courses(
+    program: str = Query(..., description="IT, DSBA, BIT, AIT or GENED"),
+    track: str | None = Query(default=None, description="coop, nocoop or default (AIT)"),
     search: str = Query(default="", max_length=100),
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
 ) -> list[dict]:
+    selected_database = select_database(program, track)
     try:
-        return database.courses(search, limit, offset)
+        return selected_database.courses(search, limit=settings.max_rows)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/descriptions")
+def get_description(
+    courseid: str = Query(..., pattern=r"^[0-9]{8}$", description="รหัสวิชา 8 หลัก"),
+) -> dict:
+    try:
+        result = database.course_description(courseid, settings.db_paths)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    if result is None:
+        raise HTTPException(status_code=404, detail="ไม่พบรหัสวิชานี้")
+    return result
+
+
+@app.get("/api/study-plan")
+def get_study_plan(
+    program: str = Query(..., description="IT, DSBA, BIT or AIT"),
+    track: str = Query(..., description="coop, nocoop or default (AIT/GENED)"),
+    year: int = Query(..., ge=1, le=4, description="ปีการศึกษา 1–4"),
+    semester: int = Query(..., ge=1, le=3, description="1, 2 หรือ 3 (ภาคฤดูร้อน)"),
+) -> list[dict]:
+    selected_database = select_database(program, track)
+    try:
+        return selected_database.study_plan(year, semester)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -94,8 +170,12 @@ def post_course(course: CourseCreate) -> dict:
 
 @app.post("/api/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> dict:
+    selected_database = select_database(request.program, request.track)
     try:
-        return model.ask(database, request.question)
+        return model.ask(
+            selected_database, request.question,
+            program=request.program, track=request.track,
+        )
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except requests.RequestException as exc:
