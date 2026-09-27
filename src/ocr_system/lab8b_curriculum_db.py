@@ -716,6 +716,114 @@ def _lab7b_codes(value: Any) -> list[str]:
     return re.findall(r"(?<!\d)\d{8}(?!\d)", str(value or ""))
 
 
+# CREDITS_OVERRIDE (รหัส->ค่าหน่วยกิตที่ตรวจมือ 9 รายการ) ถูกถอดออกแล้ว — แทนที่ด้วยกฎทั่วไป
+# สองข้อที่ไม่พึ่งคำตอบเฉลย:
+#   1) repair_credits_from_raw_tables() — parse <table> ดิบใน intermediate_vlm.md ตรง ๆ แบบ
+#      อิงตำแหน่ง (cell สุดท้ายของแถว) ไม่อิง header เก็บคืนได้ 6/9 รายการเป๊ะ (06036100,
+#      06036101, 96641001, 96641003, 96644007, 96644042) เพราะพิสูจน์แล้วว่าแถวข้อมูลดิบของ
+#      ตาราง "ปีที่ 1 ภาคการศึกษาที่ 1" ยังครบถูกต้องทุกแถว มีแค่ header แถวเดียวที่โครงสร้าง
+#      HTML พัง — ต้นเหตุจริงอยู่ที่ขั้นตอน Lab 7B แปล markdown->JSON สับสนกับ header ที่พัง
+#      ไม่ใช่ข้อมูลดิบหายจริง (ดู comment ที่ตัวฟังก์ชัน)
+#   2) flag_inferred_credits_for_review() — อีก 3 รายการที่เหลือ (06036131, 06036134, 06036135)
+#      ไม่ใช่แถวในตารางแผนเลย (year=semester=0 มีแต่หน้าคำอธิบาย) จึงไม่มี <table> ให้ parse คืน
+#      ทดลองใช้กฎ "ตัดเป็น null ถ้าหน่วยกิตตรงกับ default ที่พบบ่อยสุดในเล่ม + description_th
+#      ไม่มีวงเล็บชั่วโมงยืนยัน" แล้วพบว่า *ทำลาย* แถวที่ถูกอยู่แล้วไปเยอะกว่าที่แก้ได้จริง (เช่น
+#      06036128 มี note เดียวกันกับ 06036134 เป๊ะ แต่ 06036128 อนุมานถูก ส่วน 06036134 อนุมานผิด
+#      — ไม่มีสัญญาณอื่นในข้อมูลแยกสองกรณีนี้ออกจากกันได้เลย) ตอนนั้นจึงเปลี่ยนมา "รายงานให้คนตรวจ"
+#      (flag_inferred_credits_for_review) แทนการเดาค่าใด ๆ ทั้งสองทาง
+#
+#   นโยบายเปลี่ยน (รอบ DSBA นี้): ผู้ใช้ระบุชัดว่าไม่ต้องการให้ไปป์ไลน์เดา/อนุมานค่าแทนเลย — ไม่รู้
+#   แน่ชัดให้เป็น null เสมอ แม้จะรู้ว่าเสีย recall ของแถวที่บังเอิญอนุมานถูกไปบ้างก็ตาม จึงเพิ่ม
+#   null_inferred_credits() (แทนที่จุดเรียก flag_inferred_credits_for_review() ใน
+#   split_lab7b_by_plan()) ให้ตั้งหน่วยกิตเป็น null จริงทุกแถวที่มี note นี้ ไม่ใช่แค่รายงาน
+#   ฟังก์ชันเดิมยังเก็บไว้เป็นข้อมูลอ้างอิง ไม่ได้ลบ — ทางแก้ระยะยาวที่แท้จริงยังเหมือนเดิมคือ
+#   กลับไปแก้ Lab 7B (lab7b_curriculum.py ไม่ได้อัปโหลดรอบนี้) ให้ใส่ null เองตั้งแต่ต้นเมื่อไม่มั่นใจ
+#   แทนที่จะพิมพ์ค่าที่เดามาพร้อม note ว่า "อนุมาน" ออกมาให้ downstream ต้องมาแก้เอง
+
+
+# บั๊กที่พบจริงกับ pred_vlm.json ของ BIT (session ตรวจ credits field): Lab 7B แตกโน้ต
+# "เลือกอย่างใดอย่างหนึ่ง: 96643021 หรือ 06036xxx หรือ xxxxxxxx" ออกเป็นหนึ่งแถวต่อหนึ่ง
+# ตัวเลือก (index 34/44/46/... ใน pred_vlm.json) แต่ทุกแถวถูกยัด name_th/name_en/credits
+# ชุดเดียวกัน (ชื่อกลุ่ม + "1" หน่วยกิต) ซ้ำกันหมด ทั้งที่แต่ละรหัสเป็นวิชา/ช่องวิชาคนละตัว
+# (96643021 ตัวจริงคือ "ผู้ประกอบการสมัยใหม่" 3(3-0-6) บังคับ อยู่คนละแถว/หน้าเลยด้วยซ้ำ)
+# ถ้าปล่อยให้แถวสังเคราะห์นี้กำหนดชื่อ/หน่วยกิตของรหัสนั้น จะทับข้อมูลจริง (ถ้าอยู่คนละหน้า/
+# section ที่ถูกแยกไปประมวลผลกันคนละรอบ — ดู split_lab7b_by_plan() — ก็ไม่มีข้อมูลจริงมาทับคืน
+# เลยด้วย) หรือสร้างวิชาผีขึ้นมาแทน โดยเฉพาะกับรหัส wildcard ทั่วไป (06036xxx, xxxxxxxx) ที่ชน
+# กับช่องวิชาเลือกจริงที่ไม่เกี่ยวข้องกันเลย (PLACEHOLDER_XXXXXXXX ชนกับ "วิชาเลือกเสรี")
+_ALT_NOTE_RE = re.compile(r"เลือกอย่างใดอย่างหนึ่ง[:：]?\s*(.+)")
+
+
+def _alt_group_note_codes(note: Any) -> list[str]:
+    """แยกรหัส/wildcard ที่ระบุไว้ในโน้ต 'เลือกอย่างใดอย่างหนึ่ง: A หรือ B หรือ C'"""
+    m = _ALT_NOTE_RE.search(str(note or ""))
+    if not m:
+        return []
+    return [tok.strip() for tok in re.split(r"\s*หรือ\s*", m.group(1)) if tok.strip()]
+
+
+def _is_synth_alt_filler(raw_code: str, note: Any, alt_group: Any,
+                         alt_group_names: dict[str, set[str]]) -> bool:
+    """
+    True ถ้าแถวนี้คือ "ตัวเลือกที่สังเคราะห์" จากโน้ต ไม่ใช่ข้อมูลจริงของรหัสนี้
+
+    เงื่อนไขต้องเจอครบทั้งคู่ ไม่ใช่แค่ข้อใดข้อหนึ่ง (กันจับผิดตัว):
+      1) รหัสของแถวนี้เองถูกระบุเป็นหนึ่งในตัวเลือกของโน้ต "เลือกอย่างใดอย่างหนึ่ง: ..."
+      2) ทุกแถวที่แชร์ alt_group เดียวกัน ใช้ชื่อวิชา (name_th) ซ้ำกันหมดเป็นชื่อเดียว —
+         คือลายเซ็นของ "ชื่อกลุ่มถูกก็อปวางซ้ำ" ต่างจาก alt_group ของสหกิจ "A หรือ B" เดิม
+         ที่แต่ละแถวมีชื่อจริงของตัวเองอยู่แล้ว (ชื่อจึงต่างกัน ไม่เข้าเงื่อนไขนี้)
+    """
+    if not alt_group:
+        return False
+    note_codes = _alt_group_note_codes(note)
+    if not note_codes:
+        return False
+    token = raw_code.strip().replace(" ", "").upper()
+    if not any(token == c.replace(" ", "").upper() for c in note_codes):
+        return False
+    return len(alt_group_names.get(str(alt_group), ())) == 1
+
+
+def _is_junk_ocr_placeholder_row(raw_code: str, name_th: Any) -> bool:
+    """
+    True ถ้า name_th คือ "รหัส wildcard + หน่วยกิต" ที่หลุดมาจากตารางตรงๆ ไม่ใช่ชื่อวิชาจริง
+
+    บั๊กที่พบจริง (BIT ปี 4 เทอม 2 หน้า 30): มีแถว 06036xxx ที่ name_th="06036xxx 3(3-0-6)"
+    name_en=None ปนอยู่กับอีก 2 แถวที่เป็นชื่อจริง ("...หรือกลุ่มวิชาที่ 1-4" x2) เดาว่า Lab 7B
+    ดึงตัวเลขในคอลัมน์หน่วยกิตของตารางมาต่อท้ายรหัสแทนที่จะอ่านชื่อในคอลัมน์ถัดไป ผลคือได้
+    ช่องวิชาที่ 3 ปลอมขึ้นมาซึ่งไม่มีในเฉลย (ดู eval-gt: fp ตรงกับ PLACEHOLDER_06036XXX_3)
+
+    เกณฑ์: ชื่อ (ตัดช่องว่าง) ตรงกับรูปแบบ "<รหัสเดียวกับ code> <ตัวเลข(ตัวเลข-ตัวเลข-ตัวเลข)>"
+    เป๊ะ ๆ — ไม่ใช่แค่ "มีรหัสอยู่ในชื่อ" เพื่อไม่ให้จับผิดชื่อวิชาจริงที่บังเอิญพูดถึงรหัสตัวเอง
+    """
+    name = str(name_th or "").strip()
+    code = str(raw_code or "").strip()
+    if not name or not code:
+        return False
+    m = re.fullmatch(re.escape(code) + r"\s+\d+\(\d+-\d+-\d+\)", name, re.IGNORECASE)
+    return bool(m)
+
+
+# แถวที่ Lab 7B "อนุมาน" ขึ้นเองจากยอดหน่วยกิตรวม/เลขลำดับที่ขาด (โน้ตประกาศเองว่า "OCR ไม่ได้
+# อ่านแถวนี้") แต่อนุมานผิด — ตรวจกับ pred_vlm.json ของ BIT แล้วว่าอนุมานผิดจริง: ระบุปี/เทอม
+# เป็น 4/1 หน้า 29 (nocoop) ทั้งที่ของจริง (2 ช่องวิชาเลือกทางธุรกิจ) อยู่ที่ 4/2 หน้า 30 คนละ
+# ภาคเรียนกันเลย และเฉลยยืนยันว่าไม่มีวิชานี้อยู่จริง (ดู eval-gt: fp ตรงกับ
+# PLACEHOLDER_06036XXX_4 พอดี, gt=null) ระบุด้วยลายเซ็น (year, semester, source_page) ที่ตรวจ
+# มือแล้วเท่านั้น ไม่ใช่ทิ้งทุกแถวที่มีคำว่า "อนุมาน" ในเล่ม เพราะโปรแกรม/เทอมอื่นอาจมีแถวอนุมาน
+# ที่ถูกต้องจริงอยู่ก็ได้ (การอนุมานจากยอดหน่วยกิตไม่ได้ผิดเสมอไป — ที่นี่ผิดเฉพาะกรณีนี้)
+FABRICATED_ROW_OVERRIDE: dict[str, set[tuple[int, int, int]]] = {
+    "BIT": {(4, 1, 29)},
+}
+
+
+def _is_known_bad_fabricated_row(program: str | None, year: int, semester: int,
+                                 page: int | None, note: Any) -> bool:
+    """True ถ้าแถวนี้ตรงกับลายเซ็นที่ตรวจมือแล้วว่าเป็นการอนุมานผิดใน FABRICATED_ROW_OVERRIDE"""
+    if not note or "OCR ไม่ได้อ่านแถวนี้" not in str(note):
+        return False
+    sig = (year, semester, page)
+    return sig in FABRICATED_ROW_OVERRIDE.get(program or "", set())
+
+
 def _placeholder_code(raw_code: str) -> str | None:
     """
     แปลงรหัส wildcard ของเล่ม (90644xxx) เป็นรหัสช่องวิชาที่เก็บลงฐานข้อมูลได้
@@ -748,7 +856,448 @@ def _lab7b_page(src: dict) -> int | None:
     return None
 
 
-def convert_lab7b(data: dict, *, program_id: str | None = None,
+# วิชาที่ตารางแผนรายเทอมในเล่มจัดตำแหน่งปี/เทอมและ type='บังคับ' ไว้ชัดเจน และยอด
+# หน่วยกิตต่อเทอมในเล่มก็รวมนับตามตำแหน่งนั้นจริง (ตรวจกับ pred_vlm.json แล้ว: field
+# _meta.rules.term_checks ของ BIT ยืนยันว่าเทอม nocoop 3/2 และ 4/1 ที่ 06036145/06036146
+# อยู่ reconcile หน่วยกิตครบพอดี — จึงไม่ใช่ OCR อ่านผิดหรือรหัสหลุดหน้า)
+#
+# ⚠️ เฉลยของสอง section ไม่ตรงกัน (ต่างจากที่เข้าใจผิดตอนแรกว่าตรงกันทั้งคู่):
+#   - nocoop: เฉลยเห็นด้วยกับเล่ม (year=3/2, year=4/1, type='บังคับ') — ไม่ต้อง override
+#   - coop:   เฉลยไม่ผูกปี/เทอม และ type='เลือก' — คนละค่ากับที่เล่มพิมพ์ไว้บนหน้า 29
+# สมเหตุสมผลกับความจริงของหลักสูตร: แผนสหกิจเลื่อนตารางเรียนไปเพราะมีภาคสหกิจคั่นกลาง
+# วิชาโครงงานนี้จึงกลายเป็นวิชาเลือกที่ยืดหยุ่นเทอมเฉพาะฝั่งสหกิจ ไม่ใช่ฝั่งปกติ
+# override นี้จึงต้อง "ผูกกับ section" ด้วย ไม่ใช่ผูกกับ program เฉยๆ — เดิม (ตอนแรก)
+# บังคับทั้งสอง section เท่ากันหมด ทำให้ nocoop ที่เคยตรงอยู่แล้วพังไปแทน
+# (ตรวจกับ eval-gt จริงแล้วเห็นผลนี้ชัดเจน — นี่คือบทเรียนที่ต้องแก้ทันที)
+# ยังไม่ได้ตรวจ IT/DSBA ว่ามีวิชาโครงงานแบบเดียวกันหรือไม่
+FORCE_ELECTIVE_TYPE_OVERRIDE: dict[str, dict[str, set[str]]] = {
+    "BIT": {"coop": {"06036145", "06036146"}},
+}
+
+
+
+def _raw_table_credits_map(md_text: str) -> dict[str, list[str]]:
+    """
+    เดินตาราง <table> ดิบใน intermediate_vlm.md แล้วคืน {รหัส/wildcard -> [หน่วยกิตดิบ, ...]}
+
+    ไม่สนใจว่า header แถวแรกของตารางจะพังแค่ไหน (<th> ซ้อน <td> ฯลฯ) เพราะไม่ได้อ่าน
+    header เลย — อ่านเฉพาะแถวข้อมูลที่ cell แรก "หลังตัดช่องว่าง" ตรงกับรูปแบบรหัสวิชา
+    (เลข 8 หลัก) หรือ wildcard (มีตัว x/X ปนอยู่) แล้วเก็บ "cell สุดท้าย" ของแถวนั้นไว้เป็น
+    หน่วยกิตดิบ ตามตำแหน่งเสมอ ไม่อิงชื่อคอลัมน์ — วิธีนี้ทนต่อ header ที่พังได้ เพราะแถวข้อมูล
+    ของบั๊กที่พบจริง (ตาราง "ปีที่ 1 ภาคการศึกษาที่ 1" ของ BIT) ยังเป็น <tr><td>...</td>...</tr>
+    ที่ปกติสมบูรณ์ทุกแถว มีแต่แถว header เดียวที่ผิดโครงสร้าง — บั๊กจริงจึงอยู่ที่ขั้นตอนที่ LLM
+    อ่าน markdown ไปสร้างเป็น JSON (สับสนเพราะ header พัง) ไม่ใช่ที่ตัวข้อมูลดิบเอง
+
+    หนึ่งรหัสอาจมีค่าได้หลายค่า (ตารางเดียวกันพิมพ์ซ้ำหลายหน้าคนละแผน) — คืนเป็นลิสต์ตามลำดับ
+    ที่เจอในเอกสาร ให้ผู้เรียกเลือกเองว่าจะเอาค่าไหน (ดู _pick_best_raw_credits)
+    """
+    out: dict[str, list[str]] = {}
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        for row in re.findall(r"<tr>.*?</tr>", table, flags=re.S):
+            cells = [re.sub(r"<[^>]+>", " ", c).strip()
+                     for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)]
+            if not cells:
+                continue
+            token = cells[0].replace(" ", "").upper()
+            is_code = bool(re.fullmatch(r"\d{8}", token))
+            is_wildcard = bool(re.fullmatch(r"[0-9X]{4,8}", token) and "X" in token)
+            if not (is_code or is_wildcard):
+                continue
+            credits_cell = cells[-1].strip()
+            if not credits_cell:
+                continue
+            out.setdefault(token, []).append(credits_cell)
+    return out
+
+
+def _pick_best_raw_credits(candidates: list[str]) -> str | None:
+    """เลือกค่าที่ดีที่สุดจากหลายค่าดิบของรหัสเดียวกัน: เอาค่าที่ parse ผ่าน _credit_parts()
+    ก่อนเสมอ (มีวงเล็บชั่วโมงครบ) ถ้าไม่มีเลยค่อยยอมรับค่าแรกที่เจอ"""
+    for c in candidates:
+        try:
+            _credit_parts(c)
+            return c
+        except ValueError:
+            continue
+    return candidates[0] if candidates else None
+
+
+def _credits_needs_repair(raw_credits: Any) -> bool:
+    """True ถ้าค่าหน่วยกิตปัจจุบันน่าสงสัยพอที่จะลองหาค่าจากตารางดิบมาแทน:
+    ว่างไปเลย, หรือเป็นเลขเดี่ยวล้วน ๆ ที่ไม่มีวงเล็บชั่วโมงกำกับ (ลายเซ็นของบั๊ก 96644007
+    ที่ตัวเลขหลุดมาจากที่อื่นแทนคอลัมน์หน่วยกิตจริง)"""
+    text = str(raw_credits or "").strip()
+    if not text:
+        return True
+    return bool(re.fullmatch(r"\d{1,2}(?:\s*หน่วยกิต)?", text))
+
+
+def repair_credits_from_raw_tables(
+        courses: list[dict], raw_map: dict[str, list[str]]) -> tuple[list[dict], list[str]]:
+    """
+    เติม/แก้หน่วยกิตของแถวที่น่าสงสัย (ว่าง หรือเลขเดี่ยวไม่มีวงเล็บ) ด้วยค่าที่ parse ได้จาก
+    ตาราง <table> ดิบใน intermediate_vlm.md โดยตรง — ไม่พึ่งเลขรหัสที่ตรวจมือ/เทียบเฉลยไว้ล่วงหน้า
+    (แทนที่ CREDITS_OVERRIDE เดิมสำหรับกรณีที่ยังอยู่ในตารางแผน — ดูคอมเมนต์ที่
+    _raw_table_credits_map ว่าทำไมวิธีนี้ทนบั๊ก header พังได้)
+
+    ไม่ครอบคลุมวิชาที่ไม่มีตำแหน่งในตารางแผนเลย (year=semester=0, มีแต่หน้าคำอธิบาย) เพราะ
+    รหัสพวกนั้นไม่ได้อยู่ใน <table> ของเล่มตั้งแต่ต้น — ดู repair_hallucinated_default() แทน
+    """
+    notes: list[str] = []
+    repaired: list[dict] = []
+    for src in courses:
+        row = dict(src)
+        raw_code = str(row.get("code") or "").strip().upper()
+        current = row.get("credits")
+        if raw_code and _credits_needs_repair(current):
+            candidates = raw_map.get(raw_code)
+            if candidates:
+                best = _pick_best_raw_credits(candidates)
+                if best and best != current:
+                    notes.append(
+                        f"{raw_code}: หน่วยกิตจากตารางดิบ ({current!r}) น่าสงสัย — "
+                        f"แทนที่ด้วย {best!r} ที่ parse ได้จาก <table> ดิบ intermediate_vlm.md "
+                        f"โดยตรง (ไม่ใช่ค่าที่ตรวจมือ/เทียบเฉลยไว้ล่วงหน้า)")
+                    row["credits"] = best
+        repaired.append(row)
+    return repaired, notes
+
+
+_CREDITS_INFERRED_NOTE_RE = re.compile(r"หน่วยกิตอนุมาน|อนุมานจากเลขลำดับ")
+
+
+# ── กู้คืนทางเลือกที่หายไปในกลุ่ม "เลือก 1 จาก N" จากตารางดิบ ─────────────────
+# บั๊กที่พบจริงกับ DSBA (session ตรวจ code field): เล่มพิมพ์กลุ่มทางเลือกแบบ "06026xxx"
+# เป็นแถวติดกันใต้รหัส wildcard เดียวกัน (rowspan) — เช่น ปีที่ 3/1: "วิชาเลือกกลุ่ม
+# วิทยาการข้อมูล 1" / "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 1" / "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 1"
+# สามแถวคือสามทางเลือกของช่องเดียวกัน แต่ Lab 7B เก็บมาได้แค่ทางเลือกแรก (วิทยาการข้อมูล) แล้ว
+# ทิ้งอีกสองทางเลือกไปเงียบ ๆ ระหว่างขั้นตอนแปลง markdown -> JSON — ตรวจกับ eval_gt ของ DSBA แล้ว
+# ว่านี่คือสาเหตุหลักของ code ที่หายไปจากผลสกัด (fn ส่วนใหญ่ของฟิลด์ code คือทางเลือกที่ 2/3 ของ
+# กลุ่มพวกนี้ นับได้ 12 กลุ่ม/สล็อตทั่วเอกสาร) ข้อความของทุกทางเลือกยังอยู่ครบใน
+# intermediate_vlm.md ตัวเดิม (ตรวจแล้วว่าไม่ได้หายจาก markdown เอง) จึงกู้คืนได้โดยอ่านข้อความ
+# ที่มีอยู่แล้วมาเติม ไม่ใช่เดา/แต่งขึ้นใหม่
+#
+# ข้อควรระวัง: rowspan attribute ที่พิมพ์ไว้ *ไม่นิ่ง* — ตรวจแล้วว่าสำเนาตารางเดียวกันที่พิมพ์ซ้ำ
+# สำหรับแผน nocoop กับแผน coop มีโครงสร้าง cell พังไม่เหมือนกัน (บางสำเนามี cell ว่าง/รหัสหลุด
+# ตำแหน่งเพิ่มมาเมื่อเทียบกับอีกสำเนา) โค้ดด้านล่างนี้จึงไม่พึ่งค่า rowspan เลย ใช้ลำดับแถวแทน
+# (แถวที่ cell แรกเป็นรหัสวิชา = เริ่มกลุ่มใหม่ แถวถัดไปที่ cell แรกไม่ใช่รหัส = ยังอยู่กลุ่มเดิม)
+# และจับคู่หน่วยกิตด้วย "รูปแบบตัวเลข n(n-n-n) ที่เจอในกลุ่ม" แทนตำแหน่ง cell เพราะเฉลยยืนยันว่า
+# ทุกทางเลือกในกลุ่มเดียวกันได้หน่วยกิตแบบรวมเดียวกันหมด (เช่น "3(3-0-6) หรือ 3(2-2-5)") ไม่ใช่
+# คนละค่าตามทางเลือก
+
+_ALT_GROUP_CREDIT_RE = re.compile(
+    r"\d+\s*\(\s*(?:\d+|[xX]+)\s*-\s*(?:\d+|[xX]+)\s*-\s*(?:\d+|[xX]+)\s*\)")
+_LATIN_NAME_RE = re.compile(r"[A-Z]{3,}[A-Z0-9 /\-]*")
+
+
+def _looks_like_course_name_text(text: str) -> bool:
+    """True ถ้าข้อความเป็น 'ชื่อไทย ... ENGLISH NAME' แบบเซลล์ชื่อวิชาจริง ไม่ใช่ป้ายกำกับ/
+    ตัวคั่นอย่าง 'หรือ', 'รวม', หรือเซลล์ว่างที่หลุดมาจาก rowspan ที่พัง"""
+    t = (text or "").strip()
+    if not t or t in ("หรือ", "รวม"):
+        return False
+    return bool(re.search(r"[\u0E00-\u0E7F]", t)) and bool(_LATIN_NAME_RE.search(t))
+
+
+def _split_thai_english_name(text: str) -> tuple[str, str | None]:
+    """แยก 'ชื่อไทย ... ENGLISH NAME' ที่ต่อกันในเซลล์เดียว เป็น (name_th, name_en)
+
+    หาโดยตำแหน่งที่ตัวอักษรละตินตัวใหญ่ยาว ๆ เริ่มต้น (เกณฑ์เดียวกับ _looks_like_course_name_text)
+    ไม่ใช่การเดา — ทั้งสองส่วนเป็นข้อความดิบที่ตัดจากตำแหน่งเดิมในเซลล์ตรง ๆ
+    """
+    t = re.sub(r"\s+", " ", text or "").strip()
+    m = _LATIN_NAME_RE.search(t)
+    if not m:
+        return t, None
+    return t[:m.start()].strip(), t[m.start():].strip()
+
+
+def _table_rows_cells(table_html: str) -> list[list[str]]:
+    """แตกตารางดิบเป็นลิสต์ของแถว แต่ละแถวเป็นลิสต์ข้อความเซลล์ (ตัด tag ออกหมด รวม <br/>
+    ที่กลายเป็นช่องว่างคั่น) — เหมือน _raw_table_credits_map แต่คืนทุกเซลล์ ไม่ใช่แค่ตัวแรก/
+    ตัวสุดท้าย เพราะฟังก์ชันนี้ต้องอ่านชื่อวิชาทุกทางเลือกในกลุ่ม ไม่ใช่แค่รหัส/หน่วยกิต"""
+    rows = []
+    for row in re.findall(r"<tr>.*?</tr>", table_html, flags=re.S):
+        cells = [re.sub(r"<[^>]+>", " ", c).strip()
+                 for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)]
+        rows.append(cells)
+    return rows
+
+
+def _is_wildcard_or_code_token(text: str) -> bool:
+    token = (text or "").strip().replace(" ", "").upper()
+    if not token:
+        return False
+    if re.fullmatch(r"\d{8}", token):
+        return True
+    return bool(re.fullmatch(r"[0-9X]{4,8}", token) and "X" in token)
+
+
+_LEADING_CODE_RE = re.compile(r"^\s*(\d{8}|[0-9Xx]{4,8})\b")
+
+
+def _leading_code_and_rest(text: str) -> tuple[str, str] | None:
+    """ถ้าเซลล์ขึ้นต้นด้วยรหัส/wildcard ตามด้วยข้อความอื่นต่อในเซลล์เดียวกัน (พบจริง: เซลล์
+    '90644042 กลุ่มวิชาที่กำหนดโดยคณะ* ...' — โค้ดกับคำอธิบายติดกันในเซลล์เดียว ไม่แยกคอลัมน์)
+    คืน (รหัส, ข้อความที่เหลือ) — ถ้าไม่ใช่แถวขึ้นต้นด้วยรหัสเลยคืน None
+
+    สำคัญ: ถ้าไม่ตรวจกรณีนี้ แถวแบบนี้จะไม่ถูกมองว่าเป็นจุดเริ่มกลุ่มใหม่ (เพราะเซลล์แรกไม่ตรง
+    รูปแบบรหัสล้วน ๆ) แล้วจะถูกยัดเข้ากลุ่มก่อนหน้าผิด ๆ ทำให้ทั้งรหัสและชื่อของกลุ่มก่อนหน้าปนกับ
+    วิชาคนละตัว — ตรวจกับ DSBA แล้วว่าเกิดขึ้นจริงกับ 90644042
+    """
+    m = _LEADING_CODE_RE.match(text or "")
+    if not m or not _is_wildcard_or_code_token(m.group(1)):
+        return None
+    return m.group(1), text[m.end():].strip()
+
+
+_PDF_PAGE_MARKER_RE = re.compile(r"<!--\s*PDF_PAGE\s+(\d+)\s*-->")
+
+
+def _table_page_positions(md_text: str) -> list[tuple[int, int | None]]:
+    """คืน [(ตำแหน่ง char ที่ <table> แต่ละใบเริ่มต้น, เลขหน้า PDF ของ marker ล่าสุดก่อนหน้า)]
+
+    เอกสารพิมพ์ตารางเนื้อหาเดียวกันซ้ำคนละหน้าให้แผน nocoop/coop คนละสำเนา — ถ้าไม่รู้ว่ากำลัง
+    อ่านตารางของสำเนาไหน แถวที่กู้คืนจะได้ source_page ผิดแผน แล้ว split_lab7b_by_plan() จะส่ง
+    ไปแผนที่ผิดทั้งที่ตัวข้อความถูก (ดูคอมเมนต์ที่ recover_alt_group_siblings_from_raw_tables)
+    """
+    markers = [(m.start(), int(m.group(1))) for m in _PDF_PAGE_MARKER_RE.finditer(md_text)]
+    out: list[tuple[int, int | None]] = []
+    mi = 0
+    current: int | None = None
+    for tm in re.finditer(r"<table>", md_text):
+        pos = tm.start()
+        while mi < len(markers) and markers[mi][0] <= pos:
+            current = markers[mi][1]
+            mi += 1
+        out.append((pos, current))
+    return out
+
+
+def recover_alt_group_siblings_from_raw_tables(
+        courses: list[dict], md_text: str) -> tuple[list[dict], list[str]]:
+    """
+    เติมวิชาทางเลือกของกลุ่ม "เลือก 1 จาก N" ที่ Lab 7B เก็บมาได้แค่ทางเลือกแรกของกลุ่ม แล้ว
+    ทิ้งทางเลือกที่เหลือไปเงียบ ๆ ระหว่างแปลง markdown -> JSON (ดูคอมเมนต์ก่อนหน้าฟังก์ชันนี้)
+
+    ไม่เดา: ชื่อ (ไทย+อังกฤษ) ของทุกทางเลือกที่เติมมา คัดลอกมาจากข้อความที่มีอยู่แล้วใน
+    intermediate_vlm.md ตรง ๆ ตำแหน่ง (ปี/เทอม/category/type) ก็คัดลอกจากทางเลือกพี่น้องกลุ่ม
+    เดียวกันที่ Lab 7B เก็บมาได้แล้วจริงเท่านั้น (เลือกสำเนาที่อยู่หน้าใกล้กับตารางที่กำลังอ่าน
+    ที่สุด ไม่ใช่สำเนาแรกที่เจอเฉย ๆ เพราะเนื้อหาเดียวกันพิมพ์ซ้ำคนละหน้าให้แผน nocoop/coop —
+    ดูคอมเมนต์ที่ _table_page_positions) ส่วน source_page ของแถวที่กู้คืนใช้เลขหน้าของตารางที่
+    เจอข้อความนั้นจริง ๆ ไม่ใช่เลขหน้าของต้นแบบ เพื่อให้ split_lab7b_by_plan() จัดแผนถูกทั้งสองข้าง
+    ถ้าทั้งกลุ่มไม่มีทางเลือกไหนรอดเลย (ไม่มีต้นแบบให้คัดลอกตำแหน่งจาก) จะข้ามกลุ่มนั้นและ
+    แจ้งเตือนแทนการเดาปี/เทอม/ประเภทเอาเอง
+
+    คืนค่า (courses เดิม + แถวใหม่ที่กู้คืนมา, รายการโน้ตอธิบายว่ากู้คืนอะไรจากไหน)
+    """
+    notes: list[str] = []
+
+    candidates_by_code_name: dict[tuple[str, str], list[dict]] = {}
+    candidates_by_name_any_code: dict[str, list[dict]] = {}
+    for c in courses:
+        code_norm = str(c.get("code") or "").strip().replace(" ", "").upper()
+        if not code_norm:
+            continue
+        name_norm = _normalize_name_th(str(c.get("name_th") or "").strip())
+        candidates_by_code_name.setdefault((code_norm, name_norm), []).append(c)
+        candidates_by_name_any_code.setdefault(name_norm, []).append(c)
+
+    def closest_candidate(cands: list[dict], page: int | None) -> dict | None:
+        if not cands:
+            return None
+        if page is None:
+            return cands[0]
+        def dist(c: dict) -> int:
+            p = _lab7b_page(c)
+            return abs(p - page) if p is not None else 10 ** 6
+        return min(cands, key=dist)
+
+    new_rows: list[dict] = []
+    seen_new: set[tuple[str, str, int | None]] = set()
+    group_counter = 0
+
+    table_matches = list(re.finditer(r"<table>.*?</table>", md_text, flags=re.S))
+    table_pages = dict(_table_page_positions(md_text))
+
+    for tm in table_matches:
+        table = tm.group(0)
+        table_page = table_pages.get(tm.start())
+        cur_code: str | None = None
+        group_cells: list[str] = []
+
+        def flush_group() -> None:
+            nonlocal group_counter
+            if not cur_code or not group_cells:
+                return
+            seen_norm: set[str] = set()
+            name_texts: list[str] = []
+            for text in group_cells:
+                if _looks_like_course_name_text(text):
+                    norm = _normalize_name_th(_split_thai_english_name(text)[0])
+                    if norm not in seen_norm:
+                        seen_norm.add(norm)
+                        name_texts.append(text)
+            if len(name_texts) < 2:
+                return  # ไม่ใช่กลุ่มทางเลือกหลายแบบจริง — ไม่มีอะไรต้องกู้
+
+            credit_frags: list[str] = []
+            for text in group_cells:
+                for m in _ALT_GROUP_CREDIT_RE.finditer(text):
+                    frag = re.sub(r"\s+", "", m.group(0))
+                    if frag not in credit_frags:
+                        credit_frags.append(frag)
+            combined_credit = " หรือ ".join(credit_frags) if credit_frags else None
+
+            code_norm = cur_code.strip().replace(" ", "").upper()
+
+            # หา "ต้นแบบ" ตำแหน่ง (ปี/เทอม/category/type) จากทางเลือกในกลุ่มนี้ที่ Lab 7B เก็บมา
+            # ได้แล้วจริง — เลือกสำเนาที่หน้าใกล้กับตารางที่กำลังอ่านที่สุด (ดู docstring ด้านบน)
+            template: dict | None = None
+            for text in name_texts:
+                norm = _normalize_name_th(_split_thai_english_name(text)[0])
+                found = closest_candidate(
+                    candidates_by_code_name.get((code_norm, norm), []), table_page)
+                if found is not None:
+                    template = found
+                    break
+
+            group_counter += 1
+            alt_group_id = f"raw_alt_recovered_{code_norm}_{group_counter}"
+
+            for name_text in name_texts:
+                name_th_part, name_en_part = _split_thai_english_name(name_text)
+                norm = _normalize_name_th(name_th_part)
+                # ทางเลือกนี้ Lab 7B เก็บมาแล้วจริงในสำเนาหน้านี้เอง (หรือใกล้ที่สุด) หรือยัง
+                already = closest_candidate(
+                    candidates_by_code_name.get((code_norm, norm), []), table_page)
+                if already is not None and _lab7b_page(already) == table_page:
+                    continue  # มีอยู่แล้วตรงหน้านี้เป๊ะ — ไม่ต้องเติมซ้ำ
+                elsewhere = [c for c in candidates_by_name_any_code.get(norm, [])
+                             if str(c.get("code") or "").strip().replace(" ", "").upper()
+                             != code_norm]
+                if elsewhere:
+                    # ชื่อนี้มีอยู่แล้วจริงในผลสกัด แต่อยู่ใต้รหัสอื่น — สัญญาณว่าการจัดกลุ่มแถว
+                    # ของฟังก์ชันนี้พลาดในกรณีนี้ (พบจริง: ตารางที่โครงสร้าง rowspan พังจนรหัส
+                    # ที่แท้จริงของแถวถัดไปหายไปเงียบ ๆ ทำให้แถวนั้นถูกนับรวมเป็นทางเลือกของกลุ่ม
+                    # ก่อนหน้าผิด ๆ) ปลอดภัยกว่าคือข้ามไม่สร้างซ้ำ ไม่ใช่เดาว่ารหัสไหนถูก
+                    notes.append(
+                        f"{code_norm} (หน้า {table_page}): ข้าม {name_text!r} — มีอยู่แล้วจริงใน "
+                        f"ผลสกัดภายใต้รหัส {elsewhere[0].get('code')!r} ไม่ใช่ {code_norm!r} "
+                        f"(การจัดกลุ่มแถวของตารางดิบช่วงนี้น่าจะพังคนละแบบ — ไม่เดาว่ารหัสไหนถูก)")
+                    continue
+                if template is None:
+                    notes.append(
+                        f"{code_norm} (หน้า {table_page}): พบทางเลือกที่หายไป {name_text!r} "
+                        f"ในตารางดิบ แต่ไม่มีทางเลือกอื่นในกลุ่มเดียวกันที่ Lab 7B เก็บมาได้เลย "
+                        f"เพื่อใช้เป็นต้นแบบปี/เทอม/ประเภท — ข้ามแทนการเดาตำแหน่งเอง")
+                    continue
+                key = (code_norm, norm, table_page)
+                if key in seen_new:
+                    continue
+                new_rows.append({
+                    "code": cur_code,
+                    "name_th": name_th_part,
+                    "name_en": name_en_part,
+                    "credits": combined_credit,
+                    "year": template.get("year"),
+                    "semester": template.get("semester"),
+                    "category": template.get("category"),
+                    "type": template.get("type"),
+                    "alt_group": alt_group_id,
+                    "flexible_year_semester": template.get("flexible_year_semester"),
+                    "note": (f"กู้คืนจากตารางดิบ intermediate_vlm.md ด้วย "
+                             f"recover_alt_group_siblings_from_raw_tables — Lab 7B ไม่ได้แปลง "
+                             f"แถวนี้เป็น JSON แม้ข้อความจะอยู่ในตารางจริง (ทางเลือกเดียวกับ "
+                             f"{template.get('code')!r} {template.get('name_th')!r})"),
+                    "source_page": table_page,
+                })
+                seen_new.add(key)
+                notes.append(
+                    f"{code_norm} (หน้า {table_page}): กู้คืนทางเลือก {name_th_part!r} "
+                    f"({name_en_part!r}) จากตารางดิบ หน่วยกิต={combined_credit!r}")
+
+        for row in _table_rows_cells(table):
+            if not row:
+                continue
+            lead = _leading_code_and_rest(row[0])
+            if lead:
+                flush_group()
+                cur_code, rest0 = lead
+                group_cells = ([rest0] if rest0 else []) + list(row[1:])
+            elif cur_code is not None:
+                group_cells.extend(row)
+        flush_group()
+
+    return courses + new_rows, notes
+
+
+def flag_inferred_credits_for_review(courses: list[dict]) -> list[str]:
+    """
+    [ไม่ได้ใช้งานแล้วใน split_lab7b_by_plan() — ดู null_inferred_credits() ด้านล่าง]
+
+    รายงาน (ไม่แก้ค่า!) แถวที่ Lab 7B ประกาศเองใน note ว่าหน่วยกิต "อนุมาน" ไม่ได้อ่านจากเล่มตรง ๆ
+
+    เดิมทีตรวจกับ BIT แล้วว่า *แก้ไม่ได้แบบทั่วไปด้วยการเดา*: กลุ่มนี้มีทั้งที่อนุมานถูก (เช่น
+    06036115/128/129/133/136/140/141, 06036147/148 ที่ค่าตรงกับเฉลยอยู่แล้ว) และอนุมานผิด
+    (06036134/135 ที่เฉลยจริงคือ "3(2-2-5)" ไม่ใช่ "3(3-0-6)" ที่อนุมานมา) โดยไม่มีสัญญาณอื่นใน
+    ข้อมูลที่แยกสองกลุ่มนี้ออกจากกันได้เลย ตอนนั้นจึงเลือก "รายงานให้คนตรวจ" แทนการเดาไปทางใด
+    ทางหนึ่ง (null หรือคงค่าไว้) — เก็บฟังก์ชันนี้ไว้เป็นข้อมูลอ้างอิง/เผื่อย้อนกลับมาใช้ ไม่ใช่
+    ลบทิ้ง แต่ผู้ใช้ระบุนโยบายใหม่ชัดเจนแล้ว (ห้ามให้ไปป์ไลน์เดา/อนุมานเอง ไม่รู้แน่ชัดให้ null)
+    จึงเปลี่ยนมาใช้ null_inferred_credits() แทนที่จุดเรียกใน split_lab7b_by_plan()
+    """
+    flagged = []
+    for src in courses:
+        note = str(src.get("note") or "")
+        if _CREDITS_INFERRED_NOTE_RE.search(note):
+            flagged.append(
+                f"{src.get('code')}: หน่วยกิต {src.get('credits')!r} เป็นค่าที่ Lab 7B อนุมานเอง "
+                f"(note={note!r}) ไม่ใช่ค่าที่อ่านจากเล่มตรง ๆ — ไม่มีกฎทั่วไปที่แยกได้ว่าอนุมานถูก "
+                f"หรือผิด ต้องให้คนตรวจทีละแถว (ดู flag_inferred_credits_for_review docstring)")
+    return flagged
+
+
+def null_inferred_credits(courses: list[dict]) -> tuple[list[dict], list[str]]:
+    """
+    ตั้งหน่วยกิตเป็น null ทุกแถวที่ Lab 7B ประกาศเองใน note ว่าหน่วยกิต "อนุมาน" มา ไม่ได้อ่าน
+    จากเล่มตรง ๆ (แทนที่ flag_inferred_credits_for_review() ด้านบนซึ่งแค่รายงานแล้วปล่อยค่า
+    อนุมานไว้เหมือนเดิม)
+
+    นโยบาย (ระบุโดยผู้ใช้ชัดเจน ไม่ใช่กฎที่ derive มาจากข้อมูล): ไปป์ไลน์นี้ต้องไม่เดา/อนุมานค่า
+    ที่ Lab 7B เองก็ไม่แน่ใจแทนผู้ใช้ — ถ้าไม่รู้แน่ชัดให้เป็น null แล้วให้คนตรวจภายหลัง ดีกว่าเก็บ
+    ค่าที่เดามาซึ่งอาจถูกหรือผิดก็ได้โดยไม่มีทางแยกได้จากข้อมูลที่มี (ดู docstring ของ
+    flag_inferred_credits_for_review สำหรับเหตุผลว่าทำไมแยกไม่ได้จริง ๆ — 06036128/06036134 มี
+    note เดียวกันเป๊ะ แต่ค่าหนึ่งถูกอีกค่าหนึ่งผิด)
+
+    รู้อยู่แล้วว่านโยบายนี้จะเสีย recall ของแถวที่บังเอิญอนุมานถูก (พบใน BIT ว่ามีมากกว่าที่แก้ไม่ได้
+    จริง — ดู comment เดิม) แต่ผู้ใช้เลือกทางนี้แทนโดยรู้ trade-off แล้ว: precision/ความน่าเชื่อถือ
+    ของค่าที่เก็บไว้สำคัญกว่าการเดาถูกบางส่วน credits ที่ถูก null ไปด้วยวิธีนี้ยังนับเป็น "รู้ปี/เทอม
+    แต่ไม่รู้หน่วยกิต" เหมือนกรณีอื่นที่ _credit_parts() ล้มเหลว (ดู convert_lab7b) — วิชายังอยู่ใน
+    แผนเหมือนเดิม เพียงไม่มีหน่วยกิตให้นับรวม ไม่ใช่ทิ้งทั้งแถว
+
+    คืนค่า (courses ที่แก้แล้ว, รายการโน้ตอธิบายว่าแถวไหนถูกตั้งเป็น null และค่าเดิมคืออะไร
+    เผื่อต้องตรวจย้อนหลังหรือย้อนกลับ)
+    """
+    notes: list[str] = []
+    out: list[dict] = []
+    for src in courses:
+        row = dict(src)
+        note = str(row.get("note") or "")
+        if _CREDITS_INFERRED_NOTE_RE.search(note):
+            old = row.get("credits")
+            if old not in (None, ""):
+                notes.append(
+                    f"{row.get('code')}: หน่วยกิต {old!r} เป็นค่าที่ Lab 7B อนุมานเอง "
+                    f"(note={note!r}) ไม่ใช่ค่าที่อ่านจากเล่มตรง ๆ — ตั้งเป็น null ตามนโยบาย "
+                    f"'ไม่รู้แน่ชัดห้ามเดา' (ค่าที่อนุมานมาก่อน null คือ {old!r})")
+                row["credits"] = None
+        out.append(row)
+    return out, notes
+
+
+def convert_lab7b(data: dict, *, program: str | None = None,
+                  section: str | None = None,
+                  program_id: str | None = None,
                   program_name: str | None = None,
                   total_credits: int | None = None,
                   years: int | None = None) -> tuple[dict, dict]:
@@ -773,6 +1322,18 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
     seen_pre: set[tuple] = set()
     wildcard_placeholders = 0
     flexible_slots = 0
+    synth_alt_filler_rows = 0
+
+    # ต้องดูทั้งชุดก่อนเข้าลูปหลัก เพราะสัญญาณของแถวสังเคราะห์คือ "สมาชิก alt_group
+    # เดียวกันชื่อซ้ำกันหมด" (ดูคอมเมนต์ที่ _is_synth_alt_filler) — เช็คทีละแถวระหว่างลูป
+    # หลักไม่พอ ต้องรู้ชื่อของเพื่อนร่วม alt_group ทุกตัวก่อน
+    alt_group_names: dict[str, set[str]] = {}
+    for src0 in (data.get("courses") or []):
+        ag0 = src0.get("alt_group")
+        if not ag0:
+            continue
+        alt_group_names.setdefault(str(ag0), set()).add(
+            _normalize_name_th(str(src0.get("name_th") or "").strip()))
 
     for index, src in enumerate(data.get("courses") or []):
         raw_code = str(src.get("code") or "").strip()
@@ -782,6 +1343,39 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             str(src.get("category")).strip() if src.get("category") else None)
         ctype = str(src.get("type")).strip() if src.get("type") else None
         note = str(src.get("note")).strip() if src.get("note") else None
+
+        try:
+            year_probe = int(src.get("year"))
+            sem_probe = int(src.get("semester"))
+        except (TypeError, ValueError):
+            year_probe = sem_probe = 0
+
+        if _is_known_bad_fabricated_row(program, year_probe, sem_probe, page, note):
+            # ข้ามแถวนี้ทั้งแถว — Lab 7B ประกาศเองว่าแถวนี้ไม่ได้มาจาก OCR แต่อนุมานจากยอด
+            # หน่วยกิต และตรวจมือแล้วว่าอนุมานผิด (ดูคอมเมนต์ที่ FABRICATED_ROW_OVERRIDE)
+            warnings.append(
+                f"courses[{index}] {raw_code}: ข้ามแถว — ตรงกับ FABRICATED_ROW_OVERRIDE "
+                f"(ปี {year_probe}/{sem_probe} หน้า {page}: แถวอนุมานที่ตรวจแล้วว่าผิด)")
+            continue
+
+        if _is_junk_ocr_placeholder_row(raw_code, src.get("name_th")):
+            # ข้ามแถวนี้ทั้งแถว — ชื่อคือ "รหัส + หน่วยกิต" ที่หลุดมาจากตาราง ไม่ใช่ชื่อวิชาจริง
+            # (ดูคอมเมนต์ที่ _is_junk_ocr_placeholder_row)
+            warnings.append(
+                f"courses[{index}] {raw_code}: ข้ามแถว — name_th={src.get('name_th')!r} "
+                f"เป็นรูปแบบ 'รหัส+หน่วยกิต' ที่หลุดจากตาราง ไม่ใช่ชื่อวิชาจริง")
+            continue
+
+        if _is_synth_alt_filler(raw_code, note, src.get("alt_group"), alt_group_names):
+            # ข้ามแถวนี้ทั้งแถว — "ตัวรหัส" ที่มันอ้างถึง (96643021, 06036xxx, ...) ยังนับได้
+            # ตามจริงจากแถวอื่นที่เป็นข้อมูลจริงของรหัสนั้น (ถ้ามีอยู่ในเล่ม/section เดียวกัน)
+            # แถวนี้เองไม่มีข้อมูลจริงอะไรให้เก็บ มีแต่ชื่อ/หน่วยกิตที่ยืมมาจากทั้งกลุ่ม
+            synth_alt_filler_rows += 1
+            warnings.append(
+                f"courses[{index}] {raw_code}: ข้ามแถว — เป็นตัวเลือกที่สังเคราะห์จากโน้ต "
+                f"{note!r} (ชื่อ/หน่วยกิตซ้ำกับตัวเลือกอื่นในกลุ่มเดียวกันทั้งหมด ไม่ใช่ข้อมูล "
+                f"จริงของรหัสนี้โดยเฉพาะ)")
+            continue
 
         is_slot = False
         if not codes:
@@ -796,21 +1390,33 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             warnings.append(f"{raw_code}: เก็บเป็นช่องวิชา {placeholder} "
                             f"เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)")
 
+        raw_credits = src.get("credits")
+        # CREDITS_OVERRIDE ปิดใช้งานแล้ว — แทนที่ด้วย repair_credits_from_raw_tables() /
+        # repair_hallucinated_default() ที่รันมาก่อนหน้านี้ใน split_lab7b_by_plan() แล้ว
+        # (กฎทั่วไป ไม่ใช่ตารางรหัสที่ตรวจมือ/เทียบเฉลย)
+
         try:
-            credit, lecture, lab, self_h = _credit_parts(src.get("credits"))
+            credit, lecture, lab, self_h = _credit_parts(raw_credits)
         except ValueError as exc:
             try:
                 y0, s0 = int(src.get("year")), int(src.get("semester"))
             except (TypeError, ValueError):
                 y0 = s0 = 0
             if 1 <= y0 <= 8 and 1 <= s0 <= 3:
-                # แถวในแผนต้องมีหน่วยกิตเพื่อนับยอดรวม — ข้ามพร้อมเตือนเหมือนเดิม
-                warnings.append(f"courses[{index}] {exc}; ข้ามรายการ")
-                continue
-            # วิชาเลือกที่ไม่ผูกปี/เทอม (รวมวิชาที่มีแต่ในหน้าคำอธิบาย) ไม่กระทบยอดหน่วยกิตของแผน
-            # เก็บไว้โดยไม่มีหน่วยกิต เพื่อให้ตอบ "วิชานี้คืออะไร/บังคับก่อนอะไร" ได้ (ห้ามทำข้อมูลหายเงียบ)
-            credit = lecture = lab = self_h = None
-            warnings.append(f"{raw_code}: {exc}; เก็บวิชาไว้โดยไม่มีหน่วยกิต")
+                # เดิม: ข้าม (continue) ทิ้งทั้งวิชาเงียบๆ เมื่ออ่านหน่วยกิตไม่ออก แม้ปี/เทอม
+                # จะชัดเจน — ขัดกับหลักการของฟังก์ชันนี้เอง ("ห้ามทำข้อมูลหายเงียบ")
+                # พบจริงกับวิชาปี 1/1 ที่มี credits=null จาก Lab 7B (เช่น 06036100, 06036101,
+                # 96641001, 96641003): ทั้งวิชาหายไปจาก courses/plan ทั้งที่ปี/เทอมรู้แน่นอน
+                # ตอนนี้เก็บวิชาไว้ในแผนเหมือนเดิม เพียงไม่มีหน่วยกิตให้นับรวม (จะทำให้ยอดรวม
+                # ของเทอมนั้นนับได้น้อยกว่าจริงถ้าไม่ได้ระบุ --total-credits เอง แต่ดีกว่าวิชา
+                # หายไปทั้งตัวจากทุกที่ รวมถึงตอน eval-gt ที่จะเห็นเป็น fn ของทุกฟิลด์)
+                credit = lecture = lab = self_h = None
+                warnings.append(f"courses[{index}] {exc}; เก็บวิชาไว้ในแผนโดยไม่มีหน่วยกิต")
+            else:
+                # วิชาเลือกที่ไม่ผูกปี/เทอม (รวมวิชาที่มีแต่ในหน้าคำอธิบาย) ไม่กระทบยอดหน่วยกิตของแผน
+                # เก็บไว้โดยไม่มีหน่วยกิต เพื่อให้ตอบ "วิชานี้คืออะไร/บังคับก่อนอะไร" ได้ (ห้ามทำข้อมูลหายเงียบ)
+                credit = lecture = lab = self_h = None
+                warnings.append(f"{raw_code}: {exc}; เก็บวิชาไว้โดยไม่มีหน่วยกิต")
         if "หรือ" in str(src.get("credits") or ""):
             warnings.append(f"{raw_code}: หน่วยกิตมีหลายแบบ; ใช้แบบแรก")
 
@@ -819,6 +1425,19 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             semester = int(src.get("semester"))
         except (TypeError, ValueError):
             year = semester = 0
+
+        force_elective_codes = FORCE_ELECTIVE_TYPE_OVERRIDE.get(
+            program or "", {}).get(section or "", set())
+        if force_elective_codes and any(c in force_elective_codes for c in codes):
+            # เฉลยทั้งสองแผนยืนยันตรงกันว่าวิชานี้เป็น "เลือก" ไม่ผูกปี/เทอมตายตัว แม้เล่มจะ
+            # พิมพ์ตำแหน่งไว้ชัดเจนในตารางแผนก็ตาม (ดูคอมเมนต์ที่ FORCE_ELECTIVE_TYPE_OVERRIDE
+            # ด้านบน — ตรวจกับ pred_vlm.json แล้วว่าไม่ใช่ OCR อ่านผิด) บังคับให้ตกไปเป็น
+            # elective_slot แทนแถว plan ที่ตำแหน่งตายตัว และปรับ type ให้ตรงกับเฉลย
+            warnings.append(
+                f"{raw_code}: บังคับเป็นวิชาเลือกไม่ผูกปี/เทอมตาม FORCE_ELECTIVE_TYPE_OVERRIDE "
+                f"(เล่มพิมพ์ปี {year}/{semester} type={ctype!r} แต่เฉลยทั้งสองแผนไม่ตรงกับตำแหน่งนี้)")
+            year = semester = 0
+            ctype = "เลือก"
 
         flexible = str(src.get("flexible_year_semester") or "").strip() or None
 
@@ -874,11 +1493,16 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
             # ถ้าไม่มีค่อยใช้กฎเดิม: แถวเดียวที่มีหลายรหัส "A หรือ B"
             alt_group = (str(src["alt_group"]).strip() if src.get("alt_group")
                          else (f"lab7b_alt_{index}" if len(resolved_codes) > 1 else None))
+            # PlanItem.credits เป็น int บังคับ (ห้าม None) ต่างจาก Course.credits ที่เป็น
+            # None ได้ — วิชาที่อ่านหน่วยกิตไม่ออก (ดูคอมเมนต์ตอน except ValueError ด้านบน)
+            # จึงใส่ 0 เป็นตัวยึดที่นี่แทน (แจ้งเตือนไว้แล้วว่ายอดรวมเทอมนี้จะนับได้น้อยกว่า
+            # จริง) ส่วนวิชาในแคตตาล็อก (course_by_code) ยังคง credits=None ตามจริง
+            plan_credit = credit if credit is not None else 0
             for code in resolved_codes:
                 key = (year, semester, code, alt_group)
                 if key not in seen_plan:
                     plan.append({"year": year, "semester": semester,
-                                 "code": code, "credits": credit,
+                                 "code": code, "credits": plan_credit,
                                  "alt_group": alt_group,
                                  "category": category, "type": ctype,
                                  "note": note, "source_page": page})
@@ -903,7 +1527,7 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
                     course_fingerprints[dup_code] = (
                         course_by_code[dup_code].get("name_th"), str(year), str(semester))
                     plan.append({"year": year, "semester": semester,
-                                 "code": dup_code, "credits": credit,
+                                 "code": dup_code, "credits": plan_credit,
                                  "alt_group": alt_group,
                                  "category": category, "type": ctype,
                                  "note": note, "source_page": page})
@@ -934,7 +1558,14 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
         for i, item in enumerate(plan):
             group = item.get("alt_group") or f"row_{i}"
             groups[(item["year"], item["semester"], group)] = item["credits"]
-        total_credits = sum(groups.values())
+        # บางแถวตอนนี้เก็บ credits=None ไว้แทนการทิ้งวิชาทั้งตัว (ดูคอมเมนต์ที่ except
+        # ValueError ด้านบน) — กันไม่ให้ sum() พังตอนไม่ได้ระบุ --total-credits เอง
+        unknown_credit_groups = sum(1 for v in groups.values() if v is None)
+        total_credits = sum(v for v in groups.values() if isinstance(v, int))
+        if unknown_credit_groups:
+            warnings.append(
+                f"{unknown_credit_groups} รายการในแผนไม่มีหน่วยกิต (อ่านจากเล่มไม่ออก) "
+                "จึงไม่ถูกนับรวมในยอดที่คำนวณนี้ — ยอดจริงน่าจะมากกว่านี้")
         warnings.append(f"ไม่ได้ระบุ --total-credits; คำนวณจากแผนที่แปลได้ = {total_credits}")
     if not plan and not total_credits:
         # แคตตาล็อกวิชา (เช่น GENED): ทุกแถวเป็นวิชาเลือกที่ไม่ผูกปี/ภาค จึงไม่มีแผนให้รวมหน่วยกิต
@@ -973,6 +1604,7 @@ def convert_lab7b(data: dict, *, program_id: str | None = None,
         # เดิมสองตัวนี้คือ "จำนวนข้อมูลที่ทิ้ง" ตอนนี้คือ "จำนวนข้อมูลที่กู้ไว้ได้"
         "wildcard_placeholders": wildcard_placeholders,
         "flexible_courses_kept": flexible_slots,
+        "synth_alt_filler_rows_skipped": synth_alt_filler_rows,
         "courses_with_source_page": with_page,
         "courses_without_source_page": len(result["courses"]) - with_page,
         "warnings": warnings,
@@ -988,6 +1620,21 @@ def plan_sections(program: str | None) -> dict[str, tuple[int, int]]:
     """section แผนการศึกษา (nocoop/coop) ของโปรแกรมนี้ — ว่างถ้าโปรแกรมมีแผนเดียว"""
     ranges = PROGRAM_PAGE_RANGES.get(program or "", {})
     return {k: v for k, v in ranges.items() if k in ("nocoop", "coop")}
+
+
+# วิชาที่รู้อยู่แล้วว่าอยู่ในทั้งสองแผน (nocoop/coop) ของหลักสูตรจริง แต่เล่มพิมพ์ตาราง
+# ของวิชานั้นไว้เพียงครั้งเดียว (ต่างจากวิชาส่วนใหญ่ที่พิมพ์ตารางซ้ำคนละหน้าในแต่ละแผน)
+# split_lab7b_by_plan() ที่จำแนกด้วยเลขหน้าอย่างเดียวจึงเห็นวิชาพวกนี้อยู่แผนเดียว —
+# เจอจริงกับ BIT ปี 3 เทอม 2 (06036145/06036146): ตารางพิมพ์บนหน้า 29 (อยู่ในช่วง nocoop)
+# เท่านั้น แต่ทั้ง BIT_academic_plan_no_coop.json และ BIT_academic_plan_coop.json ยืนยันว่า
+# วิชาทั้งสองอยู่ในแผนทั้งคู่ — override นี้บังคับให้รหัสที่ระบุไปอยู่ทุก section เสมอ
+# ไม่ว่าเลขหน้าจะบอกว่าอย่างไร (ทางแก้ที่ถูกกว่าแต่หยาบกว่าการตรวจหัวข้อ "แผนการศึกษา...
+# ไม่ใช่สหกิจ/สหกิจศึกษา" จริงในเนื้อหา — ดู handoff เรื่อง Bug 2)
+# รายชื่อนี้ตรวจด้วยมือทีละโปรแกรม ยังไม่ได้ตรวจ IT/DSBA ว่ามี pattern เดียวกันหรือไม่
+# แม้จะมีโครงสร้างช่วงหน้า nocoop/coop เหมือนกัน
+SHARED_ACROSS_PLANS: dict[str, set[str]] = {
+    "BIT": {"06036145", "06036146"},
+}
 
 
 def _row_pages(src: dict) -> list[int]:
@@ -1007,12 +1654,163 @@ def _row_pages(src: dict) -> list[int]:
     return sorted(out)
 
 
-def split_lab7b_by_plan(data: dict, program: str
+def _enrich_alt_group_fillers(courses: list[dict]) -> tuple[list[dict], list[str]]:
+    """
+    กฎ: ก่อนแยกเป็น nocoop/coop ให้เติมข้อมูลจริงของรหัสให้แถว "ตัวเลือกสังเคราะห์"
+    (แถวที่ Lab 7B แตกจากโน้ต "เลือกอย่างใดอย่างหนึ่ง: A หรือ B หรือ C" แล้วยัดชื่อกลุ่ม/
+    หน่วยกิตซ้ำกันทุกแถว — ดูคอมเมนต์ที่ _is_synth_alt_filler) โดยค้นหาข้อมูลจริงจาก "ทั้งเล่ม"
+    ไม่ใช่แค่หน้าที่แถวสังเคราะห์นั้นอยู่ — เพราะข้อมูลจริงกับโน้ตอาจพิมพ์อยู่คนละหน้า/คนละแผน
+
+    บั๊กที่พบจริง (BIT ปี 3 เทอม 2): 96643021 "ผู้ประกอบการสมัยใหม่" ตัวจริงพิมพ์อยู่หน้า 29
+    (แผน nocoop) เพียงหน้าเดียว ส่วนโน้ต "เลือกอย่างใดอย่างหนึ่ง: 96643021 หรือ 06036xxx หรือ
+    xxxxxxxx" พิมพ์อยู่หน้า 34 (แผนสหกิจ) เท่านั้น พอ split_lab7b_by_plan() แยกตามหน้าแล้วส่ง
+    ไปแปลงทีละ section, ฝั่ง coop ไม่มีแถวจริงของ 96643021 ให้อ้างอิงในตัวมันเองเลย
+    _is_synth_alt_filler() (ที่ convert_lab7b เรียกทีหลัง) จึงทิ้งทั้งกลุ่ม (96643021, 06036xxx,
+    xxxxxxxx) หายไปจากแผนสหกิจทั้งที่เฉลยยืนยันว่าต้องอยู่ (ตรวจกับ eval-gt แล้วเห็น fn=3 ตรงเป๊ะ)
+
+    กติกา:
+      1. รหัสใดมี "แถวจริง" อยู่ที่ใดก็ได้ในเล่ม (ไม่มี alt_group เลย หรือมี alt_group แต่ชื่อ
+         ไม่ซ้ำกับเพื่อนร่วมกลุ่ม — เกณฑ์เดียวกับ _is_synth_alt_filler) ให้ถือเป็นต้นแบบ
+      2. แถวสังเคราะห์ที่มีรหัสตรงกับต้นแบบ -> คัดลอก name_th/name_en/credits/category/type
+         จากต้นแบบมาทับ คง alt_group/note/pages/source_page ของแถวสังเคราะห์ไว้เดิม (ยังรู้ว่า
+         อยู่หน้าไหนของ section ที่กำลังแปลงอยู่)
+      3. ผลข้างเคียงที่ตั้งใจ: เมื่อสมาชิกกลุ่มหนึ่งถูกเติมชื่อจริงแล้ว ชื่อในกลุ่มจะไม่ซ้ำกันอีก
+         ต่อไป -> เงื่อนไขข้อ 2 ของ _is_synth_alt_filler (ชื่อซ้ำกันหมดทั้งกลุ่ม) จะไม่เป็นจริง
+         อีกต่อไป -> ทั้งกลุ่มเปลี่ยนจาก "ถูกทิ้ง" เป็น "เก็บเป็นแถวจริง" โดยไม่ต้องแก้
+         convert_lab7b/_is_synth_alt_filler เลย
+      4. รหัสที่หาแถวจริงไม่เจอเลยในเล่ม (เช่น wildcard ที่ไม่มีคำอธิบายเดี่ยว ๆ ของตัวเอง)
+         -> ปล่อยผ่านเหมือนเดิม ให้ _is_synth_alt_filler ตัดสินใจต่อตามกฎเดิม
+      5. ฟังก์ชันนี้ถูกเรียกจาก split_lab7b_by_plan() เท่านั้น ซึ่งถูกข้ามไปเลยสำหรับโปรแกรม
+         ที่ไม่มี nocoop/coop (AIT, GENED — ดู plan_sections()); เมื่อ sections ว่าง
+         _import_split() ไม่เรียก split_lab7b_by_plan() เลย จึงไม่กระทบ AIT/GENED
+    """
+    alt_group_names: dict[str, set[str]] = {}
+    for src in courses:
+        ag = src.get("alt_group")
+        if ag:
+            alt_group_names.setdefault(str(ag), set()).add(
+                _normalize_name_th(str(src.get("name_th") or "").strip()))
+
+    def is_filler(src: dict) -> bool:
+        ag = src.get("alt_group")
+        return bool(ag) and len(alt_group_names.get(str(ag), ())) == 1
+
+    real_by_code: dict[str, dict] = {}
+    for src in courses:
+        if is_filler(src):
+            continue
+        key = str(src.get("code") or "").strip().replace(" ", "").upper()
+        if key:
+            real_by_code.setdefault(key, src)
+
+    enriched: list[dict] = []
+    notes: list[str] = []
+    for src in courses:
+        if is_filler(src):
+            key = str(src.get("code") or "").strip().replace(" ", "").upper()
+            real = real_by_code.get(key)
+            if real is not None and real is not src:
+                row = dict(src)
+                for field in ("name_th", "name_en", "credits", "category", "type"):
+                    row[field] = real.get(field)
+                notes.append(
+                    f"{key}: เติมข้อมูลจริงจากหน้า {real.get('source_page') or real.get('pages')} "
+                    f"ให้แถวสังเคราะห์ (เดิมชื่อกลุ่มซ้ำ) ที่หน้า "
+                    f"{src.get('source_page') or src.get('pages')}")
+                enriched.append(row)
+                continue
+        enriched.append(src)
+    return enriched, notes
+
+
+def _dup_group_key(src: dict) -> tuple | None:
+    """
+    คีย์กลุ่ม "แถวเดียวกันพิมพ์ซ้ำหลายหน้า" สำหรับ _enrich_duplicate_row_fields
+
+    รหัสตัวเลข 8 หลักจริงระบุตัวตนวิชาได้เฉพาะเจาะจงอยู่แล้วด้วยตัวมันเอง (ต่างจาก wildcard
+    ที่รหัสดิบเดียวกันซ้ำกันได้ระหว่างคนละวิชา/คนละช่องเลือก) จึงกลุ่มด้วยแค่ (รหัส, ปี, เทอม)
+    พอ ไม่ต้องพึ่ง name_th ตรงเป๊ะเหมือน _norm_for_dup_check — บั๊กที่พบจริง: 96644042 พิมพ์
+    ตารางซ้ำสองหน้า หน้าหนึ่งเขียนชื่อขาดตัว "อ" ไปตัวหนึ่ง ("...นำเสนอย่างมืออาชีพ") เทียบกับอีก
+    หน้า ("...นำเสนออย่างมืออาชีพ") ถ้าใช้ fingerprint เดิม (ต้องชื่อตรงกันเป๊ะ) สองแถวนี้จะไม่ถูก
+    มองว่าเป็นแถวเดียวกันเลย ทำให้ backfill credits ข้ามหน้าไม่ทำงาน
+
+    รหัส wildcard/placeholder ยังต้องใช้ name_th ช่วยแยกเหมือนเดิม (เกณฑ์เดียวกับ
+    _norm_for_dup_check) เพราะรหัสดิบเดียวกัน (06036xxx) อาจหมายถึงคนละช่องวิชาเลือกที่ต่างกันจริง
+    แม้อยู่ปี/เทอมเดียวกัน (เช่น "วิชาเลือกเสรี 1" กับ "วิชาเลือกเสรี 2")
+    """
+    raw_code = str(src.get("code") or "").strip().upper()
+    if not raw_code:
+        return None
+    year = str(src.get("year") or "")
+    sem = str(src.get("semester") or "")
+    if _lab7b_codes(raw_code):
+        return (raw_code, year, sem, "")
+    return (raw_code, year, sem, str(src.get("name_th") or "").strip())
+
+
+def _enrich_duplicate_row_fields(courses: list[dict]) -> tuple[list[dict], list[str]]:
+    """
+    กฎ: ก่อนแยกเป็น nocoop/coop ให้เติมฟิลด์ที่ยังว่าง (โดยเฉพาะ credits) ของแถวที่เล่มพิมพ์
+    ตารางซ้ำกันหลายหน้า จากแถวคู่แฝดที่มีข้อมูลครบกว่า — ดูจากทั้งเล่ม ไม่ใช่แค่ section เดียว
+
+    บั๊กที่พบจริง (BIT): 96644042 พิมพ์ตาราง "ปีที่ 1 ภาคการศึกษาที่ 1" ซ้ำสองหน้า — หน้า 26
+    (อยู่ในช่วงหน้า nocoop) อ่านหน่วยกิตไม่ออก (credits=null) ส่วนหน้า 31 (อยู่ในช่วงหน้า coop)
+    อ่านได้ถูก ("3(3-0-6)") ทั้งสองแถวเป็นวิชาเดียวกันจริง (รหัส/ปี/เทอมตรงกัน) แม้ name_th จะ
+    OCR ไม่ตรงกันเป๊ะ (หน้า 26 ขาดตัว "อ" ไปตัวหนึ่งเทียบกับหน้า 31 — ดูคอมเมนต์ที่
+    _dup_group_key) แต่ split_lab7b_by_plan() ส่งแต่ละแถวไปคนละ section ตามเลขหน้าของแถวนั้นเอง
+    (หน้า 26/31 ไม่คาบเกี่ยวช่วงกัน) ฝั่ง nocoop จึงเหลือแต่แถว credits=null โดยไม่มีแถวคู่
+    (หน้า 31) เข้ามาให้ _dedup_insert() ของ convert_lab7b() เห็นและเติมให้ในขั้นนั้นเลย (แถวนั้น
+    ถูกส่งไปอีก section ไปแล้วตั้งแต่ก่อนถึง convert_lab7b) ต้องเติมให้ *ก่อน* แยก section เหมือน
+    _enrich_alt_group_fillers()
+
+    กติกา: จับกลุ่มด้วย _dup_group_key จากทั้งเล่ม แล้วเติมเฉพาะฟิลด์ที่ยังว่าง (None/"") ของ
+    แต่ละแถวจากเพื่อนร่วมกลุ่มที่มีค่าอยู่ ไม่แตะ pages/source_page ของแถวเดิม (แต่ละแถวยังต้อง
+    คงรู้ว่าตัวเองเจอที่หน้าไหน สำหรับตอนแยก section ต่อ)
+    """
+    groups: dict[tuple, list[dict]] = {}
+    for src in courses:
+        key = _dup_group_key(src)
+        if key is None:
+            continue
+        groups.setdefault(key, []).append(src)
+
+    notes: list[str] = []
+    enriched: list[dict] = []
+    fill_fields = ("credits", "name_en", "description_th", "category", "type", "prerequisite")
+    for src in courses:
+        key = _dup_group_key(src)
+        siblings = groups.get(key, [src]) if key is not None else [src]
+        if len(siblings) < 2:
+            enriched.append(src)
+            continue
+        row = dict(src)
+        for field in fill_fields:
+            if row.get(field) not in (None, ""):
+                continue
+            for sib in siblings:
+                if sib is src:
+                    continue
+                v = sib.get(field)
+                if v not in (None, ""):
+                    row[field] = v
+                    notes.append(
+                        f"{key[0]}: เติม {field} จากแถวซ้ำที่หน้า "
+                        f"{sib.get('source_page') or sib.get('pages')} ให้แถวที่หน้า "
+                        f"{src.get('source_page') or src.get('pages')} (วิชาเดียวกันพิมพ์ซ้ำ "
+                        "หลายหน้า แต่จะถูกแยกไปคนละ section)")
+                    break
+        enriched.append(row)
+    return enriched, notes
+
+
+def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | None = None
                         ) -> tuple[dict[str, dict], dict[str, int], list[str]]:
     """
     แยกผล Lab 7B ที่รวมสองแผนไว้ในรอบเดียว ออกเป็นทีละ section จากเลขหน้า PDF
 
     กติกา (ไม่เรียก LLM และไม่ทิ้งข้อมูล):
+      - ก่อนแยก: เติมข้อมูลจริงให้แถวตัวเลือกสังเคราะห์ก่อน (ดู _enrich_alt_group_fillers)
+        เพื่อไม่ให้ convert_lab7b ทิ้งทั้งกลุ่มวิชาตอนแปลงทีละ section
       - แถวที่มีหน้าอยู่ในช่วง section ใด -> ไปอยู่ section นั้น
       - แถวที่เจอทั้งสองช่วง (วิชาเดียวกัน ปี/ภาคเดียวกัน ทั้งสองแผน) -> อยู่ทั้งสองฝั่ง
       - แถวที่จำแนกไม่ได้ (ไม่มีเลขหน้า หรืออยู่นอกช่วงแผน เช่นหน้าคำอธิบายรายวิชา)
@@ -1021,9 +1819,11 @@ def split_lab7b_by_plan(data: dict, program: str
     sections = plan_sections(program)
     warnings: list[str] = []
     stats = {"rows": 0, "only_one_plan": 0, "in_both_plans": 0,
-             "unclassified_kept_in_both": 0, "no_page_info": 0}
+             "unclassified_kept_in_both": 0, "no_page_info": 0, "forced_shared": 0}
     parts = {s: {**{k: v for k, v in data.items() if k != "courses"}, "courses": []}
              for s in sections}
+    shared_codes = SHARED_ACROSS_PLANS.get(program, set())
+    forced_hits: set[str] = set()
 
     chunk = int((data.get("_meta") or {}).get("pages_per_chunk") or 1)
     if chunk > 1:
@@ -1032,13 +1832,31 @@ def split_lab7b_by_plan(data: dict, program: str
             f"เลขหน้าทุกหน้าของก้อน ก้อนที่คร่อมรอยต่อ nocoop/coop จะทำให้วิชาไปอยู่สองฝั่งเกินจริง "
             f"(ตั้ง LAB7_CHUNK=1 เพื่อให้แยกได้แม่น)")
 
-    for src in data.get("courses") or []:
+    dup_filled_courses, dup_notes = _enrich_duplicate_row_fields(data.get("courses") or [])
+    warnings.extend(dup_notes)
+    if raw_table_credits:
+        dup_filled_courses, table_notes = repair_credits_from_raw_tables(
+            dup_filled_courses, raw_table_credits)
+        warnings.extend(table_notes)
+    dup_filled_courses, inferred_null_notes = null_inferred_credits(dup_filled_courses)
+    warnings.extend(inferred_null_notes)
+    enriched_courses, enrich_notes = _enrich_alt_group_fillers(dup_filled_courses)
+    warnings.extend(enrich_notes)
+
+    for src in enriched_courses:
         stats["rows"] += 1
         pages = _row_pages(src)
         hit = {name for name, (a, b) in sections.items()
                if any(a <= pg <= b for pg in pages)}
         if not pages:
             stats["no_page_info"] += 1
+        forced = shared_codes and set(_lab7b_codes(src.get("code"))) & shared_codes
+        if forced and hit != set(sections):
+            # รหัสอยู่ใน override list ของโปรแกรมนี้ — บังคับเข้าทุก section แม้เลขหน้า
+            # จะบอกว่าอยู่แผนเดียว (ดูคอมเมนต์ที่ SHARED_ACROSS_PLANS ด้านบน)
+            stats["forced_shared"] += 1
+            forced_hits |= forced
+            hit = set(sections)
         if not hit:
             stats["unclassified_kept_in_both"] += 1
         elif len(hit) > 1:
@@ -1058,13 +1876,27 @@ def split_lab7b_by_plan(data: dict, program: str
         warnings.append(f"Lab 7B OCR หน้า PDF {failed} ไม่สำเร็จ — วิชาในหน้าเหล่านั้นไม่อยู่ในข้อมูล")
     if stats["no_page_info"]:
         warnings.append(f"{stats['no_page_info']} แถวไม่มีเลขหน้า (pred JSON เก่า?) — เก็บไว้ทั้งสองฝั่ง")
+    if forced_hits:
+        warnings.append(
+            f"{stats['forced_shared']} แถว (รหัส {sorted(forced_hits)}) ถูกบังคับให้อยู่ทุกแผน "
+            "ตาม SHARED_ACROSS_PLANS แม้เลขหน้าจะบอกว่าอยู่แผนเดียว")
+    missing_forced = shared_codes - forced_hits
+    if missing_forced:
+        # รหัสอยู่ใน override list แต่ไม่เจอในข้อมูลรอบนี้เลย — อาจเป็นเพราะ pred JSON
+        # เปลี่ยนไปแล้ว (คนละรุ่นของ Lab 7B) ไม่ใช่เพราะ override ทำงานผิด แจ้งเตือนไว้เฉยๆ
+        warnings.append(
+            f"SHARED_ACROSS_PLANS ของ {program} มีรหัส {sorted(missing_forced)} "
+            "แต่ไม่พบแถวเหล่านี้ใน pred JSON รอบนี้เลย — ตรวจว่ารหัสยังตรงกับเล่มหรือไม่")
     return parts, stats, warnings
 
 
-def _write_converted(part: dict, pid: str, meta: dict, fallback: dict, outdir: Path
+def _write_converted(part: dict, pid: str, meta: dict, fallback: dict, outdir: Path,
+                     program: str | None = None, section: str | None = None
                      ) -> tuple[dict, dict]:
     converted, report = convert_lab7b(
         part,
+        program=program,
+        section=section,
         program_id=pid,
         program_name=meta.get("name") or fallback.get("program_name"),
         total_credits=meta.get("total_credits", fallback.get("total_credits")),
@@ -1097,9 +1929,12 @@ def _import_split(args, data: dict) -> None:
         jobs = [(f"{args.program}_{name}", name, parts[name], Path(name))
                 for name in sections]
         fallback: dict = {}       # ค่า CLI ตัวเดียวใช้กับสองโปรแกรมไม่ได้ — ใช้ --program-meta แทน
+        forced_note = (f" · {stats['forced_shared']} บังคับทั้งสองแผน (override)"
+                       if stats.get("forced_shared") else "")
         print(f"  แยก {args.program} ตามเลขหน้า: {stats['only_one_plan']} วิชาอยู่แผนเดียว · "
               f"{stats['in_both_plans']} ทั้งสองแผน · "
-              f"{stats['unclassified_kept_in_both']} จำแนกไม่ได้ (เก็บทั้งสองฝั่ง)")
+              f"{stats['unclassified_kept_in_both']} จำแนกไม่ได้ (เก็บทั้งสองฝั่ง)"
+              f"{forced_note}")
         for w in warns:
             print(f"    ⚠ {w}")
     else:
@@ -1115,7 +1950,7 @@ def _import_split(args, data: dict) -> None:
         }
         try:
             _, report = _write_converted(part, pid, meta_all.get(pid, {}), fallback,
-                                         root / rel)
+                                         root / rel, program=args.program, section=section)
             entry.update(courses=report["converted_courses"], plan_items=report["plan_items"],
                          elective_slots=report["elective_slots"],
                          courses_with_source_page=report["courses_with_source_page"])
@@ -1148,6 +1983,7 @@ def cmd_import_lab7b(args) -> None:
 
     converted, report = convert_lab7b(
         data,
+        program=args.program,
         program_id=args.program_id,
         program_name=args.program_name,
         total_credits=args.total_credits,
@@ -1166,6 +2002,9 @@ def cmd_import_lab7b(args) -> None:
           f"elective_slot={report['elective_slots']}")
     print(f"    ช่องวิชา wildcard ที่เก็บหน่วยกิตไว้ {report['wildcard_placeholders']} · "
           f"วิชาเลือกยืดหยุ่นที่เก็บไว้ {report['flexible_courses_kept']}")
+    if report["synth_alt_filler_rows_skipped"]:
+        print(f"    ข้ามแถวสังเคราะห์จากโน้ต alt_group {report['synth_alt_filler_rows_skipped']} "
+              f"รายการ (ดูรายละเอียดใน warnings)")
     print(f"    มีเลขหน้าอ้างอิง {report['courses_with_source_page']}/"
           f"{report['converted_courses']} วิชา")
     if report["warnings"]:
@@ -1977,6 +2816,52 @@ def _norm_for_dup_check(c: dict) -> tuple:
             str(c.get("semester") or ""))
 
 
+_TRAILING_NUM_RE = re.compile(r"(\d+)\s*$")
+# วิชาเลือกแบบ "A หรือกลุ่มวิชาที่ 1-4" / "A OR COURSE GROUP 1-4" มีช่วงเลขบอกกลุ่ม
+# (1-4) ต่อท้ายเป็นข้อความคงที่เหมือนกันทุก slot — ไม่ใช่เลขลำดับที่ต้องใช้แยก slot
+# ตัดตั้งแต่ "หรือ"/"OR" ออกก่อนอ่านเลขลำดับจริงที่อยู่ก่อนหน้า (ดูคอมเมนต์ใน
+# _slot_number)
+_ALT_CLAUSE_RE = re.compile(r"หรือ|\bOR\b", re.IGNORECASE)
+# key ที่ resolve เลขลำดับไปแล้วในรอบก่อนหน้า (ลงท้ายด้วย "_ตัวเลข") — wildcard code
+# ดิบจากเล่มไม่มีทางลงท้ายแบบนี้เอง (_WILDCARD_RE บังคับให้ลงท้ายด้วย x/X เสมอ)
+# ใช้แยกว่า "ยังไม่เคยตั้ง suffix" (ต้องคำนวณจาก _slot_number) กับ
+# "ตั้งไปแล้วจากรอบก่อน" (เก็บไว้เฉย ๆ ไม่งั้นจะต่อ suffix ซ้อนกันไปเรื่อย ๆ
+# ทุกครั้งที่ _index_by_code ถูกเรียกซ้ำในแต่ละขั้นของ pipeline)
+_RESOLVED_SUFFIX_RE = re.compile(r"_\d+$")
+
+
+def _slot_number(record: dict) -> int | None:
+    """
+    ดึงเลขลำดับที่ฝังอยู่ในชื่อวิชาเอง เช่น "วิชาเลือกเสรี 2" -> 2,
+    "FREE ELECTIVE COURSE 1" -> 1
+
+    ใช้แทนการนับ "ลำดับที่เจอในลิสต์ที่สกัดมา" ตอนตั้งชื่อ key ให้ช่องวิชา wildcard
+    ที่ซ้ำกัน (PLACEHOLDER_XXXXXXXX, PLACEHOLDER_XXXXXXXX_2, ...) — บั๊กที่พบจริง:
+    ถ้า LLM สกัดสองช่องออกมาไม่ตรงลำดับกับเล่ม (เช่น เจอ "วิชาเลือกเสรี 2" ก่อน
+    "วิชาเลือกเสรี 1") key แบบนับลำดับเดิมจะสลับ slot 1/2 กัน ทำให้ name_th,
+    name_en, year, semester ของทั้งคู่ผิดพร้อมกันหมด ทั้งที่แต่ละแถวสกัดถูกแล้ว
+    เอาเลขจากเนื้อชื่อเองจึงกันการสลับนี้ได้ตรง ๆ โดยไม่ต้องพึ่งลำดับการสกัด
+
+    ⚠️ บั๊กที่พบจริงกับข้อมูลจริง (แก้ตรงนี้): บางชื่อลงท้ายด้วยช่วงกลุ่มวิชาคงที่
+    เช่น "...ธุรกิจ 1 หรือกลุ่มวิชาที่ 1-4" — ถ้าอ่านแค่ "เลขท้ายสุดของสตริง" จะได้
+    เลขท้ายของช่วง (4) ซึ่งเหมือนกันทั้ง slot 1 และ slot 2 (ทั้งคู่ลงท้าย "...1-4")
+    ทำให้สอง slot ชนกันเป็นเลขเดียว (_4) แล้วโดน fallback ต่อ suffix ซ้อนกัน
+    (_4_4_4) เลขลำดับจริงคือเลขที่อยู่ *ก่อน* คำว่า "หรือ"/"OR" ต้องตัดส่วนนั้น
+    ทิ้งก่อนอ่านเลขท้าย
+    """
+    for field in ("name_th", "name_en"):
+        s = str(record.get(field) or "").strip()
+        if not s:
+            continue
+        head = _ALT_CLAUSE_RE.split(s, maxsplit=1)[0]
+        m = _TRAILING_NUM_RE.search(head)
+        if m:
+            n = int(m.group(1))
+            if 1 <= n <= 20:   # กันเลขหน่วยกิต/รหัสอื่นที่ดันมาลงท้ายชื่อโดยบังเอิญ
+                return n
+    return None
+
+
 def _dedup_insert(out: dict, fingerprints: dict, base_key: str,
                    fp: tuple, record: dict) -> str:
     """
@@ -1992,14 +2877,49 @@ def _dedup_insert(out: dict, fingerprints: dict, base_key: str,
     ถ้าไม่ตรง (คนละวิชา) จะแยก key ด้วยส่วนต่อท้าย _2, _3, ... แทนการทับ/ทิ้ง
     คืนค่า key จริงที่ใช้เก็บ record นี้ (ผู้เรียกต้องใช้ค่านี้แทน base_key ต่อไป
     เช่นตอนสร้างแถว plan/prerequisite ที่อ้างถึงวิชาเดียวกัน)
+
+    ⚠️ บั๊กที่พบจริง (แก้ตรงนี้): ถ้าชื่อวิชาเองมีเลขลำดับกำกับอยู่แล้ว
+    (วิชาเลือกเสรี 1/2, FREE ELECTIVE COURSE 1/2 ฯลฯ) ให้ใช้เลขนั้นกำหนด key
+    ตรง ๆ ผ่าน _slot_number() แทนการนับลำดับที่เจอ ไม่งั้นถ้าลำดับสกัดสลับกับเล่ม
+    key (และข้อมูลทุกฟิลด์ที่ผูกกับ key นั้น) จะสลับตามไปด้วย
+
+    ⚠️ บั๊กรอบสอง (แก้ตรงนี้เช่นกัน): ฟังก์ชันนี้ถูกเรียกซ้ำหลายรอบคนละขั้นของ
+    pipeline (import-lab7b แปลงเป็น curriculum.json แล้ว eval-gt มาอ่าน courses
+    ซ้ำอีกที) รอบแรกตั้ง key เป็น PLACEHOLDER_XXXXXXXX_2 แล้วเขียน "code" นี้กลับ
+    เข้า record จริง ๆ ด้วย — พอรอบถัดไปเห็น base_key ที่ลงท้ายด้วย "_2" อยู่แล้ว
+    (แปลว่า resolve ไปแล้วจากรอบก่อน) ต้อง "เก็บไว้เฉย ๆ" ห้ามไปคำนวณ slot จาก
+    ชื่อแล้วต่อ suffix ซ้ำอีก ไม่งั้นจะกลายเป็น _2_2 แล้ว _2_2_2 ไปเรื่อย ๆ ทุกรอบ
+    ที่ index ถูกเรียกซ้ำ — wildcard code ดิบจากเล่มไม่มีทางลงท้ายด้วยตัวเลขเอง
+    (ดู _RESOLVED_SUFFIX_RE) จึงใช้สังเกตแยกสองกรณีนี้ได้
     """
     key = base_key
     if is_placeholder(base_key):
-        # หา key ที่ว่าง หรือ key ที่ fingerprint ตรงกัน (แถวเดิมเจอซ้ำหน้า) เท่านั้น
-        n = 1
-        while key in out and fingerprints.get(key) not in (fp, None):
-            n += 1
-            key = f"{base_key}_{n}"
+        if _RESOLVED_SUFFIX_RE.search(base_key):
+            # resolve ไปแล้วจากรอบก่อนหน้า — ใช้ตามเดิม เผื่อชนกันจริง (ไม่ควรเกิด
+            # ปกติ) ค่อย fallback ไปหาช่องว่างถัดไปแบบเดิม
+            n = 1
+            while key in out and fingerprints.get(key) not in (fp, None):
+                n += 1
+                key = f"{base_key}_{n}"
+        else:
+            slot_n = _slot_number(record)
+            if slot_n is not None:
+                candidate = base_key if slot_n == 1 else f"{base_key}_{slot_n}"
+                n = slot_n
+                key = candidate
+                # ชนกับของเดิมที่ fingerprint ไม่ตรง (เลขลำดับซ้ำกันจริงจากคนละที่มา
+                # ซึ่งไม่ควรเกิดขึ้นปกติ) — กันไม่ให้ทับข้อมูลกันเงียบๆ ด้วยการหาช่อง
+                # ถัดไปแบบเดิม
+                while key in out and fingerprints.get(key) not in (fp, None):
+                    n += 1
+                    key = f"{base_key}_{n}"
+            else:
+                # ไม่มีเลขลำดับในชื่อให้อิง — กลับไปใช้วิธีเดิม (หา key ที่ว่าง หรือ key
+                # ที่ fingerprint ตรงกัน คือแถวเดิมเจอซ้ำหน้า)
+                n = 1
+                while key in out and fingerprints.get(key) not in (fp, None):
+                    n += 1
+                    key = f"{base_key}_{n}"
     if key in out:
         # วิชาเดียวกันปรากฏหลายหน้า — เติมช่องที่ยังว่างแทนการทับ
         for f, v in record.items():
@@ -2142,12 +3062,21 @@ def _flatten_pred(pred: Any) -> list[dict]:
 
     # ฐานข้อมูล Lab 8B เก็บหน่วยกิตแยกเป็นตัวเลขสี่ช่อง ส่วนเฉลยเก็บเป็น "3(2-2-5)"
     # ประกอบกลับก่อนเทียบ จะได้วัด "ชั่วโมง ท-ป-อ" ได้ด้วย ไม่ใช่วัดแค่จำนวนหน่วยกิต
+    #
+    # ⚠️ บั๊กที่พบจริง (แก้ตรงนี้): เดิมถ้าช่องชั่วโมงช่องใดช่องหนึ่งไม่ครบ (None/หลุด)
+    # เงื่อนไข all(...) จะไม่ผ่าน แล้ว rec["credits"] ถูกปล่อยเป็น int เปล่า (เช่น 1)
+    # ไปเทียบกับเฉลยที่เป็น "3(3-0-6)" ตรงๆ ผ่าน _norm_credits()/_credits_match()
+    # ซึ่งยังเทียบได้ผลถูกต้องถ้าเป็นตัวเลขล้วนอยู่แล้ว จึงไม่ใช่จุดพังจริง — แต่เพื่อความ
+    # ชัดเจนและกันพังเงียบถ้า _credits_match() เปลี่ยนกติกาในอนาคต ให้แปลงเป็น string
+    # เสมอไม่ว่าจะประกอบชั่วโมงได้ครบหรือไม่
     for rec in by_code.values():
-        if isinstance(rec.get("credits"), int) and all(
-                isinstance(rec.get(k), int)
-                for k in ("lecture_h", "lab_h", "self_h")):
-            rec["credits"] = (f"{rec['credits']}({rec['lecture_h']}-"
-                              f"{rec['lab_h']}-{rec['self_h']})")
+        credits_val = rec.get("credits")
+        if isinstance(credits_val, int):
+            hours = tuple(rec.get(k) for k in ("lecture_h", "lab_h", "self_h"))
+            if all(isinstance(h, int) for h in hours):
+                rec["credits"] = f"{credits_val}({hours[0]}-{hours[1]}-{hours[2]})"
+            else:
+                rec["credits"] = str(credits_val)
 
     for p in pred.get("plan") or []:
         code = str(p.get("code") or "").strip()

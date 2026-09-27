@@ -5,10 +5,11 @@ __pycache__/
 probe_stream.py
 probe.py
 program_meta.json
-splice_intermediate.py
+splice_intermediate_md.py
 handoff.md
 work/lab8b_run/page29_retry
 work/lab8b_run/page35_retry
 work/lab8b_run/page255_retry
 work/lab7b_run/BIT_patch
 eval_gt.json
+*.env

@@ -14,7 +14,7 @@
 
 ปีที่ 1 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036100</td><td>พื้นฐานทางด้านเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036101</td><td>คณิตศาสตร์สำหรับธุรกิจ<br/>MATHEMATICS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036118</td><td>การแก้ปัญหาทางด้านเทคโนโลยีสารสนเทศ<br/>PROBLEM SOLVING IN INFORMATION TECHNOLOGY</td><td>3(2-2-5)</td></tr><tr><td>96641001</td><td>โรงเรียนสร้างเสน่ห์<br/>CHARM SCHOOL</td><td>2(1-2-3)</td></tr><tr><td>96641003</td><td>กีฬาและนันทนาการ<br/>SPORTS AND RECREATIONAL ACTIVITIES</td><td>1(0-3-2)</td></tr><tr><td>96644007</td><td>ภาษาอังกฤษพื้นฐาน 1<br/>FOUNDATION ENGLISH 1</td><td>3(3-0-6)</td></tr><tr><td>96644042</td><td>กลุ่มวิชาที่กำหนดโดยคณะ*<br/>การสื่อสารและการนำเสนอย่างมืออาชีพ<br/>PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+<table><tr><td>รหัสวิชา</td><th colspan="2">ชื่อวิชา<td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></th></tr><tr><td>06036100</td><td colspan="2">พื้นฐานทางด้านเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036101</td><td colspan="2">คณิตศาสตร์สำหรับธุรกิจ<br/>MATHEMATICS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036118</td><td colspan="2">การแก้ปัญหาทางด้านเทคโนโลยีสารสนเทศ<br/>PROBLEM SOLVING IN INFORMATION TECHNOLOGY</td><td>3(2-2-5)</td></tr><tr><td>96641001</td><td colspan="2">โรงเรียนสร้างเสน่ห์<br/>CHARM SCHOOL</td><td>2(1-2-3)</td></tr><tr><td>96641003</td><td colspan="2">กีฬาและนันทนาการ<br/>SPORTS AND RECREATIONAL ACTIVITIES</td><td>1(0-3-2)</td></tr><tr><td>96644007</td><td colspan="2">ภาษาอังกฤษพื้นฐาน 1<br/>FOUNDATION ENGLISH 1</td><td>3(3-0-6)</td></tr><tr><td>96644042</td><td colspan="2">กลุ่มวิชาที่กำหนดโดยคณะ*<br/>การสื่อสารและการนำเสนอย่างมืออาชีพ<br/>PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td></td><td>18</td></tr></table>
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
 คณะเทคโนโลยีสารสนเทศ สจล.
@@ -27,11 +27,14 @@
 
 ปีที่ 1 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036102</td><td>การวิเคราะห์เชิงสถิติสำหรับธุรกิจ STATISTICAL ANALYSIS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036109</td><td>กระบวนการและโมเดลทางธุรกิจ BUSINESS PROCESSES AND BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06036119</td><td>พื้นฐานการเขียนโปรแกรม PROGRAMMING FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036125</td><td>สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ COMPUTER ARCHITECTURE AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr><tr><td>96641002</td><td>ความฉลาดทางดิจิทัล DIGITAL INTELLIGENCE QUOTIENT</td><td>3(3-0-6)</td></tr><tr><td>96644008</td><td>ภาษาอังกฤษพื้นฐาน 2 FOUNDATION ENGLISH 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036102</td><td>การวิเคราะห์เชิงสถิติสำหรับธุรกิจ<br/>STATISTICAL ANALYSIS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036109</td><td>กระบวนการและโมเดลทางธุรกิจ<br/>BUSINESS PROCESSES AND BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06036119</td><td>พื้นฐานการเขียนโปรแกรม<br/>PROGRAMMING FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036125</td><td>สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ<br/>COMPUTER ARCHITECTURE AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr><tr><td>96641002</td><td>ความฉลาดทางดิจิทัล<br/>DIGITAL INTELLIGENCE QUOTIENT</td><td>3(3-0-6)</td></tr><tr><td>96644008</td><td>ภาษาอังกฤษพื้นฐาน 2<br/>FOUNDATION ENGLISH 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
 
 ปีที่ 2 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036103</td><td>บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036104</td><td>องค์กรและการจัดการ MANAGEMENT AND ORGANIZATIONS</td><td>3(3-0-6)</td></tr><tr><td>06036105</td><td>บัญชีการเงินสำหรับผู้มิใช่นักบัญชี FINANCIAL ACCOUNTING FOR NON-Accountants</td><td>3(3-0-6)</td></tr><tr><td>06036117</td><td>อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่ BUSINESS INTELLIGENCE AND BIG DATA</td><td>3(3-0-6)</td></tr><tr><td>06036120</td><td>หลักการโครงสร้างข้อมูลและอัลกอริทึม DATA STRUCTURES AND ALGORITHMS PRINCIPLES</td><td>3(3-0-6)</td></tr><tr><td>06036122</td><td>การสื่อสารด้วยภาพสำหรับธุรกิจ VISUAL COMMUNICATION
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036103</td><td>บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ<br/>INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036104</td><td>องค์กรและการจัดการ<br/>MANAGEMENT AND ORGANIZATIONS</td><td>3(3-0-6)</td></tr><tr><td>06036105</td><td>บัญชีการเงินสำหรับผู้มิใช่นักบัญชี<br/>FINANCIAL ACCOUNTING FOR NON-Accountants</td><td>3(3-0-6)</td></tr><tr><td>06036117</td><td>อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่<br/>BUSINESS INTELLIGENCE AND BIG DATA</td><td>3(3-0-6)</td></tr><tr><td>06036120</td><td>หลักการโครงสร้างข้อมูลและอัลกอริทึม<br/>DATA STRUCTURES AND ALGORITHMS PRINCIPLES</td><td>3(3-0-6)</td></tr><tr><td>06036122</td><td>การสื่อสารด้วยภาพสำหรับธุรกิจ<br/>VISUAL COMMUNICATION FOR BUSINESS</td><td>3(2-2-5)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
 
 ---
 
@@ -45,7 +48,10 @@
 
 ปีที่ 3 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036107</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036110</td><td>การวางแผนทรัพยากรองค์กร ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06036114</td><td>การพัฒนาเว็บแอปพลิเคชันโดยใช้เฟรมเวิร์ก WEB APPLICATION DEVELOPMENT USING FRAMEWORKS</td><td>3(2-2-5)</td></tr><tr><td>06036121</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ BUSINESS INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036123</td><td>เทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>96644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร ELECTIVE IN LANGUAGE AND COMMUNICATION</td><td>3 (3-0-6)<br/>หรือ
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036107</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036110</td><td>การวางแผนทรัพยากรองค์กร ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06036114</td><td>การพัฒนาเว็บแอปพลิเคชันโดยใช้เฟรมเวิร์ก WEB APPLICATION DEVELOPMENT USING FRAMEWORKS</td><td>3(2-2-5)</td></tr><tr><td>06036121</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ BUSINESS INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036123</td><td>เทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>96644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร ELECTIVE IN LANGUAGE AND COMMUNICATION</td><td>3 (3-0-6)<br/>หรือ 3 (2-2-5)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
 
 ---
 
@@ -59,7 +65,7 @@
 
 ปีที่ 4 ภาคการศึกษาที่ 1
 
-<table><tr><th rowspan="2">รหัสวิชา<th rowspan="2">ชื่อวิชา<td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></th></th></tr><tr><td>0603615 ความมั่นคงของระบบสารสนเทศ INFORMATION SYSTEM SECURITY</td><td>3(3-0-6)</td></tr><tr><td rowspan="2">06036146</td><td>โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2 PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2</td><td>3(0-9-0)</td></tr><tr><td colspan="2"></td></tr><tr><td rowspan="2">96642033</td><td>กลุ่มวิชาที่กำหนดโดยคณะ* กฎหมายสำหรับคนรุ่นใหม่ LAW FOR NEW GENERATION</td><td>3(3-0-6)</td></tr><tr><td colspan="2"></td></tr><tr><td rowspan="2">9664xxxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป สำหรับหลักสูตรนานาชาติ 2 GE ELECTIVE COURSE REQUIREMENT 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2"></td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
+<table><tr><th rowspan="2">รหัสวิชา<th rowspan="2">ชื่อวิชา<td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></th></th></tr><tr><td>0603615</td><td>ความมั่นคงของระบบสารสนเทศ INFORMATION SYSTEM SECURITY 3(3-0-6)</td></tr><tr><td rowspan="2">06036146</td><td>โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2 PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2</td><td>3(0-9-0)</td></tr><tr><td colspan="2"></td></tr><tr><td rowspan="2">96642033</td><td>กลุ่มวิชาที่กำหนดโดยคณะ* กฎหมายสำหรับคนรุ่นใหม่ LAW FOR NEW GENERATION</td><td>3(3-0-6)</td></tr><tr><td colspan="2"></td></tr><tr><td rowspan="2">9664xxxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป สำหรับหลักสูตรนานาชาติ 2 GE ELECTIVE COURSE REQUIREMENT 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2"></td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
 คณะเทคโนโลยีสารสนเทศ สจล.
@@ -72,7 +78,7 @@
 
 ปีที่ 4 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06036xxx<br/>06036xxx</td><td>วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4</td><td rowspan="3">3(3-0-6)<br/>หรือ<br/>3(2-2-5)</td></tr><tr><td>วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือ กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP 1-4</td></tr><tr><td>3(3-0-6)<br/>หรือ<br/>3(2-2-5)</td></tr><tr><td>Xxxxxxxx</td><td>วิชาเลือกเสรี 1<br/>FREE ELECTIVE COURSE 1</td><td>3(3-0-6)</td></tr><tr><td>Xxxxxxxx</td><td>วิชาเลือกเสรี 2<br/>FREE ELECTIVE COURSE 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06036xxx<br/>06036xxx</td><td>วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4</td><td rowspan="2">3(3-0-6)<br/>หรือ<br/>3(2-2-5)</td></tr><tr><td>วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือ กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP 1-4</td></tr><tr><td>3(3-0-6)<br/>หรือ<br/>3(2-2-5)</td></tr><tr><td>Xxxxxxxx</td><td>วิชาเลือกเสรี 1<br/>FREE ELECTIVE COURSE 1</td><td>3(3-0-6)</td></tr><tr><td>Xxxxxxxx</td><td>วิชาเลือกเสรี 2<br/>FREE ELECTIVE COURSE 2</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>12</td></tr></table>
 
 รวมตลอดหลักสูตร
 126
@@ -104,11 +110,14 @@
 
 ปีที่ 1 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036102</td><td>การวิเคราะห์เชิงสถิติสำหรับธุรกิจ STATISTICAL ANALYSIS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036109</td><td>กระบวนการและโมเดลทางธุรกิจ BUSINESS PROCESSES AND BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06036119</td><td>พื้นฐานการเขียนโปรแกรม PROGRAMMING FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036125</td><td>สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ COMPUTER ARCHITECTURE AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr><tr><td>96644008</td><td>ภาษาอังกฤษพื้นฐาน 2 FOUNDATION ENGLISH 2</td><td>3(3-0-6)</td></tr><tr><td>96641002</td><td>ความฉลาดทางดิจิทัล DIGITAL INTELLIGENCE QUOTIENT</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036102</td><td>การวิเคราะห์เชิงสถิติสำหรับธุรกิจ<br/>STATISTICAL ANALYSIS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036109</td><td>กระบวนการและโมเดลทางธุรกิจ<br/>BUSINESS PROCESSES AND BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06036119</td><td>พื้นฐานการเขียนโปรแกรม<br/>PROGRAMMING FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036125</td><td>สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ<br/>COMPUTER ARCHITECTURE AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr><tr><td>96644008</td><td>ภาษาอังกฤษพื้นฐาน 2<br/>FOUNDATION ENGLISH 2</td><td>3(3-0-6)</td></tr><tr><td>96641002</td><td>ความฉลาดทางดิจิทัล<br/>DIGITAL INTELLIGENCE QUOTIENT</td><td>3(3-0-6)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
 
 ปีที่ 2 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036103</td><td>บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036104</td><td>องค์กรและการจัดการ MANAGEMENT AND ORGANIZATIONS</td><td>3(3-0-6)</td></tr><tr><td>06036105</td><td>บัญชีการเงินสำหรับผู้มิใช่นักบัญชี FINANCIAL ACCOUNTING FOR NON-Accountants</td><td>3(3-0-6)</td></tr><tr><td>06036117</td><td>อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่ BUSINESS INTELLIGENCE AND BIG DATA</td><td>3(3-0-6)</td></tr><tr><td>06036120</td><td>หลักการโครงสร้างข้อมูลและอัลกอริทึม DATA STRUCTURES AND ALGORITHMS PRINCIPLES</td><td>3(3-0-6)</td></tr><tr><td>06036122</td><td>การสื่อสารด้วยภาพสำหรับธุรกิจ VISUAL COMMUNICATION
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036103</td><td>บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ<br/>INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036104</td><td>องค์กรและการจัดการ<br/>MANAGEMENT AND ORGANIZATIONS</td><td>3(3-0-6)</td></tr><tr><td>06036105</td><td>บัญชีการเงินสำหรับผู้มิใช่นักบัญชี<br/>FINANCIAL ACCOUNTING FOR NON-AccountANTS</td><td>3(3-0-6)</td></tr><tr><td>06036117</td><td>อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่<br/>BUSINESS INTELLIGENCE AND BIG DATA</td><td>3(3-0-6)</td></tr><tr><td>06036120</td><td>หลักการโครงสร้างข้อมูลและอัลกอริทึม<br/>DATA STRUCTURES AND ALGORITHMS PRINCIPLES</td><td>3(3-0-6)</td></tr><tr><td>06036122</td><td>การสื่อสารด้วยภาพสำหรับธุรกิจ<br/>VISUAL COMMUNICATION FOR BUSINESS</td><td>3(2-2-5)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
 
 ---
 
@@ -122,13 +131,16 @@
 
 ปีที่ 3 ภาคการศึกษาที่ 1
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036107</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036110</td><td>การวางแผนทรัพยากรองค์กร ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06036114</td><td>การพัฒนาเว็บแอปพลิเคชันโดยใช้เฟรมเวิร์ก WEB APPLICATION DEVELOPMENT USING FRAMEWORKS</td><td>3(2-2-5)</td></tr><tr><td>06036121</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ BUSINESS INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036123</td><td>เทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>96644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร ELECTIVE IN LANGUAGE AND COMMUNICATION</td><td>3 (3-0-6) หรือ <!-- PDF_PAGE 34 -->
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036107</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036110</td><td>การวางแผนทรัพยากรองค์กร ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06036114</td><td>การพัฒนาเว็บแอปพลิเคชันโดยใช้เฟรมเวิร์ก WEB APPLICATION DEVELOPMENT USING FRAMEWORKS</td><td>3(2-2-5)</td></tr><tr><td>06036121</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ BUSINESS INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036123</td><td>เทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>96644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร ELECTIVE IN LANGUAGE AND COMMUNICATION</td><td>3 (3-0-6)<br/>หรือ 3 (2-2-5)</td></tr><tr><td colspan="2">รวม</td><td>18</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.<!-- PDF_PAGE 34 -->
 <page_number>29</page_number>
 มคอ. 2
 
 ปีที่ 3 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06036106<br/>06036116</td><td>การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่<br/>MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES</td><td>3(3-0-6)</td></tr><tr><td>การตลาดเชิงดิจิทัล<br/>DIGITAL MARKETING</td><td>3(2-2-5)</td></tr><tr><td colspan="2">กลุ่มวิชาที่กำหนดโดยคณะ*<br/>ผู้ประกอบการสมัยใหม่<br/>MODERN ENTREPRENEURS</td><td>3(3-0-6)</td></tr><tr><td rowspan="4">96643021<br/>06036xxx<br/>xxxxxx</td><td colspan="2" rowspan="2">วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ<br/>กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4</td><td>3(3-0-6)</td></tr><tr><td rowspan="2">3(2-2-5)</td></tr><tr><td colspan="2" rowspan="2">วิชาเลือกเสรี 1<br/>FREE ELECTIVE COURSE 1</td></tr><tr><td>3(3-0-6)</td></tr><tr><td colspan="3">รวม 15</td></tr></table>
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06036106<br/>06036116</td><td>การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่<br/>MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES</td><td>3(3-0-6)</td></tr><tr><td>การตลาดเชิงดิจิทัล<br/>DIGITAL MARKETING</td><td>3(2-2-5)</td></tr><tr><td colspan="2">กลุ่มวิชาที่กำหนดโดยคณะ*<br/>ผู้ประกอบการสมัยใหม่<br/>MODERN ENTREPRENEURS</td><td>3(3-0-6)</td></tr><tr><td rowspan="4">96643021<br/>06036xxx<br/>xxxxxx</td><td colspan="2" rowspan="2">วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ<br/>กลุ่มวิชาที่ 1-4<br/>ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 1 OR COURSE GROUP 1-4</td><td>3(3-0-6)</td></tr><tr><td rowspan="2">3(2-2-5)</td></tr><tr><td colspan="2" rowspan="2">วิชาเลือกเสรี 1<br/>FREE ELECTIVE COURSE 1</td></tr><tr><td>3(3-0-6)</td></tr><tr><td colspan="4">รวม 15</td></tr></table>
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
 คณะเทคโนโลยีสารสนเทศ สจล.
@@ -145,7 +157,7 @@
 
 ปีที่ 4 ภาคการศึกษาที่ 2
 
-<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="3">06036147 หรือ<br/>06036148</td><td>สหกิจศึกษา<br/>COOPERATIVE EDUCATION</td><td>6(0-35-0)</td></tr><tr><td>สหกิจศึกษาต่างประเทศ<br/>OVERSEA COOPERPETIVE EDUCATION</td><td></td></tr><tr><td>รวม</td><td>6</td></tr></table>
+<table><tr><th rowspan="2">รหัสวิชา<th rowspan="2">ชื่อวิชา<td>-หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></th></th></tr><tr><td>6(0-35-0)</td></tr><tr><td>06036147 หรือ</td><td>สหกิจศึกษา<br/>COOPERATIVE EDUCATION</td><td></td></tr><tr><td rowspan="2">06036148</td><td>สหกิจศึกษาต่างประเทศ<br/>OVERSEA COOPERERATIVE EDUCATION</td><td></td></tr><tr><td>รวม</td><td>6</td></tr></table>
 
 รวมตลอดหลักสูตร 126 หน่วยกิต
 
@@ -201,12 +213,13 @@ INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
-ข้อมูลและสถิติ การประยุกต์ใช้สถิติในธุรกิจและเศรษฐศาสตร์ สถิติสำหรับข้อมูลขนาดใหญ่และการทำเหมืองข้อมูล การคลื่นข้อมูล แผนภาพตารางและกราฟ การสร้างแดชบอร์ด แนวทางปฏิบัติในการสร้างภาพข้อมูล มาตรวัดเชิงตัวเลข การแจกแจงตัวแปรสุ่ม การแจกแจงแบบสองตัวแปร ความแปรปรวนร่วม และสหสัมพันธ์แบบเพียร์สัน การวิเคราะห์และตีความการถดถอยพหุคูณ การพยากรณ์ การวิเคราะห์แนวโน้ม การแตกตัวแปรฤดูกาล อัตถถอย และอัตสหสัมพันธ์ การวิเคราะห์ข้อมูลทหมวดหมู่ สถิติไร้พารามิเตอร์ การทดสอบอันดับ
+ข้อมูลและสถิติ การประยุกต์ใช้สถิติในธุรกิจและเศรษฐศาสตร์ สถิติสำหรับข้อมูลขนาดใหญ่และการทำเหมืองข้อมูล การคลื่นข้อมูล แผนภาพตารางและกราฟ การสร้างแดชบอร์ด แนวทางปฏิบัติในการสร้างภาพข้อมูล มาตรวัดเชิงตัวเลข การแจกแจงแบบสูงสุด การแจกแจงแบบสองตัวแปร ความแปรปรวนร่วม และสหสัมพันธ์แบบเพียร์สัน การวิเคราะห์และตีความการถดถอยพหุคูณ การพยากรณ์ การวิเคราะห์แนวโน้ม การแตกตัวแปรฤดูกาล อัตถถอย และอัตสหสัมพันธ์ การวิเคราะห์ข้อมูลทหมวดหมู่ สถิติไร้พารามิเตอร์ การทดสอบอันดับวิ
 
 ---
 
 <!-- PDF_PAGE 240 -->
 <page_number>235</page_number>
+
 มคอ. 2
 
 covariance and Pearson correlation, multiple regression analysis and interpretation,
@@ -246,22 +259,26 @@ Introduction to accounting in business, specifically, the basic principles and p
 
 มคอ. 2
 
-06036106 การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่
-MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES
+**06036106 การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่**
+**(3-0-6) MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES**
+
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
 ระบบสารสนเทศจากมุมมองทางธุรกิจ ความเข้าใจในกิจกรรมทางธุรกิจและความต้องการข้อมูล เทคโนโลยีเกิดใหม่ ระบบแอปพลิเคชันเพื่อรองรับความต้องการของผู้มีส่วนได้ส่วนเสียและเพิ่มมูลค่าทาง ธุรกิจ การพัฒนาระบบสารสนเทศ การประเมินและการคัดเลือกระบบสารสนเทศ Information systems from the business view point understanding of its business activities and information requirement, emerging technology, application systems to support stakeholders needs and enhance business value, information systems development, evaluation and selection.
 
 ระบบสารสนเทศจากมุมมองทางธุรกิจ ความเข้าใจในกิจกรรมทางธุรกิจและความต้องการข้อมูล เทคโนโลยีเกิดใหม่ ระบบแอปพลิเคชันเพื่อรองรับความต้องการของผู้มีส่วนได้ส่วนเสียและเพิ่มมูลค่าทาง ธุรกิจ การพัฒนาระบบสารสนเทศ การประเมินและการคัดเลือกระบบสารสนเทศ
+
 Information systems from the business view point understanding of its business activities and information requirement, emerging technology, application systems to support stakeholders needs and enhance business value, information systems development, evaluation and selection.
 
-06036107 การบริหารโครงการเทคโนโลยีสารสนเทศ
-INFORMATION TECHNOLOGY PROJECT MANAGEMENT
+**06036107 การบริหารโครงการเทคโนโลยีสารสนเทศ**
+**(3-0-6) INFORMATION TECHNOLOGY PROJECT MANAGEMENT**
+
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
 ธรรมชาติและวงจรชีวิตของโครงการ การศึกษาความเป็นไปได้ของโครงการ เทคนิคการเลือก โครงการ องค์ความรู้สำหรับการบริหารโครงการ กลุ่มกระบวนการบริหารโครงการ การจัดการขอบเขตของ โครงการ การจัดการตารางเวลา การจัดการค่าใช้จ่ายโครงการ การจัดการคุณภาพ การจัดทีมงานและ ทรัพยากร การจัดการงานสื่อสาร การจัดการความเสี่ยง การควบคุมโครงการ และประเมินผลโครงการ
+
 Nature and life cycle of information technology (IT) projects, project feasibility, project selection techniques, project management body of knowledge, PM process groups, project scope management, project cost, project scheduling, quality management, team and resources management, communication management, risk management, project controlling, project evaluation.
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
@@ -275,7 +292,7 @@ Nature and life cycle of information technology (IT) projects, project feasibili
 มคอ. 2
 
 **06036108 เศรษฐศาสตร์เทคโนโลยีสารสนเทศ**
-ECONOMICS OF INFORMATION TECHNOLOGY
+**(ECONOMICS OF INFORMATION TECHNOLOGY)**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
@@ -284,7 +301,7 @@ PREREQUISITE : NONE
 Fundamental economic principles, economic theories and concepts relating to innovation process and technical change, information technology market, evaluation of information technology investment, implications of information technology on economic and industrial development, employment, business growth, productivity, technology transfer, research and development, social transformation of information age.
 
 **06036109 กระบวนการและโมเดลทางธุรกิจ**
-BUSINESS PROCESSES AND BUSINESS MODEL
+**(BUSINESS PROCESSES AND BUSINESS MODEL)**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
@@ -303,26 +320,26 @@ The The fundamentals of business processes, The basic elements of the business c
 มคอ. 2
 
 **06036110 การวางแผนทรัพยากรองค์กร**
-ENTERPRISE RESOURCE PLANNING
+**ENTERPRISE RESOURCE PLANNING**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
-กระบวนการพื้นฐานที่เกี่ยวข้องกับการวางแผนทรัพยากรองค์กรในธุรกิจ กระบวนการทางบัญชี กระบวนการได้มาซึ่งทรัพยากร กระบวนการจัดการสินค้าและคลังสินค้า กระบวนการการผลิต และ กระบวนการการขายสินค้าหรือบริการ การบูรณาการกระบวนการธุรกิจด้วยระบบวางแผนทรัพยากรองค์กร แนวคิดการวางแผนทรัพยากรองค์กร เรียนรู้ทักษะเชิงปฏิบัติในการวางแผนทรัพยากรบนแอปพลิเคชันมาตรฐานของระบบวางแผนทรัพยากรองค์กร
+กระบวนการการขึ้นฐานที่เกี่ยวข้องกับการวางแผนทรัพยากรองค์กรในธุรกิจ กระบวนการทางบัญชี กระบวนการได้มาซึ่งทรัพยากร กระบวนการจัดการสินค้าและคลังสินค้า กระบวนการการผลิต และ กระบวนการการขายสินค้าหรือบริการ การบูรณาการกระบวนการธุรกิจด้วยระบบวางแผนทรัพยากรองค์กร แนวคิดการวางแผนทรัพยากรองค์กร เรียนรู้ทักษะเชิงปฏิบัติในการวางแผนทรัพยากรบนแอปพลิเคชันมาตรฐานของระบบวางแผนทรัพยากรองค์กร
 Related business processes in ERP, accounting process, procurement process, inventory and warehouse management process, production process, and order fulfilment process, Integrate business processes with enterprise resource planning (ERP), concepts of ERP, learning practical skills on planning resources with a standard application of ERP.
 
 **06036111 เทคโนโลยีดิจิทัลสำหรับธุรกิจ**
-DIGITAL TECHNOLOGY FOR BUSINESS
+**DIGITAL TECHNOLOGY FOR BUSINESS**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 ความรู้พื้นฐานในเทคโนโลยีปัจจุบันที่กำลังถูกใช้ในภาคธุรกิจ, ความรู้เบื้องต้นเกี่ยวกับการประมวลผลบนระบบคลาวด์ ข้อมูลขนาดใหญ่ ปัญญาประดิษฐ์ การค้นคืนข้อมูลสารสนเทศ เว็บ และสื่อสังคม ซึ่งนำไปสู่ การทำการเปลี่ยนแปลงทางดิจิทัล วิธีปฏิบัติที่นิยมในปัจจุบัน แนวโน้มในอนาคตและผลกระทบต่อธุรกิจ
 Foundational knowledge in recent technologies used in business, Introduction to Cloud Computing, Big Data, Artificial Intelligence, Information Retrieval, Recommendation System, Web and Social Media, Leading to Digital Transformation. Current practices, future trends and Business impact.
 
 **06036112 แนวคิดระบบฐานข้อมูล**
-DATABASE SYSTEM CONCEPTS
+**DATABASE SYSTEM CONCEPTS**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 แนะนำฐานข้อมูลและระบบจัดการฐานข้อมูล แบบจำลองสำหรับฐานข้อมูลและสถาปัตยกรรมฐานข้อมูล แบบจำลองฐานข้อมูลเชิงสัมพันธ์ ความซ้ำซ้อนของข้อมูลและปัญหาที่เกิดจากความซ้ำซ้อนของฐานข้อมูลการทำฐานข้อมูลให้อยู่ในรูปแบบที่พร้อมใช้งานในระดับต่างๆ ตั้งแต่ 1NF-5NF แบบจำลองความสัมพันธ์ระหว่างเอนทิตี และการแปลงรูปเป็นฐานข้อมูลเชิงสัมพันธ์ กรณีศึกษาการออกแบบฐานข้อมูล การเขียนโปรแกรมด้วยภาษาฐานข้อมูล เอสคิวแอลขั้นต้นจนถึงขั้นสูง
 
-วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทาง
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยี
 
 ---
 
@@ -347,6 +364,7 @@ WEB APPLICATION DEVELOPMENT USING FRAMEWORKS
 PREREQUISITE : 06036119 PROGRAMMING FUNDAMENTALS OR 06036122 VISUAL COMMUNICATION FOR BUSINESS
 
 การพัฒนาเว็บแอพพลิเคชันด้วยเทคโนโลยีเฟรมเวิร์ก การเชื่อมต่อฐานข้อมูลด้วยเทคโนโลยี Object Relational Mapping การสร้าง API และการสร้างเว็บฟอนต์เอนด้วยเทคโนโลยีสมัยใหม่
+
 Web application development with Framework technology. Database connection with Object Relational Mapping. Application Programming Interface (API) development, and Front-end development.
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
@@ -356,46 +374,27 @@ Web application development with Framework technology. Database connection with 
 
 <!-- PDF_PAGE 245 -->
 <page_number>240</page_number>
-
 มคอ. 2
 
 **06036115 ความมั่นคงของระบบสารสนเทศ**
 INFORMATION SYSTEM SECURITY
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
-แนวคิดเกี่ยวกับความมั่นคงปลอดภัยของระบบสารสนเทศ, ช่องโหว่ ภัย และความเสี่ยง, มัลแวร์,
-ความมั่นคงปลอดภัยของข้อมูล ซอฟต์แวร์ และเครือข่ายเบื้องต้น, การดำเนินมาตรการรักษาความมั่นคง
-ปลอดภัย, การเข้ารหัสลับ, การจัดการการระบุตัวตน, การพิสูจน์ตัวตนและการกำหนดสิทธิ์, การควบคุม
-การเข้าถึง, ไฟร์วอล์, ระบบจัดการความมั่นคงปลอดภัยข้อมูลสารสนเทศ
-
-Basic information system security, vulnerabilities, threats, and risk, malware,
-introduction to information security, software security, and network security, security
-implementation, cryptography, identity management, authentication and authorization,
-access control, firewalls, information security management system.
+แนวคิดเกี่ยวกับความมั่นคงปลอดภัยของระบบสารสนเทศ, ช่องโหว่ ภัย และความเสี่ยง, มัลแวร์, ความมั่นคงปลอดภัยของข้อมูล ซอฟต์แวร์ และเครือข่ายเบื้องต้น, การดำเนินมาตรการรักษาความมั่นคง ปลอดภัย, การเข้ารหัสลับ, การจัดการการระบุตัวตน, การพิสูจน์ตัวตนและการกำหนดสิทธิ์, การควบคุม การเข้าถึง, ไฟร์วอล์ด, ระบบจัดการความมั่นคงปลอดภัยข้อมูลสารสนเทศ
+Basic information system security, vulnerabilities, threats, and risk, malware, introduction to information security, software security, and network security, security implementation, cryptography, identity management, authentication and authorization, access control, firewalls, information security management system.
 
 **06036116 การตลาดเชิงดิจิทัล**
 DIGITAL MARKETING
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
-ธุรกิจและการตลาดร่วมสมัย โฆษณาออนไลน์และออฟไลน์ในโลกดิจิทัล เช่น โทรทัศน์ ดิสเพลย์
-การค้นหา วิดีโอ และโฆษณาบนมือถือ ฯลฯ การโฆษณาดิจิทัลและการจัดการสื่อ แคมเปญการสื่อสาร
-การตลาดและการวางแผนการประเมินผล กลยุทธ์แบรนด์ โซเชียลมีเดียสำหรับการจัดการแบรนด์และการ
-โฆษณา
-
-Contemporary business and marketing, online and offline advertising in digital world,
-e.g., television, display, search, video, and mobile advertising, etc., digital advertising and
-media management, marketing communications campaign and evaluation planning, brand
-strategy, social media for brand management and advertising.
+ธุรกิจและการตลาดร่วมสมัย โฆษณาออนไลน์และออฟไลน์ในโลกดิจิทัล เช่น โทรทัศน์ ดิสเพลย์ การค้นหา วิดีโอ และโฆษณาบนมือถือ ฯลฯ การโฆษณาดิจิทัลและการจัดการสื่อ แคมเปญการสื่อสาร การตลาดและการวางแผนการประเมินผล กลยุทธ์แบรนด์ โซเชียลมีเดียสำหรับการจัดการแบรนด์และการ โฆษณา
+Contemporary business and marketing, online and offline advertising in digital world, e.g., television, display, search, video, and mobile advertising, etc., digital advertising and media management, marketing communications campaign and evaluation planning, brand strategy, social media for brand management and advertising.
 
 **06036117 อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่**
 BUSINESS INTELLIGENCE AND BIG DATA
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
-ธุรกิจอัจฉริยะ (business Intelligence) และส่วนประกอบของมัน ข้อมูลขนาดใหญ่ (big data)
-และการวิเคราะห์ข้อมูลขนาดใหญ่ (big data analytics) ลักษณะเฉพาะ 5 อย่างของข้อมูลขนาดใหญ่ -
-volume (ข้อมูลมหาศาล ขนาดใหญ่) variety (ข้อมูลที่มีความหลากหลายทั้งที่เป็นแบบโครงสร้างหรือ
-รูปแบบที่ไม่แน่นอน) velocity (ข้อมูลที่จะต้องวิเคราะห์เข้าสู่ระบบฐานข้อมูลอย่างรวดเร็ว โดยให้
-ความสำคัญกับข้อมูลที่เป็น real - time) veracity (ความถูกต้อง ครบถ้วนของข้อมูล) และ value (ข้อมูล
+ธุรกิจอัจฉริยะ (business Intelligence) และส่วนประกอบของมัน ข้อมูลขนาดใหญ่ (big data) และการวิเคราะห์ข้อมูลขนาดใหญ่ (big data analytics) ลักษณะเฉพาะ 5 อย่างของข้อมูลขนาดใหญ่ - volume (ข้อมูลมหาศาล ขนาดใหญ่) variety (ข้อมูลที่มีความหลากหลายทั้งที่เป็นแบบโครงสร้างหรือ รูปแบบที่ไม่แน่นอน) velocity (ข้อมูลที่จะต้องวิเคราะห์เข้าสู่ระบบฐานข้อมูลอย่างรวดเร็ว โดยให้ ความสำคัญกับข้อมูลที่เป็น real - time) veracity (ความถูกต้อง ครบถ้วนของข้อมูล) และ value (ข้อมูล
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
 คณะเทคโนโลยีสารสนเทศ สจล.
@@ -493,48 +492,26 @@ Introduction to multimedia systems, types for multimedia data such as photos, sc
 
 มคอ. 2
 
-# 06036123 เทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY
-
+**06036123 เทคโนโลยีกลุ่มเมฆ**
+CLOUD TECHNOLOGY
 วิชาบังคับก่อน : ไม่มี
-
 PREREQUISITE : NONE
+การแนะนำโครงสร้างของระบบคลาวด์ รูปแบบการให้บริการของระบบคลาวด์ รูปแบบการติดตั้ง ระบบคลาวด์ เทคโนโลยีที่ใช้ในการสร้างระบบคลาวด์ การบริหารจัดการระบบคลาวด์ ความปลอดภัย สำหรับระบบคลาวด์ และ ค่าชี้วัดในทางธุรกิจและรูปแบบการคิดค่าบริการของบริการของระบบคลาวด์
+Introduction to cloud architecture, cloud delivery models, cloud deployment models, Cloud-Enabling technology, cloud management, cloud security, and business cost metrics and pricing models for cloud services
 
-การแนะนำโครงสร้างของระบบคลาวด์ รูปแบบการให้บริการของระบบคลาวด์ รูปแบบการติดตั้ง
-ระบบคลาวด์ เทคโนโลยีที่ใช้ในการสร้างระบบคลาวด์ การบริหารจัดการระบบคลาวด์ ความปลอดภัย
-สำหรับระบบคลาวด์ และ ค่าชี้วัดในทางธุรกิจและรูปแบบการคิดค่าบริการของบริการของระบบคลาวด์
-
-Introduction to cloud architecture, cloud delivery models, cloud deployment
-models, Cloud-Enabling technology, cloud management, cloud security, and business cost
-metrics and pricing models for cloud services
-
-# 06036124 เครือข่ายคอมพิวเตอร์และความมั่นคงทางไซเบอร์เบื้องต้น INTRODUCTION TO COMPUTER NETWORK AND CYBERSECURITY
-
+**06036124 เครือข่ายคอมพิวเตอร์และความมั่นคงทางไซเบอร์เบื้องต้น**
+INTRODUCTION TO COMPUTER NETWORK AND CYBERSECURITY
 วิชาบังคับก่อน : ไม่มี
-
 PREREQUISITE : NONE
+แนวคิดเกี่ยวกับเครือข่ายคอมพิวเตอร์และความมั่นคงปลอดภัยไซเบอร์พื้นฐาน, การเชื่อมโยง เครือข่ายและอินเทอร์เน็ต, หลักการสื่อสาร, สถาปัตยกรรมเครือข่ายและแอพลิเคชัน, แอพลิเคชันและ บริการบนเครือข่าย, ภัยและการโจมตีทางไซเบอร์, ช่องโหว่และความเสี่ยง, พื้นฐานมัลแวร์, เครื่องมือ รักษาความปลอดภัย, การเข้ารหัสสับ, การพิสูจน์ตัวตน, การลงลายเซ็นดิจิทัล, การควบคุมการเข้าถึง, ความปลอดภัยข้อมูลส่วนบุคคล, กฎหมายและจริยธรรมที่เกี่ยวกับไซเบอร์
 
-แนวคิดเกี่ยวกับเครือข่ายคอมพิวเตอร์และความมั่นคงปลอดภัยไซเบอร์พื้นฐาน, การเชื่อมโยง
-เครือข่ายและอินเทอร์เน็ต, หลักการสื่อสาร, สถาปัตยกรรมเครือข่ายและแอพลิเคชัน, แอพลิเคชันและ
-บริการบนเครือข่าย, ภัยและการโจมตีทางไซเบอร์, ช่องโหว่และความเสี่ยง, พื้นฐานมัลแวร์, เครื่องมือ
-รักษาความปลอดภัย, การเข้ารหัส/ลง, การพิสูจน์ตัวตน, การลงลายเซ็นดิจิทัล, การควบคุมการเข้าถึง,
-ความปลอดภัยข้อมูลส่วนบุคคล, กฎหมายและจริยธรรมที่เกี่ยวกับไซเบอร์
+Basic computer networks and cybersecurity concepts, network and Internet connections, communication principles, network and application architectures, network applications and services, cyber threats and cyber attacks, vulnerabilities and risks, malware fundamentals, security safeguards and countermeasures, cryptography, authentication, digital signature, access control, data privacy, cyber laws and ethics.
 
-Basic computer networks and cybersecurity concepts, network and Internet
-connections, communication principles, network and application architectures, network
-applications and services, cyber threats and cyber attacks, vulnerabilities and risks, malware
-fundamentals, security safeguards and countermeasures, cryptography, authentication,
-digital signature, access control, data privacy, cyber laws and ethics.
-
-# 06036125 สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ COMPUTER ARCHITECTURE AND OPERATING SYSTEM
-
+**06036125 สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ**
+COMPUTER ARCHITECTURE AND OPERATING SYSTEM
 วิชาบังคับก่อน : ไม่มี
-
 PREREQUISITE : NONE
-
-วิวัฒนาการของคอมพิวเตอร์, พื้นฐานความรู้เกี่ยวกับคอมพิวเตอร์, การคำนวณทางคณิตศาสตร์ใน
-คอมพิวเตอร์, ข้อมูลและการส่งข้อมูล, สถาปัตยกรรมของหน่วยความจำ, บัสและหน่วยความจำแคช, การ
-เชื่อมต่อและการสื่อสาร, โครงสร้างของหน่วยประมวลผล, การคำนวณแบบขนานและไปทไลน์, เทคโนโลยี
-ของไมโครโพรเซสเซอร์, อินเตอร์รัพท์, การทำดิเอ็มเอ, โปรแกรมอินพทเอาต์พุ
+วิวัฒนาการของคอมพิวเตอร์, พื้นฐานความรู้เกี่ยวกับคอมพิวเตอร์, การคำนวณทางคณิตศาสตร์ใน คอมพิวเตอร์, ข้อมูลและการส่งข้อมูล, สถาปัตยกรรมของหน่วยความจำ, บัสและหน่วยความจำแคช, การ เชื่อมต่อและการสื่อสาร, โครงสร้างของหน่วยประมวลผล, การคำนวณแบบขนานและไปทไลน์, เทคโนโลยี ของไมโครโพรเซสเซอร์, อินเตอร์รัพท์, การทำดิเอ็มเอ, โปรแกรมอินพทเอาต์พุต, ระบบ
 
 ---
 
@@ -577,7 +554,7 @@ test, and user documentation activities.
 
 PREREQUISITE : 06036112 DATABASE SYSTEM CONCEPTS
 
-การประมวลผลธุรกรรม การกู้คืนธุรกรรมจากความผิดพลาดต่างๆ การจัดลำดับการปฏิบัติงาน
+การประมวลผลธุรกรรม การภู้คืนธุรกรรมจากความผิดพลาดต่างๆ การจัดลำดับการปฏิบัติงาน
 ในธุรกรรม การรักษาความถูกต้องสอดคล้องในระดับต่างๆ การปฏิบัติกิจกรรมฐานข้อมูลในช่วงเวลา
 เดียวกันให้ได้ผลลัพธ์ถูกต้อง ฐานข้อมูลระดับกายภาพและกลไกการเข้าถึง การประมวลคำถามและการ
 เข้าถึงคำตอบอย่างเล็งเลิศ ฐานข้อมูลแบบกระจาย ฐานข้อมูลเชิงเวลา การบูรณาการฐานข้อมูลและ
@@ -626,8 +603,7 @@ The importance of effective IT organization management, IT organization and chie
 มคอ. 2
 
 **06036130 เทคโนโลยีเชิงอ็อบเจกต์**
-**(3-0-6)**
-**OBJECT ORIENTED TECHNOLOGY**
+**(3-0-6) OBJECT ORIENTED TECHNOLOGY**
 
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
@@ -637,8 +613,7 @@ PREREQUISITE : NONE
 Object-oriented program design and development, encapsulation, classes and objects, methods and message passing, inheritance and polymorphism, data structures: arrays and collections, exception handling, input/output classes, Software design and development using Object-oriented technology.
 
 **06036131 การพัฒนาโปรแกรมประยุกต์บนอุปกรณ์เคลื่อนที่**
-**(3-0-6)**
-**MOBILE APPLICATION DEVELOPMENT**
+**(3-0-6) MOBILE APPLICATION DEVELOPMENT**
 
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
@@ -648,8 +623,7 @@ PREREQUISITE : NONE
 Introduction to technology and the programming of applications for mobile computing including devices such as smart phones, pads and tablets, developing mobile applications and using device emulators for coding and testing.
 
 **06036132 หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 1**
-**(3-0-6)**
-**SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1**
+**(3-0-6) SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1**
 
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
@@ -791,8 +765,9 @@ Digital Marketing Process, Increasing Visibility, Visitors Engagement, Bringing 
 <page_number>250</page_number>
 
 **06036142 การตลาดเชิงดิจิทัลขั้นสูง**
-มคอ. 2
+มคอ. 2 3(3-0-6)
 ADVANCED DIGITAL MARKETING
+
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
@@ -801,7 +776,9 @@ PREREQUISITE : NONE
 Digital Marketing Channel Mix, Implementing integrated digital mix, importance of predictive analytics for digital marketing, Customer Insights with Digital Marketing Analytics, predictive analytics techniques, Implementing predictive marketing across channel, Optimizing Return on Investment (ROI), the future of integrated digital marketing.
 
 **06036143 การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยู่ไอ**
+3(3-0-6)
 UX/UI REQUIREMENT AND PROTOTYPING
+
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
@@ -810,7 +787,9 @@ PREREQUISITE : NONE
 Principles of User experience (UX) /User Interface (UI) requirement, requirement methods, tools for UX/UI requirement, prototype principles, types and design prototypes, tools for creating prototypes.
 
 **06036144 การประเมินส่วนต่อประสานผู้ใช้**
+3(3-0-6)
 EVALUATING USER INTERFACE
+
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
 
@@ -841,7 +820,6 @@ Study or research of interesting current topics in information technology undert
 06036146 **โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2**
 PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2
 วิชาบังคับก่อน : 06036145 โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 1
-
 PREREQUISITE : 06036145 PROJECT IN BUSINESS INFORMATION TECHNOLOGY 1
 
 ศึกษาค้นคว้าหรือวิจัย ในหัวข้อปัจจุบันที่น่าสนใจทางเทคโนโลยีสารสนเทศ ในรูปแบบโครงการที่สามารถประยุกต์ใช้ทฤษฎีที่เกี่ยวข้องทางการศึกษาด้านเทคโนโลยีสารสนเทศ ภายใต้การดูแลและแนะนำของอาจารย์ที่ปรึกษา เพื่อที่จะสามารถนำเสนอผลการทดลองที่สมบูรณ์ในหัวข้อที่ได้เสนอและศึกษาต่อเนื่องมาจากวิชาโครงงาน 1
@@ -859,17 +837,21 @@ Study or research of interesting current topics in information technology undert
 มคอ. 2
 
 **06036147 สหกิจศึกษา**
-COOPERATIVE EDUCATION
+**COOPERATIVE EDUCATION**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
+
 วิชาสหกิจศึกษา เป็นโปรแกรมความร่วมมือทางด้านวิชาการระหว่างสถานศึกษากับหน่วยงานต่างๆ ที่ยินยอมให้นักศึกษาได้นำความรู้ที่ได้เรียนในห้องเรียน ไปประยุกต์ใช้ในการปฏิบัติงานจริงที่หน่วยงานนั้นๆ โดยโครงการของนักศึกษาที่ทำระหว่างปฏิบัติงานจะต้องเป็นไปตามที่ได้กำหนดไว้ร่วมกัน ระหว่างคณะฯ และหน่วยงานที่ไปปฏิบัติงาน โดยเมื่อปฏิบัติงานครบแล้วนักศึกษาจำเป็นที่จะต้องนำเสนอผลงานของโครงการต่อคณะกรรมการสอบ
+
 Cooperative Education is a collaborated education program between educational institutes and enterprises that allows students to apply their knowledge in the classroom with practical work experience. The student's project work must be approved by the faculty and the enterprises. After completion, students need to present their works to the examination committee.
 
 **06036148 สหกิจศึกษาต่างประเทศ**
-OVERSEA COOPERERATIVE EDUCATION
+**OVERSEAS COOPERERATIVE EDUCATION**
 วิชาบังคับก่อน : ไม่มี
 PREREQUISITE : NONE
+
 วิชาสหกิจศึกษา เป็นโปรแกรมความร่วมมือทางด้านวิชาการระหว่างสถานศึกษากับหน่วยงานต่างๆ ในต่างประเทศที่ยินยอมให้นักศึกษาได้นำความรู้ที่ได้เรียนในห้องเรียน ไปประยุกต์ใช้ในการปฏิบัติงานจริงที่หน่วยงานนั้นๆ โดยโครงการของนักศึกษาที่ทำระหว่างปฏิบัติงานจะต้องเป็นไปตามที่ได้กำหนดไว้ร่วมกัน ระหว่างคณะฯ และหน่วยงานที่ไปปฏิบัติงาน โดยเมื่อปฏิบัติงานครบแล้วนักศึกษาจำเป็นที่จะต้องนำเสนอผลงานของโครงการต่อคณะกรรมการสอบ
+
 Cooperative education is a collaborated education program between educational institutes and enterprises that allows students to apply their knowledge in the classroom with practical work experience. The student's project work must be approved by the faculty and the enterprises. After completion, students need to present their works to the examination committee.
 
 วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)

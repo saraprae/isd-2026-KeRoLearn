@@ -85,16 +85,26 @@
       "name_en": {
         "label": "ชื่อวิชา (อังกฤษ) ⭐",
         "n_items": 72,
-        "cer": 0.231006,
-        "wer": 0.22884,
-        "exact_match_acc": 0.791667,
+        "cer": 0.231884,
+        "wer": 0.23511,
+        "exact_match_acc": 0.763889,
         "n_sub": 5,
         "n_del": 478,
-        "n_ins": 43,
+        "n_ins": 45,
         "n_missing": 14,
         "n_hallucinated": 0,
         "n_ref_chars": 2277,
         "error_samples": [
+          {
+            "key": "06036148",
+            "gt": "OVERSEA COOPERATIVE EDUCATION",
+            "pred": "OVERSEAS COOPERATIVE EDUCATION"
+          },
+          {
+            "key": "06036148",
+            "gt": "OVERSEA COOPERATIVE EDUCATION",
+            "pred": "OVERSEAS COOPERATIVE EDUCATION"
+          },
           {
             "key": "xxxxxxxx",
             "gt": "FREE ELECTIVE COURSE 1",
@@ -109,16 +119,6 @@
             "key": "06036104 [ตกแถว]",
             "gt": "MANAGEMENT AND ORGANIZATIONS",
             "pred": ""
-          },
-          {
-            "key": "06036105 [ตกแถว]",
-            "gt": "FINANCIAL ACCOUNTING FOR NON-ACCOUNTANTS",
-            "pred": ""
-          },
-          {
-            "key": "06036117 [ตกแถว]",
-            "gt": "BUSINESS INTELLIGENCE AND BIG DATA",
-            "pred": ""
           }
         ]
       },
@@ -128,37 +128,37 @@
         "cer": 0.330696,
         "wer": null,
         "exact_match_acc": 0.652778,
-        "n_sub": 11,
-        "n_del": 190,
+        "n_sub": 12,
+        "n_del": 189,
         "n_ins": 8,
-        "n_missing": 19,
+        "n_missing": 18,
         "n_hallucinated": 1,
         "n_ref_chars": 632,
         "error_samples": [
           {
-            "key": "06036116",
-            "gt": "None",
-            "pred": "3(2-2-5)"
+            "key": "06036100",
+            "gt": "3(2-2-5)",
+            "pred": "None"
           },
           {
-            "key": "06036xxx",
-            "gt": "3(3-0-6) หรือ 3(2-2-5)",
+            "key": "06036101",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "96641001",
+            "gt": "2(1-2-3)",
+            "pred": "None"
+          },
+          {
+            "key": "96641003",
+            "gt": "1(0-3-2)",
+            "pred": "None"
+          },
+          {
+            "key": "96644007",
+            "gt": "3(3-0-6)",
             "pred": "1"
-          },
-          {
-            "key": "06036131",
-            "gt": "3(2-2-5)",
-            "pred": "3(3-0-6)"
-          },
-          {
-            "key": "06036134",
-            "gt": "3(2-2-5)",
-            "pred": "3(3-0-6)"
-          },
-          {
-            "key": "06036135",
-            "gt": "3(2-2-5)",
-            "pred": "3(3-0-6)"
           }
         ]
       },
@@ -337,16 +337,16 @@
         ]
       }
     },
-    "overall_micro_cer": 0.227095,
+    "overall_micro_cer": 0.227356,
     "alignment": {
       "matched": 58,
       "missed": 14,
-      "spurious": 14,
-      "precision": 0.8056,
+      "spurious": 16,
+      "precision": 0.7838,
       "recall": 0.8056,
-      "f1": 0.8056,
+      "f1": 0.7945,
       "gt_total": 72,
-      "pred_total": 72,
+      "pred_total": 74,
       "missed_codes": [
         "06036103",
         "06036104",
@@ -365,6 +365,7 @@
       ],
       "spurious_codes": [
         "96644042",
+        "06036xxx",
         "96643021",
         "06036xxx",
         "06036103",
@@ -377,29 +378,32 @@
         "06036117",
         "06036120",
         "06036121",
-        "06036122"
+        "06036122",
+        "06036123"
       ]
     },
     "internal_check": {
       "ok": false,
-      "n_courses": 72,
+      "n_courses": 74,
       "n_duplicate_keys": 0,
       "credits_by_term": {
-        "1/1": 21,
+        "1/1": 6,
         "1/2": 18,
         "2/2": 18,
         "3/2": 12,
         "4/1": 21,
-        "4/2": 18
+        "4/2": 21
       },
-      "total_credits_fixed_terms": 108,
+      "total_credits_fixed_terms": 96,
       "issues": [
+        "หน่วยกิตผิดรูปแบบ: 96644007 -> '1'",
         "หน่วยกิตผิดรูปแบบ: 96643021 -> '1'",
         "หน่วยกิตผิดรูปแบบ: 06036xxx -> '1'",
         "หน่วยกิตผิดรูปแบบ: xxxxxxxx -> '1'",
         "06036115: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
         "06036147: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
-        "06036148: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester"
+        "06036148: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "ภาค 1/1 มีแค่ 6 หน่วยกิต — น่าจะอ่านตกวิชา"
       ]
     }
   }

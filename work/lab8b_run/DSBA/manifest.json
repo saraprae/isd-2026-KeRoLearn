@@ -7,9 +7,14 @@
     "only_one_plan": 10,
     "in_both_plans": 39,
     "unclassified_kept_in_both": 45,
-    "no_page_info": 0
+    "no_page_info": 0,
+    "forced_shared": 0
   },
-  "warnings": [],
+  "warnings": [
+    "06026xxx: หน่วยกิต '3(3-0-6)' เป็นค่าที่ Lab 7B อนุมานเอง (note='อนุมานจากเลขลำดับที่ขาด + ยอดรวมหน่วยกิตของภาค (OCR ไม่ได้อ่านแถวนี้)') ไม่ใช่ค่าที่อ่านจากเล่มตรง ๆ — ตั้งเป็น null ตามนโยบาย 'ไม่รู้แน่ชัดห้ามเดา' (ค่าที่อนุมานมาก่อน null คือ '3(3-0-6)')",
+    "06026251: หน่วยกิต '3(2-2-5)' เป็นค่าที่ Lab 7B อนุมานเอง (note='หน่วยกิตอนุมานจากวิชาที่รหัสอยู่ติดกัน (เล่มไม่ได้พิมพ์/OCR หาย)') ไม่ใช่ค่าที่อ่านจากเล่มตรง ๆ — ตั้งเป็น null ตามนโยบาย 'ไม่รู้แน่ชัดห้ามเดา' (ค่าที่อนุมานมาก่อน null คือ '3(2-2-5)')",
+    "06026259: หน่วยกิต '6(0-35-0)' เป็นค่าที่ Lab 7B อนุมานเอง (note='ลงได้เฉพาะแผนสหกิจศึกษา; หน่วยกิตอนุมานจากวิชาชุดเดียวกัน (เล่มไม่ได้พิมพ์)') ไม่ใช่ค่าที่อ่านจากเล่มตรง ๆ — ตั้งเป็น null ตามนโยบาย 'ไม่รู้แน่ชัดห้ามเดา' (ค่าที่อนุมานมาก่อน null คือ '6(0-35-0)')"
+  ],
   "programs": [
     {
       "program_id": "DSBA_nocoop",
@@ -18,10 +23,10 @@
       "curriculum": "nocoop\\curriculum.json",
       "status": "ok",
       "source_courses": 89,
-      "courses": 85,
-      "plan_items": 44,
+      "courses": 87,
+      "plan_items": 42,
       "elective_slots": 45,
-      "courses_with_source_page": 85
+      "courses_with_source_page": 87
     },
     {
       "program_id": "DSBA_coop",
@@ -30,10 +35,10 @@
       "curriculum": "coop\\curriculum.json",
       "status": "ok",
       "source_courses": 89,
-      "courses": 85,
+      "courses": 87,
       "plan_items": 44,
       "elective_slots": 45,
-      "courses_with_source_page": 85
+      "courses_with_source_page": 87
     }
   ]
 }

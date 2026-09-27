@@ -2,7 +2,10 @@
 
 from pathlib import Path
 from types import ModuleType
+import sqlite3
 
+class UnsupportedGenedMetadata(ValueError):
+    pass
 
 class CurriculumDatabase:
     def __init__(self, lab8b: ModuleType, path: Path, max_rows: int = 100):
@@ -41,6 +44,56 @@ class CurriculumDatabase:
         finally:
             conn.close()
 
+    # เพิ่มเมธอดแผนเรียน main.py มี route /api/study-plan ที่เรียก selected_database.study_plan(...) อยู่แล้ว แต่ adapter ยังไม่มีเมธอดนี้ เพิ่มในคลาส CurriculumDatabase
+    def study_plan(self, year: int, semester: int) -> list[dict]:
+        self._require_db()
+        conn = self.lab8b.open_db(self.path, readonly=True)
+        try:
+            rows = conn.execute(
+                """
+                SELECT year, semester, code, name_th, name_en, credits, alt_group, note
+                FROM v_plan
+                WHERE year = ? AND semester = ?
+                ORDER BY code
+                """,
+                (year, semester),
+            ).fetchall()
+            return [dict(row) for row in rows]
+        finally:
+            conn.close()
+
+    def course_description(
+        self,
+        courseid: str,
+        db_paths: dict[str, dict[str, Path]],
+    ) -> dict | None:
+        paths = dict.fromkeys(
+            path
+            for tracks in db_paths.values()
+            for path in tracks.values()
+        )
+
+        for path in paths:
+            if not path.is_file():
+                raise FileNotFoundError(f"ไม่พบฐานข้อมูล: {path}")
+
+            conn = self.lab8b.open_db(path, readonly=True)
+            try:
+                row = conn.execute(
+                    """
+                    SELECT code, name_th, name_en, description_th
+                    FROM course
+                    WHERE code = ?
+                    """,
+                    (courseid,),
+                ).fetchone()
+                if row is not None:
+                    return dict(row)
+            finally:
+                conn.close()
+
+        return None
+
     def create_course(self, course: dict) -> dict:
         self._require_db()
         columns = (
@@ -50,7 +103,12 @@ class CurriculumDatabase:
         conn = self.lab8b.open_db(self.path)
         try:
             conn.execute(
-                "INSERT INTO course VALUES (?,?,?,?,?,?,?,?)",
+                """
+                INSERT INTO course (
+                    code, name_th, name_en, credits,
+                    lecture_h, lab_h, self_h, description_th
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
                 tuple(course.get(column) for column in columns),
             )
             conn.commit()
@@ -58,13 +116,51 @@ class CurriculumDatabase:
         finally:
             conn.close()
 
-    def query_from_model(self, sql: str) -> tuple[str, list[dict]]:
-        """Use Lab 8B's SQL guard and read-only connection directly."""
+    def query_from_model(
+        self,
+        sql: str,
+        *,
+        is_gened: bool = False,
+    ) -> tuple[str, list[dict]]:
         self._require_db()
         safe_sql = self.lab8b.guard_sql(sql)
         conn = self.lab8b.open_db(self.path, readonly=True)
+
+        blocked_metadata = False
+
+        def authorize(action, table, column, database_name, source):
+            nonlocal blocked_metadata
+
+            if (
+                is_gened
+                and action == sqlite3.SQLITE_READ
+                and (table or "").lower() == "program"
+                and (column or "").lower() in {"years", "total_credits"}
+            ):
+                blocked_metadata = True
+                return sqlite3.SQLITE_DENY
+
+            return sqlite3.SQLITE_OK
+
         try:
-            rows = [dict(row) for row in conn.execute(safe_sql).fetchall()]
+            conn.set_authorizer(authorize)
+
+            try:
+                rows = [
+                    dict(row)
+                    for row in conn.execute(safe_sql).fetchall()
+                ]
+            except sqlite3.DatabaseError as exc:
+                if blocked_metadata:
+                    raise UnsupportedGenedMetadata(
+                        "GENED ไม่มีระยะเวลาหลักสูตรของตัวเอง "
+                        "ส่วนหน่วยกิตศึกษาทั่วไปที่ต้องเรียน "
+                        "ให้ตรวจจากเกณฑ์ของหลักสูตรหลักและปีหลักสูตร "
+                        "ค่า years/total_credits ใน DB นี้"
+                        "ไม่ควรใช้เป็นเกณฑ์การเรียน"
+                    ) from exc
+                raise
+
             return safe_sql, rows[:self.max_rows]
         finally:
             conn.close()
@@ -78,4 +174,3 @@ prerequisite(code, requires, kind)
 v_plan(id, year, semester, code, name_th, name_en, credits, alt_group, note)
 v_semester_credits(year, semester, credits, n_courses)
 """.strip()
-

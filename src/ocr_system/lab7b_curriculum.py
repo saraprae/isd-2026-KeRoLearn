@@ -92,7 +92,7 @@ MAX_SIDE_PX = int(os.getenv("LAB7_MAX_SIDE", "1800"))
 REQUEST_TIMEOUT = 900
 NUM_CTX = int(os.getenv("LAB7B_NUM_CTX", "8192"))
 NUM_PREDICT = int(os.getenv("LAB7B_NUM_PREDICT", "4096"))
-OCR_NUM_CTX = int(os.getenv("LAB7B_OCR_NUM_CTX", "4096"))
+OCR_NUM_CTX = int(os.getenv("LAB7B_OCR_NUM_CTX", "8192"))
 OCR_NUM_PREDICT = int(os.getenv("LAB7B_OCR_NUM_PREDICT", "3000"))
 
 # ⭐ ค่าเฉพาะของกลุ่ม B
@@ -2947,25 +2947,45 @@ def _text_to_json_chunked(md_pages: list[str],
 
 
 def pipeline_markdown(path: str) -> dict:
-    """ทำขั้น Markdown -> JSON ต่อจาก intermediate_vlm.md โดยไม่ OCR ซ้ำ"""
-    text = Path(path).read_text(encoding="utf-8")
-    parts = [part.strip() for part in re.split(r"\n\s*---\s*\n", text)
-             if part.strip()]
-    if not parts:
-        raise ValueError(f"Markdown ว่างเปล่า: {path}")
+    """ทำขั้น Markdown -> JSON ต่อจาก intermediate_vlm.md โดยไม่ OCR ซ้ำ
 
-    marker = re.compile(r"^\s*<!--\s*PDF_PAGE\s+(\d+)\s*-->\s*\n?")
+    ⚠️ แบ่งหน้าโดยยึด "<!-- PDF_PAGE N -->" เป็นขอบเขตหลักเสมอ (ไม่ใช่เส้น "---")
+    เหตุผล: หน้าที่ OCR ถูกตัดกลางคันเพราะโควตา LAB7B_OCR_NUM_PREDICT ไม่พอ บางครั้งหยุด
+    การสร้างข้อความ *ก่อน* จะเขียนเส้น "---" ปิดท้ายหน้าด้วยซ้ำ — ถ้ายังแบ่งด้วย "---" เป็น
+    หลัก หน้านั้นกับหน้าถัดไปจะถูกรวมเป็นก้อนเดียวโดยไม่มีอะไรเตือน (เจอจริง: BIT หน้า 33
+    ไม่มี "---" ปิดท้ายเพราะตัดก่อนถึง -> marker "<!-- PDF_PAGE 34 -->" ที่ตามมาติด ๆ กลาย
+    เป็นข้อความเฉย ๆ กลางก้อนที่แท็กเป็นหน้า 33 ทำให้ <table> ที่หน้า 33 เปิดค้างไปจับคู่กับ
+    </table> ของหน้า 34 แทน — วิชาจากหน้า 34 เลยได้ปี/ภาคของหน้า 33 แบบเงียบ ๆ)
+    """
+    text = Path(path).read_text(encoding="utf-8")
+    marker = re.compile(r"<!--\s*PDF_PAGE\s+(\d+)\s*-->\s*\n?")
+    matches = list(marker.finditer(text))
+
     pages: list[str] = []
     nums: list[int | None] = []
-    last: int | None = None
-    for part in parts:
-        m = marker.match(part)
-        if m:
-            last = int(m.group(1))
-            part = part[m.end():]
-        # ส่วนที่ไม่มี marker = เส้น '---' ที่ OCR วาดเองกลางหน้า -> ยังเป็นหน้าเดิม
-        nums.append(last)
-        pages.append(part)
+
+    if not matches:
+        # ไฟล์เก่าไม่มี marker เลขหน้าเลย (Lab 7B เวอร์ชันก่อนหน้า) -> ใช้วิธีเดิม
+        # แบ่งด้วย "---" เพราะไม่มีขอบเขตอื่นให้ยึดแล้ว
+        pages = [part.strip() for part in re.split(r"\n\s*---\s*\n", text)
+                 if part.strip()]
+        nums = [None] * len(pages)
+    else:
+        if matches[0].start() > 0:
+            head = text[:matches[0].start()].strip()
+            if head:
+                pages.append(head)
+                nums.append(None)
+        for i, m in enumerate(matches):
+            start = m.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+            chunk = text[start:end].strip()
+            if chunk:
+                pages.append(chunk)
+                nums.append(int(m.group(1)))
+
+    if not pages:
+        raise ValueError(f"Markdown ว่างเปล่า: {path}")
 
     page_nums: list[int] | None = None
     if all(n is not None for n in nums):

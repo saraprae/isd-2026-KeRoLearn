@@ -11,6 +11,9 @@
     section { margin-top: 22px; padding: 16px; background: #f4f4f4; }
     pre { overflow-x: auto; white-space: pre-wrap; }
     .muted { color: #666; }
+    #answer {
+    white-space: pre-wrap;
+  }
   </style>
 </head>
 <body>
@@ -20,6 +23,13 @@
 
   <form id="ask-form">
     <textarea id="question" required>หลักสูตรนี้มีหน่วยกิตรวมทั้งหมดเท่าไร</textarea>
+    <label for="program">หลักสูตร</label>
+      <select id="program" required disabled>
+        <option value="">กำลังโหลด...</option>
+      </select>
+
+      <label for="track">แผนการเรียน</label>
+      <select id="track" required disabled></select>
     <button type="submit">ถาม</button>
   </form>
 
@@ -30,25 +40,148 @@
   </section>
 
   <script>
-    document.getElementById("ask-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const answer = document.getElementById("answer");
-      answer.textContent = "กำลังประมวลผล...";
-      try {
-        const response = await fetch("/api/ask", {
-          method: "POST", headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({question: document.getElementById("question").value})
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.detail || "เกิดข้อผิดพลาด");
-        answer.textContent = data.answer;
-        document.getElementById("rows").textContent = JSON.stringify(data.rows, null, 2);
-        document.getElementById("sql").textContent = data.sql;
-      } catch (error) {
-        answer.textContent = `ผิดพลาด: ${error.message}`;
+  const programSelect = document.getElementById("program");
+  const trackSelect = document.getElementById("track");
+  const submitButton = document.querySelector(
+    '#ask-form button[type="submit"]'
+  );
+
+  let programs = [];
+
+  function updateTracks() {
+    const selected = programs.find(
+      (item) => item.program === programSelect.value
+    );
+
+    trackSelect.replaceChildren(
+      ...(selected?.tracks || []).map((track) => {
+        const option = document.createElement("option");
+        option.value = track;
+        option.textContent = track;
+        return option;
+      })
+    );
+
+    const ready = trackSelect.options.length > 0;
+    trackSelect.disabled = !ready;
+    submitButton.disabled = !ready;
+  }
+
+  async function loadPrograms() {
+    submitButton.disabled = true;
+    programSelect.disabled = true;
+    trackSelect.disabled = true;
+
+    try {
+      const response = await fetch("/api/curricula");
+
+      if (!response.ok) {
+        throw new Error(`โหลดหลักสูตรไม่ได้ (HTTP ${response.status})`);
       }
-    });
+
+      const data = await response.json();
+
+      if (!Array.isArray(data.programs) || data.programs.length === 0) {
+        throw new Error("ไม่พบหลักสูตรในระบบ");
+      }
+
+      programs = data.programs;
+
+      programSelect.replaceChildren(
+        ...programs.map((item) => {
+          const option = document.createElement("option");
+          option.value = item.program;
+          option.textContent = item.program;
+          return option;
+        })
+      );
+
+      updateTracks();
+      programSelect.disabled = false;
+    } catch (error) {
+      document.getElementById("answer").textContent =
+        `โหลดตัวเลือกไม่สำเร็จ: ${error.message} กรุณารีเฟรชหน้าเว็บ`;
+    }
+  }
+
+  programSelect.addEventListener("change", updateTracks);
+  loadPrograms();
+
+    document.getElementById("ask-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const answer = document.getElementById("answer");
+    const rows = document.getElementById("rows");
+    const sql = document.getElementById("sql");
+
+    if (button.disabled) return;
+
+    // ล้างผลเก่าและป้องกันการส่งคำถามซ้ำระหว่างรอ
+    answer.textContent = "กำลังประมวลผล...";
+    rows.textContent = "-";
+    sql.textContent = "-";
+    button.disabled = true;
+    programSelect.disabled = true;
+    trackSelect.disabled = true;
+
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: document.getElementById("question").value.trim(),
+          program: programSelect.value,
+          track: trackSelect.value
+        })
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        console.error(
+          "POST /api/ask ไม่สำเร็จ:",
+          response.status,
+          JSON.stringify(data, null, 2)
+        );
+      }
+
+      if (!response.ok) {
+        let message = `เกิดข้อผิดพลาด (HTTP ${response.status})`;
+
+        if (Array.isArray(data?.detail)) {
+          // FastAPI ส่ง validation error เป็นรายการ
+          message = data.detail.map((item) => {
+            const field = (item.loc || [])
+              .filter((part) => part !== "body")
+              .join(".");
+
+            return `${field || "ข้อมูล"}: ${item.msg || "ไม่ถูกต้อง"}`;
+          }).join("\n");
+        } else if (typeof data?.detail === "string") {
+          message = data.detail;
+        }
+
+        throw new Error(message);
+      }
+
+      if (!data) {
+        throw new Error("เซิร์ฟเวอร์ส่งคำตอบในรูปแบบที่อ่านไม่ได้");
+      }
+
+      answer.textContent = data.answer;
+      rows.textContent = JSON.stringify(data.rows, null, 2);
+      sql.textContent = data.sql;
+    } catch (error) {
+      answer.textContent = error instanceof TypeError
+        ? "ติดต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่"
+        : `ผิดพลาด: ${error.message}`;
+    } finally {
+  button.disabled = false;
+  programSelect.disabled = false;
+  trackSelect.disabled = false;
+  }
+  });
   </script>
 </body>
 </html>
-
