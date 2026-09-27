@@ -27,8 +27,17 @@ class CourseCreate(BaseModel):
     description_th: str | None = None
 
 
-class CourseResponse(CourseCreate):
-    pass
+class CourseResponse(BaseModel):
+    """Stored course data may contain placeholder codes and unknown credits."""
+
+    code: str
+    name_th: str
+    name_en: str | None = None
+    credits: int | None = Field(default=None, ge=0, le=12)
+    lecture_h: int | None = None
+    lab_h: int | None = None
+    self_h: int | None = None
+    description_th: str | None = None
 
 
 class HealthResponse(BaseModel):
@@ -38,4 +47,3 @@ class HealthResponse(BaseModel):
     model: str
     ollama_ready: bool
     lab8b_module: str
-

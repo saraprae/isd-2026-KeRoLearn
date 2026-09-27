@@ -40,7 +40,7 @@ lab10_fastapi/
 - Ollama
 - โมเดล `qwen3:4b`
 - ฝั่ง Transcript ต้องมีโมเดล `scb10x/typhoon-ocr1.5-3b` ด้วย
-- ฐานข้อมูล `work/lab8b_run/curriculum.db` จาก Lab 8B
+- ฐานข้อมูล `work/lab8b_run/DSBA/nocoop/curriculum.db` จาก Lab 8B
 
 ถ้ายังไม่มีฐานข้อมูล ให้กลับไปรันจากรากโปรเจกต์:
 
@@ -125,7 +125,7 @@ cp lab10_fastapi/transcript_app/.env.example lab10_fastapi/transcript_app/.env
 Curriculum App ใช้ค่า:
 
 ```dotenv
-CURRICULUM_DB_PATH=work/lab8b_run/curriculum.db
+CURRICULUM_DB_PATH=work/lab8b_run/DSBA/nocoop/curriculum.db
 CURRICULUM_OLLAMA_URL=http://127.0.0.1:11434
 CURRICULUM_OLLAMA_MODEL=qwen3:4b
 ```

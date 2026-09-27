@@ -59,24 +59,73 @@ def health() -> dict:
 
 
 @app.get("/api/program")
-def get_program() -> dict:
+def get_program() -> list[dict]:
     try:
-        program = database.program()
+        programs = database.programs(settings.db_paths)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    if program is None:
+    if not programs:
         raise HTTPException(status_code=404, detail="ไม่พบข้อมูลหลักสูตร")
-    return program
+    return programs
+
+
+def select_database(program: str | None, track: str | None) -> CurriculumDatabase:
+    selected_database = database
+    if program is None and track is not None:
+        raise HTTPException(status_code=422, detail="กรุณาระบุ program เมื่อเลือก track")
+    if program is not None:
+        program = program.strip().upper()
+        tracks = settings.db_paths.get(program)
+        if tracks is None:
+            raise HTTPException(status_code=422, detail="หลักสูตรต้องเป็น IT, DSBA, BIT, AIT หรือ GENED")
+        selected_track = track.strip().lower() if track is not None else (
+            "nocoop" if "nocoop" in tracks else "default"
+        )
+        if selected_track not in tracks:
+            raise HTTPException(
+                status_code=422,
+                detail=f"แผนของ {program} ต้องเป็น: {', '.join(tracks)}",
+            )
+        selected_database = CurriculumDatabase(lab8b, tracks[selected_track], settings.max_rows)
+    return selected_database
 
 
 @app.get("/api/courses", response_model=list[CourseResponse])
 def get_courses(
+    program: str | None = Query(default=None, description="IT, DSBA, BIT, AIT or GENED"),
+    track: str | None = Query(default=None, description="coop, nocoop or default (AIT and GENED)"),
     search: str = Query(default="", max_length=100),
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
 ) -> list[dict]:
+    selected_database = select_database(program, track)
     try:
-        return database.courses(search, limit, offset)
+        return selected_database.courses(search, limit=settings.max_rows)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/descriptions")
+def get_description(
+    courseid: str = Query(..., pattern=r"^[0-9]{8}$", description="รหัสวิชา 8 หลัก"),
+) -> dict:
+    try:
+        result = database.course_description(courseid, settings.db_paths)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    if result is None:
+        raise HTTPException(status_code=404, detail="ไม่พบรหัสวิชานี้")
+    return result
+
+
+@app.get("/api/study-plan")
+def get_study_plan(
+    program: str = Query(..., description="IT, DSBA, BIT, AIT or GENED"),
+    track: str = Query(..., description="coop, nocoop or default (AIT and GENED)"),
+    year: int = Query(..., ge=1, le=4, description="ปีการศึกษา 1–4"),
+    semester: int = Query(..., ge=1, le=3, description="1, 2 หรือ 3 (ภาคฤดูร้อน)"),
+) -> list[dict]:
+    selected_database = select_database(program, track)
+    try:
+        return selected_database.study_plan(year, semester)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 

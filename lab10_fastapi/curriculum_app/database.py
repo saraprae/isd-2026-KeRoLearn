@@ -23,6 +23,25 @@ class CurriculumDatabase:
         finally:
             conn.close()
 
+    def programs(self, db_paths: dict[str, dict[str, Path]]) -> list[dict]:
+        """Read curricula grouped by program, preserving each track's metadata.
+
+        Accept Settings.db_paths and return entries shaped as
+        {"program_id": "DSBA", "tracks": {"coop": {...}, "nocoop": {...}}}.
+        Empty program tables are omitted; missing databases raise FileNotFoundError.
+        """
+        programs = []
+        for program_id, track_paths in db_paths.items():
+            tracks = {}
+            for track, path in track_paths.items():
+                database = CurriculumDatabase(self.lab8b, path, self.max_rows)
+                metadata = database.program()
+                if metadata is not None:
+                    tracks[track] = metadata
+            if tracks:
+                programs.append({"program_id": program_id, "tracks": tracks})
+        return programs
+
     def courses(self, search: str = "", limit: int = 20, offset: int = 0) -> list[dict]:
         self._require_db()
         limit = min(max(limit, 1), self.max_rows)
@@ -38,6 +57,43 @@ class CurriculumDatabase:
         conn = self.lab8b.open_db(self.path, readonly=True)
         try:
             return [dict(row) for row in conn.execute(sql, params).fetchall()]
+        finally:
+            conn.close()
+
+    def course_description(
+        self, courseid: str, db_paths: dict[str, dict[str, Path]]
+    ) -> dict | None:
+        """Find an exact code; prefer the first nonempty description across tracks."""
+        found = None
+        for tracks in db_paths.values():
+            for path in tracks.values():
+                database = CurriculumDatabase(self.lab8b, path, self.max_rows)
+                database._require_db()
+                conn = self.lab8b.open_db(database.path, readonly=True)
+                try:
+                    row = conn.execute(
+                        "SELECT code AS courseid, description_th AS description "
+                        "FROM course WHERE code = ?", (courseid,),
+                    ).fetchone()
+                finally:
+                    conn.close()
+                if row is not None:
+                    found = dict(row)
+                    if found["description"] and found["description"].strip():
+                        return found
+                    found["description"] = None
+        return found
+
+    def study_plan(self, year: int, semester: int) -> list[dict]:
+        """Return all plan entries, including elective alternatives and notes."""
+        self._require_db()
+        conn = self.lab8b.open_db(self.path, readonly=True)
+        try:
+            rows = conn.execute(
+                "SELECT * FROM v_plan WHERE year = ? AND semester = ? ORDER BY id",
+                (year, semester),
+            ).fetchall()
+            return [dict(row) for row in rows]
         finally:
             conn.close()
 
@@ -78,4 +134,3 @@ prerequisite(code, requires, kind)
 v_plan(id, year, semester, code, name_th, name_en, credits, alt_group, note)
 v_semester_credits(year, semester, credits, n_courses)
 """.strip()
-

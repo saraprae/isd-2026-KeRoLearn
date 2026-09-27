@@ -13,7 +13,7 @@ ocr_system/
 │   └── curriculum_app/       ← ไฟล์ Lab 10 ของกลุ่มนี้
 ├── src/ocr_system/
 │   └── lab8b_curriculum_db.py ← โค้ด Lab 8B
-└── work/lab8b_run/
+└── work/lab8b_run/DSBA/nocoop/
     └── curriculum.db            ← ฐานข้อมูล
 ```
 
@@ -32,7 +32,7 @@ python -m uvicorn lab10_fastapi.curriculum_app.main:app --reload --port 8000
 ก่อนรันต้องมี:
 
 - `lab10_fastapi/curriculum_app/.env`
-- `work/lab8b_run/curriculum.db`
+- `work/lab8b_run/DSBA/nocoop/curriculum.db`
 - `src/ocr_system/lab8b_curriculum_db.py`
 
 ถ้าแจกเฉพาะกลุ่ม Curriculum ให้ก็อปโฟลเดอร์นี้ พร้อม Lab 8B และไฟล์ DB ตามตำแหน่งข้างต้น
@@ -49,7 +49,7 @@ FastAPI ยังไม่ได้รัน ให้รันคำสั่�
 
 ### ขึ้น `ไม่พบฐานข้อมูล`
 
-ตรวจว่ามี `work/lab8b_run/curriculum.db` และค่า `CURRICULUM_DB_PATH` ใน `.env` ถูกต้อง
+ตรวจว่ามี `work/lab8b_run/DSBA/nocoop/curriculum.db` และค่า `CURRICULUM_DB_PATH` ใน `.env` ถูกต้อง
 
 ### เปิดหน้าเว็บได้แต่ถามไม่ได้
 
