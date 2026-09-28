@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curriculum Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Curriculum Book Assistant</h1>
+  <p>Qwen แปลงคำถามเป็น SQL, SQLite ค้นข้อมูล แล้ว Qwen สรุปคำตอบ</p>
+  <p>Made by KeroLearn 🐸</p>
+
+  <form id="ask-form" aria-busy="false">
+    <textarea id="question" aria-label="คำถามเกี่ยวกับหลักสูตร" minlength="2" maxlength="500" required>หลักสูตรนี้มีหน่วยกิตรวมทั้งหมดเท่าไร</textarea>
+    <label for="program">หลักสูตร</label>
+      <select id="program" required disabled>
+        <option value="">กำลังโหลด...</option>
+      </select>
+
+      <label for="track">แผนการเรียน</label>
+      <select id="track" required disabled></select>
+    <button type="submit">ถาม</button>
+    <p id="ui-status" data-state="idle" role="status" aria-live="polite" aria-atomic="true">พร้อมรับคำถาม</p>
+  </form>
+
+  <section>
+    <h2>คำตอบ</h2><div id="answer">รอคำถาม...</div>
+    <h3>ค่าที่ได้จากฐานข้อมูล</h3><pre id="rows">-</pre>
+    <h3>SQL ที่ใช้</h3><pre id="sql">-</pre>
+  </section>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
