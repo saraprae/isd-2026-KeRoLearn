@@ -1,0 +1,155 @@
+@import "tailwindcss" source(none);
+
+/* Compile with npm run build:css. Selectors preserve the existing HTML and JS. */
+@theme {
+  --font-sans: "Inter", "Noto Sans Thai", "Segoe UI", Tahoma, sans-serif;
+}
+
+@layer base {
+  html { @apply min-h-full bg-white; overflow-x: clip; }
+  body {
+    @apply relative isolate mx-auto max-w-7xl px-6 pb-20 pt-16 font-sans text-slate-600 antialiased;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    line-height: 1.8;
+  }
+  body::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 calc((100% - 100vw) / 2) auto;
+    height: 440px;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 80% 0%, #F9B2D7 0%, transparent 45%),
+      radial-gradient(ellipse at 10% 20%, #f8e4ee 0%, transparent 48%), #fff;
+  }
+  h1 {
+    @apply mx-auto max-w-3xl bg-linear-to-r from-[#831C91] via-[#D552A3] to-[#D552A3] bg-clip-text text-center text-4xl font-bold tracking-tight text-transparent sm:text-5xl;
+    line-height: 1.22;
+    text-wrap: balance;
+  }
+  body > p:first-of-type { @apply mx-auto mt-5 max-w-2xl text-center text-base sm:text-lg; }
+  body > .muted { @apply mx-auto mt-3 mb-10 max-w-2xl text-center text-sm text-slate-500; }
+  body > p:nth-of-type(2) { @apply mx-auto mt-3 mb-10 text-center text-sm text-slate-500; }
+  h2 { @apply flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900; }
+  h3 { @apply mt-7 mb-3 text-sm font-semibold text-slate-700; }
+  h2::before {
+    content: "";
+    @apply block size-11 shrink-0 rounded-full;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF85BB' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-9l-5 3v-3H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z'/%3E%3Cpath d='M8 9h8M8 13h5'/%3E%3C/svg%3E") center / 22px no-repeat,
+      linear-gradient(135deg, #F9B2D7, #f8e4ee);
+  }
+  textarea, select, button { font: inherit; }
+  textarea, select {
+    @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition-all duration-300;
+  }
+  textarea { @apply min-h-36 resize-y; }
+  select { @apply min-h-12 cursor-pointer; }
+  textarea:focus, select:focus {
+    @apply border-[#CA6180] bg-white outline-none ring-4 ring-[#FCB7C7];
+  }
+  textarea:disabled, select:disabled { @apply cursor-not-allowed opacity-60; }
+  button {
+    @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-full bg-linear-to-r from-[#FF85BB] via-[#F9B2D7] to-[#FFCEE3] px-9 py-3 font-bold text-white shadow-lg shadow-pink-200/60 transition-all duration-300;
+  }
+  button:focus-visible { @apply outline-none ring-4 ring-blue-200 ring-offset-2; }
+  button:disabled { @apply cursor-not-allowed opacity-60 shadow-none; }
+  button::after {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h16m-6-6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  pre {
+    @apply overflow-x-auto whitespace-pre-wrap rounded-xl border border-slate-100 bg-slate-50 p-4 font-mono text-sm leading-7 text-slate-600;
+    overflow-wrap: anywhere;
+  }
+}
+
+@layer components {
+  #ui-status {
+    @apply mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-600;
+    grid-area: 6 / 2;
+    justify-self: end;
+    align-self: center;
+    max-width: 100%;
+    min-width: 0;
+    text-align: right;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+  #ui-status::before {
+    content: "";
+    @apply size-2.5 shrink-0 rounded-full bg-slate-400;
+    box-shadow: 0 0 0 5px #f1f5f9;
+  }
+  #ui-status[data-state="loading"] { @apply border-blue-100 bg-blue-50 text-blue-800; }
+  #ui-status[data-state="loading"]::before {
+    @apply size-4 border-2 border-blue-200 border-t-blue-600 bg-transparent;
+    box-shadow: none;
+    animation: clearwave-spin .8s linear infinite;
+  }
+  #ui-status[data-state="success"] { @apply border-emerald-100 bg-emerald-50 text-emerald-800; }
+  #ui-status[data-state="success"]::before { @apply bg-emerald-500; box-shadow: 0 0 0 5px #d1fae5; }
+  #ui-status[data-state="error"] { @apply border-rose-100 bg-rose-50 text-rose-800; }
+  #ui-status[data-state="error"]::before { @apply bg-rose-500; box-shadow: 0 0 0 5px #ffe4e6; }
+  #ask-form {
+    @apply grid grid-cols-1 gap-3 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all duration-300 sm:p-8;
+    grid-row: 4;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  #ask-form > textarea, #ask-form > label, #ask-form > select { grid-column: 1 / -1; }
+  #ask-form label { @apply mt-3 text-sm font-semibold text-slate-700; }
+  #ask-form button { @apply mt-5 justify-self-start; grid-area: 6 / 1; align-self: center; }
+  #ask-form[aria-busy="true"] button { cursor: wait; }
+  #ask-form[aria-busy="true"] button::after { display: none; }
+  body > section {
+    @apply relative mt-28 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all duration-300 sm:p-8;
+  }
+  body > section { isolation: isolate; }
+  body > section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: white;
+    pointer-events: none;
+  }
+  #answer { @apply mt-5 whitespace-pre-wrap text-base leading-8 text-slate-600; overflow-wrap: anywhere; }
+  #sql { @apply border-pink-100 bg-pink-50/60 text-pink-900; }
+}
+
+@media (min-width: 640px) {
+  #ask-form { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+  #question { grid-column: 1 / -1; }
+  #ask-form > label[for="program"] { grid-area: 2 / 1; }
+  #ask-form > label[for="track"] { grid-area: 2 / 2; }
+  #ask-form > #program { grid-area: 3 / 1; }
+  #ask-form > #track { grid-area: 3 / 2; }
+  #ask-form button { grid-area: 4 / 1; }
+  #ui-status { grid-area: 4 / 2; }
+}
+
+/* Equal-width workspace on larger screens; retain the stacked mobile layout. */
+@media (min-width: 768px) {
+  body { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+  body > h1, body > p:not(#ui-status) { grid-column: 1 / -1; }
+  #ask-form { grid-area: 4 / 1; grid-template-rows: auto auto auto 1fr; min-width: 0; }
+  body > section { grid-area: 4 / 2; margin-top: 0; min-width: 0; }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  #ask-form:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -20px #94a3b866; }
+  body > section:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -20px #94a3b866; }
+  button:not(:disabled):hover { transform: translateY(-6px); box-shadow: 0 16px 28px -10px #FF85BB; }
+}
+@keyframes clearwave-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+@media (max-width: 639px) {
+  #ask-form button { padding-inline: 18px; }
+  #ui-status { padding: 12px; font-size: 12px; }
+}
