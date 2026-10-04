@@ -1,9 +1,12 @@
 {
   "program": "AIT",
   "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\AIT\\pred_vlm.json",
+  "source_md": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\AIT\\intermediate_vlm.md",
   "split_by_plan": false,
   "split_stats": null,
-  "warnings": [],
+  "warnings": [
+    "90641008: name_th มีข้อความอื่นติดท้ายชื่อวิชา ('พื้นฐานทักษะการสื่อสารภาษาอังกฤษเป็นรายวิชาบังคับก่อนที่ไม่นับหน่วยกิตใช้การเทียบผ่านจากการสอบวัดระดับมาตรฐานตามประกาศของสถาบันฯเพื่อการจัดการเรียนที่ตรงตามสมรรถนะของนักศึกษาข. หมวดวิชาเฉพาะ') -- ใช้ชื่อที่เล่มพิมพ์ในตาราง 'พื้นฐานทักษะการสื่อสารภาษาอังกฤษ'"
+  ],
   "programs": [
     {
       "program_id": "AIT",

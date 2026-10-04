@@ -79,6 +79,18 @@
           "default": null,
           "title": "Self H"
         },
+        "credits_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credits Text"
+        },
         "description_th": {
           "anyOf": [
             {
@@ -91,17 +103,20 @@
           "default": null,
           "title": "Description Th"
         },
-        "source_page": {
+        "pages": {
           "anyOf": [
             {
-              "type": "integer"
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "title": "Source Page"
+          "title": "Pages"
         }
       },
       "required": [
@@ -168,6 +183,18 @@
           "default": null,
           "title": "Credits"
         },
+        "credits_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credits Text"
+        },
         "category": {
           "anyOf": [
             {
@@ -204,17 +231,20 @@
           "default": null,
           "title": "Note"
         },
-        "source_page": {
+        "pages": {
           "anyOf": [
             {
-              "type": "integer"
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "title": "Source Page"
+          "title": "Pages"
         }
       },
       "required": [
@@ -272,17 +302,20 @@
           "default": null,
           "title": "Note"
         },
-        "source_page": {
+        "pages": {
           "anyOf": [
             {
-              "type": "integer"
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "title": "Source Page"
+          "title": "Pages"
         },
         "category": {
           "anyOf": [

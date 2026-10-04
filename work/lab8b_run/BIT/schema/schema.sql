@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS course (
     lab_h          INTEGER,
     self_h         INTEGER,
     description_th TEXT,
-    source_page INTEGER
+    pages          TEXT      -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
 );
 
 CREATE TABLE IF NOT EXISTS plan_item (
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS plan_item (
     category   TEXT,          -- หมวดวิชาเฉพาะ / หมวดวิชาศึกษาทั่วไป / เลือกเสรี
     type       TEXT,          -- บังคับ / เลือก
     note       TEXT,
-    source_page INTEGER
+    pages      TEXT          -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
 );
 
 CREATE TABLE IF NOT EXISTS prerequisite (
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS elective_slot (
     category      TEXT,
     type          TEXT,
     note          TEXT,
-    source_page   INTEGER,
+    pages         TEXT,       -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
     UNIQUE (program_id, code)
 );
 
@@ -73,7 +73,7 @@ CREATE INDEX IF NOT EXISTS ix_slot_code ON elective_slot(code);
 CREATE VIEW IF NOT EXISTS v_plan AS
 SELECT p.id, p.year, p.semester, p.code, c.name_th, c.name_en,
        p.credits, p.alt_group, p.category, p.type, p.note,
-       COALESCE(p.source_page, c.source_page) AS source_page
+       COALESCE(p.pages, c.pages) AS pages
 FROM plan_item p
 LEFT JOIN course c ON c.code = p.code;
 
@@ -83,12 +83,12 @@ CREATE VIEW IF NOT EXISTS v_course_terms AS
 SELECT p.code AS code, c.name_th AS name_th,
        (p.year || '/' || p.semester) AS terms,
        p.credits AS credits, 'plan' AS source,
-       COALESCE(p.source_page, c.source_page) AS source_page
+       COALESCE(p.pages, c.pages) AS pages
 FROM plan_item p LEFT JOIN course c ON c.code = p.code
 UNION ALL
 SELECT e.code, COALESCE(c.name_th, e.name_th),
        e.allowed_terms, COALESCE(e.credits, c.credits), 'elective_slot',
-       COALESCE(e.source_page, c.source_page)
+       COALESCE(e.pages, c.pages)
 FROM elective_slot e LEFT JOIN course c ON c.code = e.code;
 
 -- VIEW ที่สองนี้สำคัญกว่าที่เห็น

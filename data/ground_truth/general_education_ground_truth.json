@@ -20,7 +20,7 @@
       "credits": "1(0-2-1)",
       "category": "หมวดวิชาศึกษาทั่วไป",
       "type": "เลือก",
-      "prerequisite": null,
+      "prerequisite": "90641004",
       "flexible_year_semester": null,
       "note": null
     },
@@ -31,7 +31,7 @@
       "credits": "1(0-2-1)",
       "category": "หมวดวิชาศึกษาทั่วไป",
       "type": "เลือก",
-      "prerequisite": null,
+      "prerequisite": "90641005",
       "flexible_year_semester": null,
       "note": null
     },

@@ -1,3 +1,212 @@
+<!-- PDF_PAGE 21 -->
+<page_number>16</page_number>
+
+มคอ.2
+
+2) กลุ่มวิชาเฉพาะด้าน
+- กลุ่มประเด็นด้านองค์การและระบบสารสนเทศ 57 หน่วยกิต
+- กลุ่มเทคโนโลยีเพื่องานประยุกต์ 9 หน่วยกิต
+- กลุ่มเทคโนโลยีและวิธีการทางซอฟต์แวร์ 27 หน่วยกิต
+- กลุ่มโครงสร้างพื้นฐานของระบบ 12 หน่วยกิต
+3) กลุ่มวิชาบังคับเฉพาะสาขา 9 หน่วยกิต
+4) กลุ่มวิชาเลือกทางเทคโนโลยีสารสนเทศ 15 หน่วยกิต
+5) กลุ่มวิชาการศึกษาทางเลือก 6 หน่วยกิต *
+- โครงงานพิเศษ 9 หน่วยกิต
+- สหกิจศึกษา 6 หน่วยกิต *
+- การศึกษาหรือการปฏิบัติการฝึกงานต่างประเทศ * 6 หน่วยกิต
+
+ค. หมวดวิชาเลือกเสรี 6 หน่วยกิต
+*นักศึกษาอาจเลือกลงทะเบียนเรียนหมวดวิชาสหกิจศึกษาได้ 6 หน่วยกิตกำหนดระยะเวลาในการฝึกอาชีพเป็นเวลา 1 ภาคการศึกษาโดยนำมาทดแทนในหมวดวิชาเฉพาะกลุ่มวิชาแกนรายวิชาโครงงาน 1 และโครงงาน 2 ของแต่ละแขนงรวมจำนวน 6 หน่วยกิต ตามความเห็นชอบของคณะฯ ทั้งนี้ในกลุ่มสหกิจศึกษานักศึกษาสามารถเลือกสหกิจศึกษาหรือสหกิจศึกษาต่างประเทศได้
+
+กรณีนักศึกษาเข้าร่วมการศึกษาระดับปริญญาตรีโครงการแววนวัตกร
+เป็นไปตามระเบียบสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังว่าด้วย การศึกษาระดับปริญญาตรีโครงการแววนวัตกร พ.ศ. 2560 (ภาคผนวก ข) หรือข้อบังคับสถาบันฯ ที่เป็นการปรับปรุงหรือทดแทนข้อบังคับข้างต้น และประกาศของส่วนงานวิชาการนั้น ๆ
+
+3.1.3 รายวิชา
+ก. หมวดวิชาศึกษาทั่วไป 30 หน่วยกิต
+1) กลุ่มวิชาพื้นฐาน 6 หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)
+รหัสวิชา ชื่อวิชา
+
+90641001 โรงเรียนสร้างเสน่ห์
+CHARM SCHOOL 2(1-2-3)
+
+90641002 ความฉลาดทางดิจิทัล 3(3-0-6)
+DIGITAL INTELLIGENCE QUOTIENT
+
+90641003 กีฬาและนันทนาการ 1(0-3-2)
+SPORTS AND RECREATIONAL ACTIVITIES
+*การประเมินผลในกลุ่มรายวิชาบังคับทั้ง 3 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)
+
+2) กลุ่มวิชาด้านภาษาและการสื่อสาร 9 หน่วยกิต
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 22 -->
+<page_number>17</page_number>
+
+มคอ.2
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td colspan="3">หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="2">90644007</td><td>ภาษาอังกฤษพื้นฐาน 1</td><td colspan="3">3 (3-0-6)</td></tr><tr><td>FOUNDATION ENGLISH 1</td><td colspan="3"></td></tr><tr><td rowspan="2">90644008</td><td>ภาษาอังกฤษพื้นฐาน 2</td><td colspan="3">3 (3-0-6)</td></tr><tr><td>FOUNDATION ENGLISH 2</td><td colspan="3"></td></tr><tr><td rowspan="4">9064xxxx</td><td>ให้นักศึกษาเลือกเรียนตามรายวิชาที่สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังเปิดสอน (ภาคผนวก ง) รวม 3 หน่วยกิต</td><td colspan="3"></td></tr><tr><td>*การประเมินผลในกลุ่มรายวิชาบังคับทั้ง 2 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่</td><td colspan="3"></td></tr><tr><td>ผ่าน (U)</td><td colspan="3"></td></tr><tr><td rowspan="4">90642033</td><td>กลุ่มวิชาตามเกณฑ์ของคณะ</td><td colspan="3">หน่วยกิต 9</td></tr><tr><td>กฎหมายสำหรับคนรุ่นใหม่</td><td colspan="3">3(3-0-6)</td></tr><tr><td>LAW FOR NEW GENERATION</td><td colspan="3"></td></tr><tr><td rowspan="2">90643021 90644042</td><td>ผู้ประกอบการสมัยใหม่ MODERN ENTREPRENEURS</td><td colspan="3">3(3-0-6)</td></tr><tr><td>การสื่อสารและการนำเสนออย่างมืออาชีพ PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td colspan="3">3(3-0-6)</td></tr><tr><td rowspan="4">9064xxxx</td><td>กลุ่มวิชาเลือกหมวดวิชาศึกษาทั่วไป</td><td colspan="3">หน่วยกิต 6</td></tr><tr><td>ให้นักศึกษาเลือกเรียนตามรายวิชาที่สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังเปิดสอน (ภาคผนวก ง) รวม 6 หน่วยกิต</td><td colspan="3"></td></tr><tr><td>ชื่อวิชา</td><td colspan="4">หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="2">9064xxxx</td><td>ให้นักศึกษาเลือกเรียนตามรายวิชาที่สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังเปิดสอน (ภาคผนวก ง) รวม 3 หน่วยกิต</td><td colspan="4"></td></tr><tr><td>*การประเมินผลในกลุ่มรายวิชาบังคับทั้ง 2 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่</td><td colspan="4"></td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 23 -->
+<page_number>18</page_number>
+มคอ.2
+
+ข. หมวดวิชาเฉพาะ 93 หน่วยกิต
+1) กลุ่มวิชาแกน 12 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06066000</td><td>คณิตศาสตร์ไม่ต่อเนื่อง<br/>DISCRETE MATHEMATICS</td><td>3(3-0-6)</td></tr><tr><td>06066001</td><td>ความน่าจะเป็นและสถิติ<br/>PROBABILITY AND STATISTICS</td><td>3(3-0-6)</td></tr><tr><td>06016401</td><td>คณิตศาสตร์สำหรับเทคโนโลยีสารสนเทศ<br/>MATHEMATICS FOR INFORMATION TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06016402</td><td>พื้นฐานทางด้านเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY FUNDAMENTALS</td><td>3(2-2-5)</td></tr></table>
+
+2) กลุ่มวิชาเฉพาะด้าน 57 หน่วยกิต
+- กลุ่มประเด็นด้านองค์การและระบบสารสนเทศ 9 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06066100</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06066101</td><td>พื้นฐานทางธุรกิจสำหรับเทคโนโลยีสารสนเทศ<br/>BUSINESS FUNDAMENTALS FOR INFORMATION TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06066102</td><td>ระบบสารสนเทศเพื่อการจัดการ<br/>MANAGEMENT INFORMATION SYSTEMS</td><td>3(3-0-6)</td></tr></table>
+
+- กลุ่มเทคโนโลยีเพื่องานประยุกต์ 27 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016403</td><td>เทคโนโลยีสื่อประสม<br/>MULTIMEDIA TECHNOLOGY</td><td>3(2-2-5)</td></tr><tr><td>06016404</td><td>เทคโนโลยีกลุ่มเมฆ<br/>CLOUD COMPUTING</td><td>3(2-2-5)</td></tr><tr><td>06016405</td><td>พื้นฐานความมั่นคงปลอดภัยไซเบอร์<br/>CYBERSECURITY FUNDAMENTALS</td><td>3(3-0-6)</td></tr><tr><td>06016406</td><td>โครงงาน 1<br/>PROJECT 1</td><td>3(0-9-0)</td></tr><tr><td>06016407</td><td>โครงงาน 2<br/>PROJECT 2</td><td>3(0-9-0)</td></tr><tr><td>06066300</td><td>แนวคิดระบบฐานข้อมูล<br/>DATABASE SYSTEM CONCEPTS</td><td>3(2-2-5)</td></tr><tr><td>06066301</td><td>โครงสร้างข้อมูลและอัลกอริทึม<br/>DATA STRUCTURES AND ALGORITHMS</td><td>3(2-2-5)</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 24 -->
+<page_number>19</page_number>
+
+มคอ.2
+
+06066302 การเขียนโปรแกรมเว็บพื้นฐาน 3(2-2-5)
+FUNDAMENTAL WEB PROGRAMMING
+
+06066304 การวิเคราะห์และออกแบบระบบสารสนเทศ 3(3-0-6)
+INFORMATION SYSTEM ANALYSIS AND DESIGN
+
+**กลุ่มเทคโนโลยีและวิธีการทางซอฟต์แวร์ 12 หน่วยกิต**
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016408</td><td>การสร้างโปรแกรมเชิงวัตถุ OBJECT-ORIENTED PROGRAMMING</td><td>3(2-2-5)</td></tr><tr><td>06016409</td><td>การประมวลทางกายภาพ PHYSICAL COMPUTING</td><td>3(2-2-5)</td></tr><tr><td>06016410</td><td>วิศวกรรมซอฟต์แวร์ SOFTWARE ENGINEERING</td><td>3(3-0-6)</td></tr><tr><td>06066303</td><td>การแก้ปัญหาและการโปรแกรมคอมพิวเตอร์ PROBLEM SOLVING AND COMPUTER PROGRAMMING</td><td>3(2-2-5)</td></tr></table>
+
+**กลุ่มโครงสร้างพื้นฐานของระบบ 9 หน่วยกิต**
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016411</td><td>ระบบคอมพิวเตอร์เบื้องต้น INTRODUCTION TO COMPUTER SYSTEMS</td><td>3(2-2-5)</td></tr><tr><td>06016412</td><td>โครงสร้างระบบคอมพิวเตอร์และระบบปฏิบัติการ COMPUTER ORGANIZATION AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr><tr><td>06016413</td><td>ระบบเครือข่ายเบื้องต้น INTRODUCTION TO NETWORK SYSTEMS</td><td>3(3-0-6)</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 25 -->
+<page_number>20</page_number>
+มคอ.2
+
+3) กลุ่มวิชาบังคับเฉพาะสาขา 15 หน่วยกิต
+**นักศึกษาต้องเลือกเรียนวิชาในกลุ่มวิชาใดกลุ่มวิชาหนึ่งดังต่อไปนี้ ตามกลุ่มวิชาพื้นฐานที่สนใจ
+
+## กลุ่มวิชาด้านการพัฒนาซอฟต์แวร์
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016414</td><td>ระบบฐานข้อมูลแบบโนเอสคิวแอล NOSQL DATABASE SYSTEMS</td><td>3(2-2-5)</td></tr><tr><td>06016415</td><td>การเขียนโปรแกรมเชิงฟังก์ชัน FUNCTIONAL PROGRAMMING</td><td>3(2-2-5)</td></tr><tr><td>06016416</td><td>วิศวกรรมความต้องการ REQUIREMENT ENGINEERING</td><td>3(3-0-6)</td></tr><tr><td>06016417</td><td>เครื่องมือและสภาพแวดล้อมสำหรับการพัฒนาซอฟต์แวร์ SOFTWARE DEVELOPMENT TOOLS AND ENVIRONMENTS</td><td>3(2-2-5)</td></tr><tr><td>06016418</td><td>การพัฒนาเว็บฝั่งเซิร์ฟเวอร์ SERVER-SIDE WEB DEVELOPMENT</td><td>3(2-2-5)</td></tr></table>
+
+## กลุ่มวิชาด้านโครงสร้างพื้นฐานเทคโนโลยีสารสนเทศ
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016419</td><td>โครงสร้างพื้นฐานเครือข่ายการสื่อสาร COMMUNICATION NETWORK INFRASTRUCTURE</td><td>3(2-2-5)</td></tr><tr><td>06016420</td><td>ระบบโครงสร้างพื้นฐานและการบริการ INFRASTRUCTURE SYSTEMS AND SERVICES</td><td>3(2-2-5)</td></tr><tr><td>06016421</td><td>ความมั่นคงปลอดภัยโครงสร้างพื้นฐานทางเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY INFRASTRUCTURE SECURITY</td><td>3(3-0-6)</td></tr><tr><td>06016422</td><td>อินเทอร์เน็ตของสรรพสิ่ง INTERNET OF THINGS</td><td>3(2-2-5)</td></tr><tr><td>06016423</td><td>การออโตเมชั่นและโครงสร้างพื้นฐานที่สามารถโปรแกรมได้ INFRASTRUCTURE PROGRAMMABILITY AND AUTOMATION</td><td>3(2-2-5)</td></tr></table>
+
+## กลุ่มวิชาด้านสื่อประสมสำหรับการพัฒนาสื่อเชิงโต้ตอบ เว็บ และเกม
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016424</td><td>การออกแบบส่วนต่อประสานกับมนุษย์ HUMAN INTERFACE DESIGN</td><td>3(3-0-6)</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 26 -->
+<page_number>21</page_number>
+
+มคอ.2
+
+<table><tr><td>06016425</td><td colspan="3">พื้นฐานการออกแบบทัศนศิลป์สำหรับสื่อปฏิสัมพันธ์ 3(2-2-5)</td></tr><tr><td>06016426</td><td colspan="3">คอมพิวเตอร์กราฟิกส์และแอนิเมชัน 3(2-2-5)</td></tr><tr><td>06016427</td><td colspan="3">การออกแบบและพัฒนาเกมเบื้องต้น 3(2-2-5)</td></tr><tr><td>06016418</td><td colspan="3">การพัฒนาเว็บฝั่งเซิร์ฟเวอร์ 3(2-2-5)</td></tr><tr><td colspan="4"></td></tr><tr><td colspan="4">**4) กลุ่มวิชาเลือกทางเทคโนโลยีสารสนเทศ 9 หน่วยกิต เลือกเรียนจากรายวิชาดังต่อไปนี้**</td></tr><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td colspan="2">หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016428</td><td colspan="3">การพัฒนาและออกแบบโปรแกรมบริการแบบจุลภาค 3(2-2-5)</td></tr><tr><td>06016429</td><td colspan="3">การพัฒนาเว็บฝั่งไคลเอนต์ 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>CLIENT-SIDE WEB DEVELOPMENT</td><td colspan="2">3(2-2-5)</td></tr><tr><td>06016430</td><td colspan="3">การพัฒนาคลาวด์แอปพลิเคชัน 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>CLOUD APPLICATION DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016432</td><td colspan="3">การทวนสอบและตรวจสอบซอฟต์แวร์ 3(3-0-6)</td></tr><tr><td rowspan="2"></td><td>SOFWARE VERIFICATION AND VALIDATION</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016433</td><td colspan="3">การทดสอบอัตโนมัติในรูปแบบออใจล์ 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>AUTOMATION TESTING IN AGILE</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016434</td><td colspan="3">การทดสอบการยอมรับของเว็บ 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016435</td><td colspan="3">องค์ประกอบสำคัญของวิทยาการข้อมูล 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016436</td><td colspan="3">การแสดงข้อมูลด้วยแผนภาพ 3(2-2-5)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(2-2-5)</td><td></td></tr><tr><td>06016437</td><td colspan="3">โครงสร้างพื้นฐานที่น่าเชื่อถือและขยายตัวได้ 3(3-0-6)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(3-0-6)</td><td></td></tr><tr><td>06016438</td><td colspan="3">ความปลอดภัยสำหรับระบบคลาวด์ 3(3-0-6)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(3-0-6)</td><td></td></tr><tr><td>06016439</td><td colspan="3">เทคโนโลยีเครือข่ายไร้สาย 3(3-0-6)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(3-0-6)</td><td></td></tr><tr><td>06016440</td><td colspan="3">การออกแบบเครือข่ายสารสนเทศ 3(3-0-6)</td></tr><tr><td rowspan="2"></td><td>CUSTOMER-SIDE WEB DEVELOPMENT</td><td colspan="2"></td></tr><tr><td>MOBILE DEVICE PROGRAMMING" 3(3-0-6)</td><td></td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 27 -->
+<page_number>22</page_number>
+มคอ.2
+
+<table><tr><td>06016441</td><td>ประสิทธิภาพเครือข่ายและระบบ<br/>NETWORK AND SYSTEM PERFORMANCE</td><td>3(3-0-6)</td></tr><tr><td>06016442</td><td>การออกแบบฮาร์ดแวร์สำหรับอินเทอร์เน็ตแห่งสรรพสิ่ง<br/>INTERNET OF THINGS HARDWARE DESIGN</td><td>3(2-2-5)</td></tr><tr><td>06016443</td><td>การวิเคราะห์ข้อมูลและแอปพลิเคชันสำหรับอินเทอร์เน็ตแห่งสรรพสิ่ง<br/>INTERNET OF THINGS DATA ANALYTICS AND APPLICATIONS</td><td>3(2-2-5)</td></tr><tr><td>06016444</td><td>การออกแบบเว็บ<br/>WEB DESIGN</td><td>3(2-2-5)</td></tr><tr><td>06016445</td><td>การเขียนสคริปต์ขั้นสูงสำหรับการออกแบบ<br/>ADVANCED SCRIPTING FOR DESIGN</td><td>3(2-2-5)</td></tr><tr><td>06016446</td><td>การออกแบบเกม<br/>GAME DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06016447</td><td>การพัฒนาเกมขั้นต้นด้วยเกมเอนจิ้น<br/>FUNDAMENTAL GAME DEVELOPMENT WITH GAME ENGINE</td><td>3(2-2-5)</td></tr><tr><td>06016448</td><td>การพัฒนาเกมขั้นสูงด้วยเอนจิ้น<br/>ADVANCED GAME DEVELOPMENT WITH GAME ENGINE</td><td>3(2-2-5)</td></tr><tr><td>06016449</td><td>เกมมีฟิเคชัน<br/>GAMIFICATION</td><td>3(3-0-6)</td></tr><tr><td>06016450</td><td>การพัฒนาเกมด้วยเทคโนโลยีเสมือนจริง<br/>GAME DEVELOPMENT WITH REALITY TECHNOLOGY</td><td>3(2-2-5)</td></tr><tr><td>06016451</td><td>การบริหารทรัพยากรองค์กร<br/>ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06016452</td><td>การจัดการห่วงโซ่อุปทานและโลจิสติกส์<br/>SUPPLY CHAIN MANAGEMENT AND LOGISTICS</td><td>3(3-0-6)</td></tr><tr><td>06016453</td><td>การบริหารระบบลูกค้าสัมพันธ์<br/>CUSTOMER RELATIONSHIP MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06016454</td><td>เครื่องมืออยูเอ็กซ์และการพัฒนาซอฟต์แวร์สำหรับธุรกิจดิจิทัล<br/>UX TOOLS AND SOFTWARE DEVELOPMENT FOR DIGITAL BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06016455</td><td>การวิเคราะห์พฤติกรรมลูกค้า<br/>CUSTOMER BEHAVIOR ANALYSIS</td><td>3(3-0-6)</td></tr><tr><td>06016456</td><td>แบบจำลองธุรกิจ<br/>BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06016457</td><td>ระบบฐานข้อมูลขั้นสูง<br/>ADVANCED DATABASE SYSTEMS</td><td>3(3-0-6)</td></tr><tr><td>06016458</td><td>การดูแลและบำรุงรักษาระบบฐานข้อมูล<br/>DATABASE SYSTEM MAINTENANCE AND ADMINISTRATION</td><td>3(2-2-5)</td></tr><tr><td>06016459</td><td>การรับรองมาตรฐานและคุณภาพซอฟต์แวร์<br/></td><td>3(3-0-6)</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 28 -->
+<page_number>23</page_number>
+มคอ.2
+
+<table><tr><td></td><td>SOFWARE STANDARD AND QUALITY ASSURANCE</td><td></td></tr><tr><td>06016460</td><td>ปัญญาประดิษฐ์<br/>ARTIFICIAL INTELLIGENCE</td><td>3(3-0-6)</td></tr><tr><td>06016461</td><td>การประมวลผลภาษาธรรมชาติเบื้องต้น<br/>INTRODUCTION TO NATURAL LANGUAGE PROCESSING</td><td>3(3-0-6)</td></tr><tr><td>06016462</td><td>เทคโนโลยีสื่อสารเคลื่อนที่<br/>MOBILE COMMUNICATION TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06016463</td><td>เทคโนโลยีการคำนวณด้วยคอมพิวเตอร์แบบผสมผสาน<br/>HYBRID COMPUTING TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06016464</td><td>ความมั่นคงปลอดภัยไซเบอร์ทางปฏิบัติ<br/>PRACTICAL CYBER SECURITY</td><td>3(2-2-5)</td></tr><tr><td>06016465</td><td>การออกแบบศูนย์ข้อมูล<br/>DATA CENTER DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06016466</td><td>การแก้ไขปัญหาระบบและเครือข่าย<br/>NETWORK AND SYSTEM TROUBLE SHOOTING</td><td>3(0-6-3)</td></tr><tr><td>06016467</td><td>การแปลงข้อมูลและการรู้จำรูปภาพ<br/>IMAGE TRANSFORMATION AND RECOGNITION</td><td>3(3-0-6)</td></tr><tr><td>06016468</td><td>การเรียนรู้เชิงลึกสำหรับการวิเคราะห์ภาพและวีดิโอทางการแพทย์<br/>DEEP LEARNING IN MEDICAL IMAGE AND VIDEO ANALYSIS</td><td>3(3-0-6)</td></tr><tr><td>06016469</td><td>การวิเคราะห์ข้อมูลสุขภาพเบื้องต้น<br/>INTRODUCTION TO HEALTHCARE DATA ANALYTICS</td><td>3(3-0-6)</td></tr><tr><td>06016470</td><td>การได้มาและการจัดการข้อมูลทางด้านคลินิก<br/>CLINICAL DATA ACQUISITION AND MANAGEMENT</td><td>3(2-2-5)</td></tr><tr><td>06016471</td><td>การวิเคราะห์ข้อมูลขนาดใหญ่<br/>BIG DATA ANALYSIS</td><td>3(2-2-5)</td></tr><tr><td>06016472</td><td>กระบวนการอัตโนมัติด้วยโรบอท<br/>ROBOTIC PROCESS AUTOMATION</td><td>3(3-0-6)</td></tr><tr><td>06016473</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศ 1<br/>SPECIAL TOPICS IN INFORMATION TECHNOLOGY 1</td><td>3(3-0-6)</td></tr><tr><td>06016474</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศ 2<br/>SPECIAL TOPICS IN INFORMATION TECHNOLOGY 2</td><td>3(3-0-6)</td></tr><tr><td>06016475</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศ 3<br/>SPECIAL TOPICS IN INFORMATION TECHNOLOGY 3</td><td>3(3-0-6)</td></tr><tr><td>06016476</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศ 4<br/>SPECIAL TOPICS IN INFORMATION TECHNOLOGY 4</td><td>3(3-0-6)</td></tr><tr><td>06016477</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศ 1<br/>SPECIAL WORKSHOP IN INFORMATION TECHNOLOGY 1</td><td>3(2-2-5)</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 29 -->
+<page_number>24</page_number>
+
+มคอ.2
+
+<table><tr><td>06016478</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศ 2<br/>SPECIAL WORKSHOP IN INFORMATION TECHNOLOGY 2</td><td>3(2-2-5)</td></tr><tr><td>06016479</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศ 3<br/>SPECIAL WORKSHOP IN INFORMATION TECHNOLOGY 3</td><td>3(2-2-5)</td></tr><tr><td>06016480</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศ 4<br/>SPECIAL WORKSHOP IN INFORMATION TECHNOLOGY 4</td><td>3(2-2-5)</td></tr></table>
+
+**โมดูลอาชีพสำหรับวิชาเลือกทางเทคโนโลยีสารสนเทศ**
+
+หลักสูตรได้จัดกลุ่มรายวิชาเลือกทางเทคโนโลยีสารสนเทศบางส่วนให้เป็นกลุ่มโมดูลอาชีพ จำนวน 3 โมดูล โดยไม่บังคับให้นักศึกษาเลือกโมดูลใดโมดูลหนึ่ง นักศึกษาสามารถเลือกวิชาเลือกอื่นที่ไม่อยู่ ในโมดูล หรือเลือกวิชาในหลายๆ โมดูลก็ได้
+
+นักศึกษาสามารถเลือกเรียนวิชาเลือกทางเทคโนโลยีสารสนเทศตามโมดูลอาชีพที่หลักสูตร กำหนด ดังนี้
+M1: **โมดูล Full-Stack Web Developer** ประกอบด้วยรายวิชาดังต่อไปนี้
+*   06016428 การพัฒนาและออกแบบโปรแกรมบริการแบบจุลภาค
+*   06016429 การพัฒนาเว็บฝั่งไคลเอนต์
+*   06016430 การพัฒนาคลาวด์แอปพลิเคชัน
+
+M2: **โมดูล Network/System Engineer** ประกอบด้วยรายวิชาดังต่อไปนี้
+*   06016439 เทคโนโลยีเครือข่ายไร้สาย
+*   06016440 การออกแบบเครือข่ายสารสนเทศ
+*   06016441 ประสิทธิภาพเครือข่ายและระบบ
+
+M3: **โมดูล Game Developer** ประกอบด้วยรายวิชาดังต่อไปนี้
+*   06016446 การออกแบบเกม
+*   06016447 การพัฒนาเกมขั้นต้นด้วยเกมเอนจิ้น
+*   06016448 การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้น
+
+**วิชาเลือกทางเทคโนโลยีสารสนเทศจากกลุ่มวิชาบังคับเฉพาะสาขา**
+
+นักศึกษาสามารถเลือกเรียนวิชาที่อยู่ในกลุ่มวิชาบังคับเฉพาะของกลุ่มวิชาสาขาอื่นเป็นวิชา เลือกทางเทคโนโลยีสารสนเทศได้
+
+5) กลุ่มวิชาการศึกษาทางเลือก **6** หน่วยกิต
+- วิชาสหกิจศึกษา **6** หน่วยกิต
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 30 -->
+<page_number>25</page_number>
+มคอ.2
+
+นักศึกษาอาจเลือกลงทะเบียนเรียนวิชาสหกิจศึกษาต่อไปนี้ได้กำหนดระยะเวลาในการฝึกอาชีพเป็นเวลา 1 ภาคการศึกษา โดยนำมาทดแทนในหมวดวิชาเฉพาะกลุ่มวิชาเลือกทางเทคโนโลยีสารสนเทศได้ตามความเห็นชอบของคณะฯ
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06016481</td><td>สหกิจศึกษา<br/>COOPERATIVE EDUCATION</td><td>6(0-36-0)</td></tr><tr><td>06016482</td><td>สหกิจศึกษาต่างประเทศ<br/>OVERSEA COOPERERATIVE EDUCATION</td><td>6(0-36-0)</td></tr></table>
+
+ค. หมวดวิชาเลือกเสรี 6 หน่วยกิต
+เลือกเรียนจากรายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จำนวนไม่น้อยกว่า 6 หน่วยกิต
+
+ความหมายของรหัสประจำรายวิชา
+รหัสวิชาที่ใช้ กำหนดให้เป็นตัวเลขและตัวอักษร 8 หลัก
+
+<table><tr><td>รหัสตัวที่ 1, 2</td><td>ได้แก่ เลข 06 หมายถึง คณะเทคโนโลยีสารสนเทศ</td></tr><tr><td>รหัสตัวที่ 3, 4</td><td>ได้แก่ เลข 01 หมายถึง สาขาวิชาเทคโนโลยีสารสนเทศ</td></tr><tr><td>รหัสตัวที่ 5</td><td>ได้แก่ เลข 6 หมายถึง ระดับปริญญาตรี</td></tr><tr><td colspan="2">รหัสตัวที่ 6, 7, 8 หมายถึง ลำดับที่ของรายวิชา</td></tr></table>
+
+วท.บ.(เทคโนโลยีสารสนเทศ) สาขาวิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
 <!-- PDF_PAGE 31 -->
 <page_number>26</page_number>
 มคอ.2

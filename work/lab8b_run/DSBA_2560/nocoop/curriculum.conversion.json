@@ -1,0 +1,24 @@
+{
+  "source_courses": 82,
+  "converted_courses": 81,
+  "plan_items": 45,
+  "prerequisites": 20,
+  "elective_slots": 37,
+  "wildcard_placeholders": 6,
+  "flexible_courses_kept": 37,
+  "synth_alt_filler_rows_skipped": 0,
+  "courses_with_source_page": 81,
+  "courses_without_source_page": 0,
+  "warnings": [
+    "90101xxx: เก็บเป็นช่องวิชา PLACEHOLDER_90101XXX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "060261xx: เก็บเป็นช่องวิชา PLACEHOLDER_060261XX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "060261xx: หน่วยกิตมีหลายแบบ; ตัวเลขใช้แบบแรก เก็บข้อความเต็มใน credits_text",
+    "060261xx: เก็บเป็นช่องวิชา PLACEHOLDER_060261XX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "060261xx: หน่วยกิตมีหลายแบบ; ตัวเลขใช้แบบแรก เก็บข้อความเต็มใน credits_text",
+    "xxxxxxxx: เก็บเป็นช่องวิชา PLACEHOLDER_XXXXXXXX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "xxxxxxxx: เก็บเป็นช่องวิชา PLACEHOLDER_XXXXXXXX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "90xxxxxx: เก็บเป็นช่องวิชา PLACEHOLDER_90XXXXXX เพื่อให้หน่วยกิตยังถูกนับ (ถามรายละเอียดวิชาไม่ได้)",
+    "06026130: ปี/เทอม=0/0 และไม่มี flexible_year_semester; เก็บเป็นวิชาเลือกที่ไม่ระบุเทอม",
+    "06026131: ปี/เทอม=0/0 และไม่มี flexible_year_semester; เก็บเป็นวิชาเลือกที่ไม่ระบุเทอม"
+  ]
+}

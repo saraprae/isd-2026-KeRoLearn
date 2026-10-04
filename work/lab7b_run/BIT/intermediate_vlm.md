@@ -1,3 +1,141 @@
+<!-- PDF_PAGE 20 -->
+<page_number>15</page_number>
+มคอ. 2
+
+กรณีนักศึกษาเข้าร่วมการศึกษาระดับปริญญาตรีโครงการแววนวัตกร เป็นไปตามข้อบังคับสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังว่าด้วยการศึกษาระดับ ปริญญาตรีโครงการแววนวัตกร พ.ศ. 2560 (ภาคผนวก ข) หรือข้อบังคับสถาบันฯ ที่เป็นการปรับปรุง หรือทดแทนข้อบังคับข้างต้น และประกาศของส่วนงานวิชาการนั้นๆ
+
+### 3.1.3 รายวิชา
+#### ก. หมวดวิชาศึกษาทั่วไป 30 หน่วยกิต
+
+**1) กลุ่มวิชาพื้นฐาน**
+6 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>96641001</td><td>โรงเรียนสร้างเสน่ห์*<br/>CHARM SCHOOL</td><td>2 (1-2-3)</td></tr><tr><td>96641002</td><td>ความฉลาดทางดิจิทัล*<br/>DIGITAL INTELLIGENCE QUOTIENT</td><td>3(3-0-6)</td></tr><tr><td>96641003</td><td>กีฬาและนันทนาการ*<br/>SPORTS AND RECREATIONAL ACTIVITIES</td><td>1 (0-3-2)</td></tr></table>
+
+\* การประเมินผลในรายวิชาทั้ง 3 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)
+
+**2) กลุ่มวิชาด้านภาษาและการสื่อสาร**
+9 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>96644007</td><td>ภาษาอังกฤษพื้นฐาน 1*<br/>FOUNDATION ENGLISH 1</td><td>3 (3-0-6)</td></tr><tr><td>96644008</td><td>ภาษาอังกฤษพื้นฐาน 2*<br/>FOUNDATION ENGLISH 2</td><td>3(3-0-6)</td></tr><tr><td>96644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร**<br/>ELECTIVE IN LANGUAGE AND COMMUNICATION</td><td>3 (3-0-6)<br/>หรือ 3 (2-2-5)</td></tr></table>
+
+\*รายวิชาบังคับเลือกเรียน 2 วิชา (จากกลุ่มวิชาเลือกหมวดวิชาการศึกษาทั่วไป)
+**ให้นักศึกษาเลือกเรียนตามรายวิชาในหมวดวิชาศึกษาทั่วไป สำหรับหลักสูตรนานาชาติ (พ.ศ. 2564) (ภาคผนวก ง)
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 21 -->
+<page_number>16</page_number>
+มคอ. 2
+
+3) กลุ่มวิชาตามเกณฑ์ของคณะ 9 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>96642033</td><td>กฎหมายสำหรับคนรุ่นใหม่<br/>LAW FOR NEW GENERATION</td><td>3(3-0-6)</td></tr><tr><td>96643021</td><td>ผู้ประกอบการสมัยใหม่<br/>MODERN ENTREPRENEURS</td><td>3(3-0-6)</td></tr><tr><td>96644042</td><td>การสื่อสารและการนำเสนออย่างมืออาชีพ<br/>PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td>3(3-0-6)</td></tr></table>
+
+4) กลุ่มวิชาเลือกหมวดวิชาศึกษาทั่วไป 6 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="2">9664xxxx<sup>x</sup></td><td>ให้นักศึกษาเลือกเรียนตามรายวิชาในหมวดวิชาศึกษาทั่วไป<br/>สำหรับหลักสูตรนานาชาติ (พ.ศ. 2564) (ภาคผนวก ง)</td><td>3(3-0-6)<br/>หรือ</td></tr><tr><td rowspan="2">9664xxxx<sup>x</sup></td><td>ให้นักศึกษาเลือกเรียนตามรายวิชาในหมวดวิชาศึกษาทั่วไป<br/>สำหรับหลักสูตรนานาชาติ (พ.ศ. 2564) (ภาคผนวก ง)</td><td>3(3-0-6)<br/>หรือ</td></tr></table>
+
+ข. หมวดวิชาเฉพาะ 96 หน่วยกิต
+
+1) กลุ่มวิชาแกน 12 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td rowspan="2">06036100<sup>x</sup></td><td>พื้นฐานทางด้านเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td rowspan="2">06036101<sup>x</sup></td><td>คณิตศาสตร์สำหรับธุรกิจ<br/>MATHEMATICS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td rowspan="2">06036102<sup>x</sup></td><td>การวิเคราะห์เชิงสถิติสำหรับธุรกิจ<br/>STATISTICAL ANALYSIS FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td rowspan="2">06036103<sup>x</sup></td><td>บูรณาการเทคนิคเชิงสถิติสำหรับธุรกิจ<br/>INTEGRATION OF STATISTICAL TECHNIQUES FOR BUSINESS</td><td>3(3-0-6)</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 22 -->
+<page_number>17</page_number>
+มคอ. 2
+
+2) กลุ่มวิชาเฉพาะด้าน 72 หน่วยกิต
+- กลุ่มประเด็นด้านองค์การและระบบสารสนเทศ 24 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036104</td><td>องค์กรและการจัดการ<br/>MANAGEMENT AND ORGANIZATIONS</td><td>3(3-0-6)</td></tr><tr><td>06036105</td><td>บัญชีการเงินสำหรับผู้มิใช่นักบัญชี<br/>FINANCIAL ACCOUNTING FOR NON-ACCOUNTANTS</td><td>3(3-0-6)</td></tr><tr><td>06036106</td><td>การจัดการข้อมูลธุรกิจและเทคโนโลยีเกิดใหม่<br/>MANAGING BUSINESS INFORMATION AND EMERGING TECHNOLOGIES</td><td>3(3-0-6)</td></tr><tr><td>06036107</td><td>การบริหารโครงการเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036108</td><td>เศรษฐศาสตร์เทคโนโลยีสารสนเทศ<br/>ECONOMICS OF INFORMATION TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06036109</td><td>กระบวนการและโมเดลทางธุรกิจ<br/>BUSINESS PROCESSES AND BUSINESS MODEL</td><td>3(3-0-6)</td></tr><tr><td>06036110</td><td>การวางแผนทรัพยากรองค์กร<br/>ENTERPRISE RESOURCE PLANNING</td><td>3(3-0-6)</td></tr><tr><td>06036111</td><td>เทคโนโลยีดิจิทัลสำหรับธุรกิจ<br/>DIGITAL TECHNOLOGY FOR BUSINESS</td><td>3(3-0-6)</td></tr></table>
+
+- กลุ่มเทคโนโลยีเพื่องานประยุกต์ 24 หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036112</td><td>แนวคิดระบบฐานข้อมูล<br/>DATABASE SYSTEM CONCEPTS</td><td>3(2-2-5)</td></tr><tr><td>06036113</td><td>การออกแบบส่วนต่อประสานกับมนุษย์<br/>HUMAN INTERFACE DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036114</td><td>การพัฒนาเว็บแอปพลิเคชันโดยใช้เฟรมเวิร์ก<br/>WEB APPLICATION DEVELOPMENT USING FRAMEWORKS</td><td>3(2-2-5)</td></tr><tr><td>06036115</td><td>ความมั่นคงของระบบสารสนเทศ<br/>INFORMATION SYSTEM SECURITY</td><td>3(3-0-6)</td></tr><tr><td>06036116</td><td>การตลาดเชิงดิจิทัล<br/>DIGITAL MARKETING</td><td>3(2-2-5)</td></tr><tr><td>06036117</td><td>อัจฉริยะทางธุรกิจและข้อมูลขนาดใหญ่<br/>BUSINESS INTELLIGENCE AND BIG DATA</td><td>3(3-0-6)</td></tr><tr><td>06036145</td><td>โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 1<br/>PROJECT IN BUSINESS INFORMATION TECHNOLOGY 1</td><td>3(0-9-0)</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 23 -->
+<page_number>18</page_number>
+มคอ. 2
+
+- กลุ่มเทคโนโลยีและวิธีการทางซอฟต์แวร์ 18 หน่วยกิต
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036146</td><td>โครงงานทางด้านเทคโนโลยีสารสนเทศเชิงธุรกิจ 2<br/>PROJECT IN BUSINESS INFORMATION TECHNOLOGY 2</td><td>3(0-9-0)</td></tr><tr><td>06036118</td><td>การแก้ปัญหาทางด้านเทคโนโลยีสารสนเทศ<br/>PROBLEM SOLVING IN INFORMATION TECHNOLOGY</td><td>3(2-2-5)</td></tr><tr><td>06036119</td><td>พื้นฐานการเขียนโปรแกรม<br/>PROGRAMMING FUNDAMENTALS</td><td>3(2-2-5)</td></tr><tr><td>06036120</td><td>หลักการโครงสร้างข้อมูลและอัลกอริทึม<br/>DATA STRUCTURES AND ALGORITHMS PRINCIPLES</td><td>3(3-0-6)</td></tr><tr><td>06036121</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ<br/>BUSINESS INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3(3-0-6)</td></tr><tr><td>06036122</td><td>การสื่อสารด้วยภาพสำหรับธุรกิจ<br/>VISUAL COMMUNICATION FOR BUSINESS</td><td>3(2-2-5)</td></tr><tr><td>06036123</td><td>เทคโนโลยีกลุ่มเมฆ<br/>CLOUD TECHNOLOGY</td><td>3(3-0-6)</td></tr></table>
+
+- กลุ่มโครงสร้างพื้นฐานของระบบ 6 หน่วยกิต
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036124</td><td>เครือข่ายคอมพิวเตอร์และความมั่นคงทางไซเบอร์เบื้องต้น<br/>INTRODUCTION TO COMPUTER NETWORK AND CYBERSECURITY</td><td>3(3-0-6)</td></tr><tr><td>06036125</td><td>สถาปัตยกรรมคอมพิวเตอร์และระบบปฏิบัติการ<br/>COMPUTER ARCHITECTURE AND OPERATING SYSTEM</td><td>3(2-2-5)</td></tr></table>
+
+3) กลุ่มวิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจหรือกลุ่มวิชา 6 หน่วยกิต
+เลือกเรียนจากรายวิชาดังต่อไปนี้
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036126</td><td>วิศวกรรมความต้องการ<br/>REQUIREMENT ENGINEERING</td><td>3(3-0-6)</td></tr><tr><td>06036127</td><td>ระบบฐานข้อมูลขั้นสูง<br/>ADVANCED DATABASE SYSTEMS</td><td>3(3-0-6)</td></tr><tr><td>06036128</td><td>การเรียนรู้ของเครื่องจักร<br/>MACHINE LEARNING</td><td>3(3-0-6)</td></tr><tr><td>06036129</td><td>การกำกับดูแลด้านเทคโนโลยีสารสนเทศ<br/>INFORMATION TECHNOLOGY GOVERNANCE</td><td>3(3-0-6)</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 24 -->
+<page_number>19</page_number>
+
+มคอ. 2
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036130</td><td>เทคโนโลยีเชิงอ็อบเจกต์<br/>OBJECT ORIENTED TECHNOLOGY</td><td>3(3-0-6)</td></tr><tr><td>06036131</td><td>การพัฒนาโปรแกรมประยุกต์บนอุปกรณ์เคลื่อนที่<br/>MOBILE APPLICATION DEVELOPMENT</td><td>3(2-2-5)</td></tr><tr><td>06036132</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 1<br/>SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 1</td><td>3(3-0-6)</td></tr><tr><td>06036133</td><td>หัวข้อพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 2<br/>SPECIAL TOPICS IN BUSINESS INFORMATION TECHNOLOGY 2</td><td>3(3-0-6)</td></tr><tr><td>06036134</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 1<br/>SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 1</td><td>3(2-2-5)</td></tr><tr><td>06036135</td><td>ปฏิบัติการพิเศษทางด้านเทคโนโลยีสารสนเทศทางธุรกิจ 2<br/>SPECIAL WORKSHOP IN BUSINESS INFORMATION TECHNOLOGY 2</td><td>3(2-2-5)</td></tr></table>
+
+- กลุ่มวิชา
+กลุ่มวิชาที่ 1 : การวิเคราะห์เชิงธุรกิจ (Business Analysis)
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036136</td><td>กระบวนการอัตโนมัติด้วยโรบอทสำหรับธุรกิจ<br/>ROBOTIC PROCESS AUTOMATION FOR BUSINESS</td><td>3(3-0-6)</td></tr><tr><td>06036137</td><td>การวิเคราะห์ธุรกิจและการพัฒนาข้อกำหนด<br/>BUSINESS ANALYSIS AND DEVELOPING REQUIREMENTS</td><td>3(3-0-6)</td></tr></table>
+
+กลุ่มวิชาที่ 2 : ระบบระดับองค์กร (Enterprise System, Business Process Improvement)
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036138</td><td>การจัดการความรู้ระดับองค์กร<br/>ORGANIZATIONAL KNOWLEDGE MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036139</td><td>การบริหารระบบลูกค้าสัมพันธ์<br/>CUSTOMER RELATIONSHIP MANAGEMENT</td><td>3(3-0-6)</td></tr><tr><td>06036140</td><td>การจัดการโซ่อุปทานและโลจิสติกส์<br/>SUPPLY CHAIN MANAGEMENT AND LOGISTICS</td><td>3(3-0-6)</td></tr></table>
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 25 -->
+<page_number>20</page_number>
+มคอ. 2
+
+กลุ่มวิชาที่ 3 : การตลาดเชิงดิจิทัล (Digital Marketing)
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036141</td><td>เครื่องมือและเทคนิคสำหรับการตลาดเชิงดิจิทัล<br/>DIGITAL MARKETING TOOLS AND TECHNIQUES</td><td>3(3-0-6)</td></tr><tr><td>06036142</td><td>การตลาดเชิงดิจิทัลขั้นสูง<br/>ADVANCED DIGITAL MARKETING</td><td>3(3-0-6)</td></tr></table>
+
+กลุ่มวิชาที่ 4 : การออกแบบและพัฒนาส่วนติดต่อกับผู้ใช้งาน (UX/UI)
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036143</td><td>การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยูไอ<br/>UX/UI REQUIREMENT AND PROTOTYPING</td><td>3(3-0-6)</td></tr><tr><td>06036144</td><td>การประเมินส่วนต่อประสานผู้ใช้<br/>EVALUATING USER INTERFACE</td><td>3(3-0-6)</td></tr></table>
+
+ค. หมวดวิชาเลือกเสรี 6 หน่วยกิต
+เลือกเรียนจากรายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จำนวนไม่น้อยกว่า 6 หน่วยกิต
+
+ง. หมวดวิชาสหกิจศึกษา 6 หน่วยกิต
+นักศึกษาอาจเลือกลงทะเบียนเรียนวิชาสหกิจศึกษาต่อไปนี้ได้ กำหนดระยะเวลาในการฝึกอาชีพ เป็นเวลา 1 ภาคการศึกษา โดยนำมาทดแทนวิชาโครงงาน 1 และ โครงงาน 2 ตามความเห็นชอบของคณะฯ
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต(บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06036147</td><td>สหกิจศึกษา<br/>COOPERATIVE EDUCATION</td><td>6(0-35-0)</td></tr><tr><td>06036148</td><td>สหกิจศึกษาต่างประเทศ<br/>OVERSEA COOPERPIANED EDUCATION</td><td>6(0-35-0)</td></tr></table>
+
+หมายเหตุ นักศึกษาต้องได้รับการอบรมเตรียมความพร้อมก่อนเริ่มปฏิบัติสหกิจศึกษาไม่น้อยกว่า 30 ชั่วโมง
+
+วท.บ. (เทคโนโลยีสารสนเทศทางธุรกิจ) สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ (หลักสูตรนานาชาติ)
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
 <!-- PDF_PAGE 26 -->
 <page_number>21</page_number>
 มคอ. 2

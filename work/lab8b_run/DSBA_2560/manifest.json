@@ -1,0 +1,44 @@
+{
+  "program": "DSBA_2560",
+  "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\DSBA_2560\\pred_vlm.json",
+  "source_md": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\DSBA_2560\\intermediate_vlm.md",
+  "split_by_plan": true,
+  "split_stats": {
+    "rows": 85,
+    "only_one_plan": 7,
+    "in_both_plans": 42,
+    "unclassified_kept_in_both": 36,
+    "no_page_info": 0,
+    "forced_shared": 0
+  },
+  "warnings": [
+    "06026136: หน่วยกิตที่ Lab 7B อนุมาน ('3(3-0-6)') ตรงกับที่เล่มพิมพ์ใน <table> ดิบ -> คงค่าไว้ ไม่ตั้งเป็น null",
+    "06026137: หน่วยกิตที่ Lab 7B อนุมาน ('3(3-0-6)') ตรงกับที่เล่มพิมพ์ใน <table> ดิบ -> คงค่าไว้ ไม่ตั้งเป็น null"
+  ],
+  "programs": [
+    {
+      "program_id": "DSBA_2560_nocoop",
+      "section": "nocoop",
+      "dir": "nocoop",
+      "curriculum": "nocoop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 82,
+      "courses": 81,
+      "plan_items": 45,
+      "elective_slots": 37,
+      "courses_with_source_page": 81
+    },
+    {
+      "program_id": "DSBA_2560_coop",
+      "section": "coop",
+      "dir": "coop",
+      "curriculum": "coop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 81,
+      "courses": 79,
+      "plan_items": 44,
+      "elective_slots": 37,
+      "courses_with_source_page": 79
+    }
+  ]
+}

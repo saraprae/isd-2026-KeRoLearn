@@ -1,15 +1,25 @@
 {
   "program": "IT",
   "source": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\IT\\pred_vlm.json",
+  "source_md": "C:\\Users\\khims\\Downloads\\ISD_final\\Lab3_ocr_system\\ocr_system\\work\\lab7b_run\\IT\\intermediate_vlm.md",
   "split_by_plan": true,
   "split_stats": {
     "rows": 116,
     "only_one_plan": 15,
-    "in_both_plans": 46,
-    "unclassified_kept_in_both": 55,
-    "no_page_info": 0
+    "in_both_plans": 47,
+    "unclassified_kept_in_both": 54,
+    "no_page_info": 0,
+    "forced_shared": 0
   },
-  "warnings": [],
+  "warnings": [
+    "3/1 (หน้า 35): เซลล์รหัส 06016426/06016427/06016418 พิมพ์เป็นช่อง 'เลือก 1' แต่ไม่มี alt_group -> ใส่ 'alt_y3s1_cell1' ให้ 3 แถว",
+    "06016430: ตัดข้อความที่ติดท้ายชื่อวิชาออก ('การพัฒนาคลาวด์แอปพลิเคชันM2: โมดูล / ประกอบด้วยรายวิชาดังต่อไปนี้' -> 'การพัฒนาคลาวด์แอปพลิเคชัน') ตามชื่อในเล่มดิบ",
+    "06016441: ตัดข้อความที่ติดท้ายชื่อวิชาออก ('ประสิทธิภาพเครือข่ายและระบบM3: โมดูลประกอบด้วยรายวิชาดังต่อไปนี้' -> 'ประสิทธิภาพเครือข่ายและระบบ') ตามชื่อในเล่มดิบ",
+    "06016448: ตัดข้อความที่ติดท้ายชื่อวิชาออก ('การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้นวิชาเลือกทางเทคโนโลยีสารสนเทศจากกลุ่มวิชาบังคับเฉพาะสาขา' -> 'การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้น') ตามชื่อในเล่มดิบ",
+    "060164xx (3/2): หน่วยกิตที่ Lab 7B อนุมาน (3) ตรงกับยอดรวมที่เล่มพิมพ์ (หน้า 36: 15 - แถวอื่น 12) -> คงค่าไว้ ไม่ตั้งเป็น null",
+    "06016453: หน่วยกิตที่ Lab 7B อนุมาน ('3(3-0-6)') ตรงกับที่เล่มพิมพ์ใน <table> ดิบ -> คงค่าไว้ ไม่ตั้งเป็น null",
+    "06016454: หน่วยกิตที่ Lab 7B อนุมาน ('3(3-0-6)') ตรงกับที่เล่มพิมพ์ใน <table> ดิบ -> คงค่าไว้ ไม่ตั้งเป็น null"
+  ],
   "programs": [
     {
       "program_id": "IT_nocoop",
@@ -18,10 +28,10 @@
       "curriculum": "nocoop\\curriculum.json",
       "status": "ok",
       "source_courses": 109,
-      "courses": 104,
-      "plan_items": 52,
+      "courses": 108,
+      "plan_items": 54,
       "elective_slots": 55,
-      "courses_with_source_page": 104
+      "courses_with_source_page": 108
     },
     {
       "program_id": "IT_coop",
@@ -30,10 +40,10 @@
       "curriculum": "coop\\curriculum.json",
       "status": "ok",
       "source_courses": 108,
-      "courses": 103,
-      "plan_items": 51,
+      "courses": 106,
+      "plan_items": 53,
       "elective_slots": 55,
-      "courses_with_source_page": 103
+      "courses_with_source_page": 106
     }
   ]
 }

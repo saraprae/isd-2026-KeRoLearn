@@ -1,45 +1,47 @@
 [
   {
-    "question": "วิชารหัส 06046400 ชื่อวิชาอะไร",
+    "question": "วิชารหัส 06036119 ชื่อวิชาอะไร",
     "expect": {
       "type": "value",
-      "value": "แคลคูลัส 1"
+      "value": "พื้นฐานการเขียนโปรแกรม"
     },
-    "sql": "SELECT name_th FROM course WHERE code = '06046400' LIMIT 200",
-    "n_rows": 0,
+    "sql": "SELECT name_th, name_en, source_page FROM course WHERE code='06036119' LIMIT 200",
+    "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT name_th FROM course WHERE code = '06046400'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
+    "sql_model_output": "{\"sql\": \"SELECT name_th, name_en, source_page FROM course WHERE code='06036119'\" }",
+    "answer_model_output": "{\n  \"answer\": \"พื้นฐานการเขียนโปรแกรม\",\n  \"source_pages\": [32]\n}",
+    "answer": "พื้นฐานการเขียนโปรแกรม (อ้างอิงหน้า 32)",
+    "source_pages": [
+      32
+    ],
     "page_warning": null,
-    "correct": false,
-    "why": "ไม่พบค่า แคลคูลัส 1 (ได้ [])",
-    "seconds": 0.8
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.3
   },
   {
-    "question": "วิชาการโปรแกรมคอมพิวเตอร์มีกี่หน่วยกิต",
+    "question": "วิชาพื้นฐานทางด้านเทคโนโลยีสารสนเทศมีกี่หน่วยกิต",
     "expect": {
       "type": "value",
       "value": 3
     },
-    "sql": "SELECT credits FROM v_semester_credits WHERE year=2 AND semester=1 LIMIT 200",
+    "sql": "SELECT SUM(credits) FROM plan_item WHERE category = 'วิชาพื้นฐานทางด้านเทคโนโลยีสารสนเทศ' AND type = 'บังคับ' LIMIT 200",
     "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=2 AND semester=1\"}",
-    "answer_model_output": "{\"answer\": \"18\", \"source_pages\": []}",
-    "answer": "18",
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM plan_item WHERE category = 'วิชาพื้นฐานทางด้านเทคโนโลยีสารสนเทศ' AND type = 'บังคับ'\" }",
+    "answer_model_output": "{\n  \"answer\": \"...\",\n  \"source_pages\": []\n}",
+    "answer": "...",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 3 (ได้ ['18'])",
-    "seconds": 1.0
+    "why": "ไม่พบค่า 3 (ได้ [])",
+    "seconds": 1.1
   },
   {
     "question": "หลักสูตรนี้มีทั้งหมดกี่หน่วยกิต",
     "expect": {
       "type": "value",
-      "value": 120
+      "value": 126
     },
     "sql": "SELECT total_credits FROM program LIMIT 200",
     "n_rows": 1,
@@ -49,9 +51,9 @@
     "answer": "126",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ไม่พบค่า 120 (ได้ ['126'])",
-    "seconds": 1.0
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
   },
   {
     "question": "หลักสูตรนี้ใช้เวลาเรียนกี่ปี",
@@ -69,113 +71,72 @@
     "page_warning": null,
     "correct": true,
     "why": "ตรง",
-    "seconds": 0.8
-  },
-  {
-    "question": "วิชา 06046406 ชื่อภาษาอังกฤษว่าอะไร",
-    "expect": {
-      "type": "value",
-      "value": "FUNDAMENTALS OF DEEP LEARNING"
-    },
-    "sql": "SELECT name_en FROM course WHERE code = '06046406' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT name_en FROM course WHERE code = '06046406'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": false,
-    "why": "ไม่พบค่า FUNDAMENTALS OF DEEP LEARNING (ได้ [])",
     "seconds": 0.6
   },
   {
-    "question": "วิชาสหกิจศึกษาทางเทคโนโลยีปัญญาประดิษฐ์มีกี่หน่วยกิต",
+    "question": "วิชา 06036119 ชื่อภาษาอังกฤษว่าอะไร",
+    "expect": {
+      "type": "value",
+      "value": "PROGRAMMING FUNDAMENTALS"
+    },
+    "sql": "SELECT name_en FROM course WHERE code = '06036119' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_en FROM course WHERE code = '06036119'\" }",
+    "answer_model_output": "{\"answer\": \"PROGRAMMING FUNDAMENTALS\", \"source_pages\": []}",
+    "answer": "PROGRAMMING FUNDAMENTALS",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.0
+  },
+  {
+    "question": "วิชาสหกิจศึกษามีกี่หน่วยกิต",
     "expect": {
       "type": "value",
       "value": 6
     },
-    "sql": "SELECT credits FROM v_plan WHERE name_th = 'สหกิจศึกษาทางเทคโนโลยีปัญญาประดิษฐ์' LIMIT 200",
-    "n_rows": 0,
+    "sql": "SELECT SUM(credits) FROM plan_item WHERE category = 'สหกิจศึกษา' AND type = 'เลือก' LIMIT 200",
+    "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_plan WHERE name_th = 'สหกิจศึกษาทางเทคโนโลยีปัญญาประดิษฐ์'\"}",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM plan_item WHERE category = 'สหกิจศึกษา' AND type = 'เลือก'\" }",
+    "answer_model_output": "{\"answer\": \"...\", \"source_pages\": []}",
+    "answer": "...",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
     "why": "ไม่พบค่า 6 (ได้ [])",
-    "seconds": 0.8
+    "seconds": 1.0
   },
   {
-    "question": "วิชาพลเมืองดิจิทัลมีรหัสวิชาอะไร",
+    "question": "วิชาการสื่อสารและการนำเสนออย่างมืออาชีพมีรหัสวิชาอะไร",
     "expect": {
       "type": "value",
-      "value": "90641007"
+      "value": "96644042"
     },
-    "sql": "SELECT code FROM course WHERE name_th = 'วิชาพลเมืองดิจิทัล' LIMIT 200",
+    "sql": "SELECT code FROM course WHERE name_th = 'วิชาการสื่อสารและการนำเสนออย่างมืออาชีพ' LIMIT 200",
     "n_rows": 0,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th = 'วิชาพลเมืองดิจิทัล'\"}",
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th = 'วิชาการสื่อสารและการนำเสนออย่างมืออาชีพ'\"}",
     "answer_model_output": null,
     "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 90641007 (ได้ [])",
+    "why": "ไม่พบค่า 96644042 (ได้ [])",
     "seconds": 0.7
   },
   {
-    "question": "วิชาแคลคูลัส 2 ต้องเรียนวิชาอะไรมาก่อน (ตอบเป็นรหัสวิชา)",
-    "expect": {
-      "type": "set",
-      "value": [
-        "06046400"
-      ]
-    },
-    "sql": "SELECT requires FROM prerequisite WHERE code='แคลคูลัส 2' AND kind='pre' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='แคลคูลัส 2' AND kind='pre'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": false,
-    "why": "ขาด 06046400",
-    "seconds": 0.6
-  },
-  {
-    "question": "วิชา 06046419 เปิดให้เลือกเรียนในภาคเรียนไหนบ้าง (รูปแบบ ปี/เทอม)",
-    "expect": {
-      "type": "set",
-      "value": [
-        "3/1",
-        "3/2"
-      ]
-    },
-    "sql": "SELECT code, name_th, terms, source FROM v_course_terms WHERE code='06046419' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT code, name_th, terms, source FROM v_course_terms WHERE code='06046419'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": false,
-    "why": "ขาด 3/1, 3/2",
-    "seconds": 0.6
-  },
-  {
-    "question": "วิชา 06046999 ชื่อวิชาอะไร",
+    "question": "วิชาพื้นฐานการเขียนโปรแกรมต้องเรียนวิชาอะไรมาก่อน (ตอบเป็นรหัสวิชา)",
     "expect": {
       "type": "none",
       "value": null
     },
-    "sql": "SELECT name_th FROM v_plan WHERE code='06046999' LIMIT 200",
+    "sql": "SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre' LIMIT 200",
     "n_rows": 0,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT name_th FROM v_plan WHERE code='06046999'\" }",
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre'\" }",
     "answer_model_output": null,
     "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
     "source_pages": [],
@@ -185,34 +146,74 @@
     "seconds": 0.5
   },
   {
-    "question": "ปี 2 เทอม 2 เรียนกี่หน่วยกิต",
+    "question": "วิชา 06036117 เปิดให้เลือกเรียนในภาคเรียนไหนบ้าง (รูปแบบ ปี/เทอม)",
     "expect": {
-      "type": "value",
-      "value": 19
+      "type": "set",
+      "value": [
+        "4/1",
+        "4/2"
+      ]
     },
-    "sql": "SELECT credits FROM v_semester_credits WHERE year=2 AND semester=2 LIMIT 200",
+    "sql": "SELECT code, name_th, terms, source FROM v_course_terms WHERE code='06036117' LIMIT 200",
     "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=2 AND semester=2\"}",
-    "answer_model_output": "{\"answer\": \"18\", \"source_pages\": []}",
-    "answer": "18",
+    "sql_model_output": "{\"sql\": \"SELECT code, name_th, terms, source FROM v_course_terms WHERE code='06036117'\" }",
+    "answer_model_output": "{\n  \"answer\": \"2/1\",\n  \"source_pages\": []\n}",
+    "answer": "2/1",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 19 (ได้ ['18'])",
-    "seconds": 1.0
+    "why": "ขาด 4/1, 4/2",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชา 06036999 ชื่อวิชาอะไร",
+    "expect": {
+      "type": "none",
+      "value": null
+    },
+    "sql": "SELECT name_th FROM v_plan WHERE code='06036999' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_th FROM v_plan WHERE code='06036999'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตอบว่าไม่พบตามที่ควร",
+    "seconds": 0.5
+  },
+  {
+    "question": "ปี 1 เทอม 2 เรียนกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": 18
+    },
+    "sql": "SELECT credits FROM v_semester_credits WHERE year=1 AND semester=2 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=1 AND semester=2\"}",
+    "answer_model_output": "{\n  \"answer\": \"18\",\n  \"source_pages\": []\n}",
+    "answer": "18",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.8
   },
   {
     "question": "ปี 1 เทอม 1 เรียนวิชารหัสอะไรบ้าง",
     "expect": {
       "type": "set",
       "value": [
-        "06046400",
-        "06046402",
-        "06066000",
-        "06066001",
-        "06066303",
-        "90641008"
+        "06036100",
+        "06036101",
+        "06036118",
+        "96641001",
+        "96641003",
+        "96644007",
+        "96644042"
       ]
     },
     "sql": "SELECT code, name_th, name_en, credits, category, type, note, source_page FROM v_plan WHERE year=1 AND semester=1 ORDER BY code LIMIT 200",
@@ -225,81 +226,83 @@
       31
     ],
     "page_warning": "โมเดลอ้างหน้าที่ไม่มีในผลลัพธ์: [12, 13]",
-    "correct": false,
-    "why": "ขาด 06046400, 06046402, 06066000, 06066001, 06066303",
-    "seconds": 1.7
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.5
   },
   {
     "question": "วิชาใดบ้างที่มีหน่วยกิตเป็น 0 (ตอบเป็นรหัสวิชา)",
     "expect": {
       "type": "set",
-      "value": [
-        "90641008"
-      ]
+      "value": []
     },
     "sql": "SELECT code FROM course WHERE credits IS NULL OR credits = 0 LIMIT 200",
-    "n_rows": 10,
+    "n_rows": 12,
     "error": null,
     "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE credits IS NULL OR credits = 0\"}",
-    "answer_model_output": "{\n  \"answer\": \"06036128,06036129,06036134,06036135,06036136,06036140,06036141,06036142,06036143,06036144\",\n  \"source_pages\": []\n}",
-    "answer": "06036128,06036129,06036134,06036135,06036136,06036140,06036141,06036142,06036143,06036144",
+    "answer_model_output": "{\"answer\": \"06036100\", \"source_pages\": []}",
+    "answer": "06036100",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ขาด 90641008",
-    "seconds": 2.3
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.1
   },
   {
-    "question": "วิชาเลือกเทคโนโลยีปัญญาประดิษฐ์เฉพาะทางที่เปิดให้เลือกมีทั้งหมดกี่วิชา",
+    "question": "วิชาเลือกในหมวดวิชาวิชาเฉพาะที่มีข้อมูลใน elective slot มีทั้งหมดกี่วิชา",
     "expect": {
       "type": "value",
-      "value": 16
+      "value": 32
     },
-    "sql": "SELECT COUNT(*) FROM plan_item WHERE category = 'เทคโนโลยีปัญญาประดิษฐ์เฉพาะทาง' AND type = 'เลือก' LIMIT 200",
+    "sql": "SELECT COUNT(*) FROM elective_slot WHERE category = 'หมวดวิชาเฉพาะ' AND type = 'เลือก' LIMIT 200",
     "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM plan_item WHERE category = 'เทคโนโลยีปัญญาประดิษฐ์เฉพาะทาง' AND type = 'เลือก'\" }",
-    "answer_model_output": "{\n  \"answer\": \"...\",\n  \"source_pages\": []\n}",
-    "answer": "...",
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM elective_slot WHERE category = 'หมวดวิชาเฉพาะ' AND type = 'เลือก'\" }",
+    "answer_model_output": "{\n  \"answer\": \"24\",\n  \"source_pages\": []\n}",
+    "answer": "24",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 16 (ได้ ['0'])",
-    "seconds": 1.3
+    "why": "ไม่พบค่า 32 (ได้ ['24'])",
+    "seconds": 1.1
   },
   {
     "question": "วิชาใดบ้างที่มีชั่วโมงบรรยาย 2 ชั่วโมงและชั่วโมงปฏิบัติ 2 ชั่วโมง (ตอบเป็นรหัสวิชา)",
     "expect": {
       "type": "set",
       "value": [
-        "06046403",
-        "06046408",
-        "06046440",
-        "06066300",
-        "06066301",
-        "06066303"
+        "06036100",
+        "06036112",
+        "06036114",
+        "06036116",
+        "06036118",
+        "06036119",
+        "06036125"
       ]
     },
     "sql": "SELECT code FROM course WHERE lecture_h = 2 AND lab_h = 2 LIMIT 200",
-    "n_rows": 8,
+    "n_rows": 7,
     "error": null,
     "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE lecture_h = 2 AND lab_h = 2\"}",
-    "answer_model_output": "{\"answer\": \"06036100\", \"source_pages\": []}",
-    "answer": "06036100",
+    "answer_model_output": "{\n  \"answer\": \"06036118,06036119,06036125,06036122,06036112,06036114,06036116\",\n  \"source_pages\": []\n}",
+    "answer": "06036118,06036119,06036125,06036122,06036112,06036114,06036116",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ขาด 06046403, 06046408, 06046440, 06066300, 06066301",
-    "seconds": 1.3
+    "why": "ขาด 06036100",
+    "seconds": 1.8
   },
   {
     "question": "วิชาในหมวดวิชาศึกษาทั่วไปที่เรียนปี 1 มีรหัสวิชาอะไรบ้าง",
     "expect": {
       "type": "set",
       "value": [
-        "90641004",
-        "90641007",
-        "90641008"
+        "96641001",
+        "96641003",
+        "96644007",
+        "96644008",
+        "96644042",
+        "96641002"
       ]
     },
     "sql": "SELECT p.code FROM v_plan p WHERE p.year = 1 AND p.category = 'หมวดวิชาศึกษาทั่วไป' LIMIT 200",
@@ -310,17 +313,17 @@
     "answer": "96641001, 96641003, 96644007, 96644042, 96641002, 96644008",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ขาด 90641004, 90641007, 90641008",
-    "seconds": 2.0
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.8
   },
   {
     "question": "วิชาสหกิจศึกษาที่ต้องเลือกอย่างใดอย่างหนึ่งในปี 4 เทอม 2 มีรหัสวิชาอะไรบ้าง",
     "expect": {
       "type": "set",
       "value": [
-        "06046443",
-        "06046444"
+        "06036147",
+        "06036148"
       ]
     },
     "sql": "SELECT code FROM plan_item WHERE year=4 AND semester=2 AND category='สหกิจศึกษา' AND type='เลือก' LIMIT 200",
@@ -332,134 +335,136 @@
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ขาด 06046443, 06046444",
-    "seconds": 0.9
+    "why": "ขาด 06036147, 06036148",
+    "seconds": 0.7
   },
   {
-    "question": "ปี 1 เรียนรวมกี่หน่วยกิต",
+    "question": "ปี 3 เรียนรวมกี่หน่วยกิตตามแผนการเรียน",
     "expect": {
       "type": "value",
-      "value": 31
+      "value": 24
     },
-    "sql": "SELECT SUM(credits) FROM v_semester_credits WHERE year=1 AND semester=1 LIMIT 200",
+    "sql": "SELECT SUM(credits) FROM v_semester_credits WHERE year=3 AND semester=1 LIMIT 200",
     "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM v_semester_credits WHERE year=1 AND semester=1\"}",
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM v_semester_credits WHERE year=3 AND semester=1\"}",
     "answer_model_output": "{\"answer\": \"18\", \"source_pages\": []}",
     "answer": "18",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 31 (ได้ ['18'])",
-    "seconds": 1.1
-  },
-  {
-    "question": "วิชาพื้นฐานการเรียนรู้เชิงลึกมีวิชาบังคับก่อนรหัสอะไรบ้าง",
-    "expect": {
-      "type": "set",
-      "value": [
-        "06046401",
-        "06046402"
-      ]
-    },
-    "sql": "SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": false,
-    "why": "ขาด 06046401, 06046402",
-    "seconds": 0.7
-  },
-  {
-    "question": "วิชา 06066300 มีวิชาบังคับก่อนไหม",
-    "expect": {
-      "type": "none",
-      "value": null
-    },
-    "sql": "SELECT requires FROM prerequisite WHERE code='06066300' AND kind='pre' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06066300' AND kind='pre'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": true,
-    "why": "ตอบว่าไม่พบตามที่ควร",
-    "seconds": 0.6
+    "why": "ไม่พบค่า 24 (ได้ ['18'])",
+    "seconds": 0.9
   },
   {
     "question": "วิชาใดบ้างที่เป็นวิชาบังคับก่อนของวิชาอื่น (ตอบเป็นรหัสวิชา)",
     "expect": {
       "type": "set",
       "value": [
-        "06046400",
-        "06046401",
-        "06046402",
-        "06066001"
+        "06036112",
+        "06036119",
+        "06036122"
       ]
     },
-    "sql": "SELECT code FROM prerequisite WHERE requires IS NOT NULL AND requires != '' AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co') LIMIT 200",
-    "n_rows": 3,
+    "sql": "SELECT code FROM prerequisite WHERE requires IS NOT NULL AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co') LIMIT 200",
+    "n_rows": 4,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT code FROM prerequisite WHERE requires IS NOT NULL AND requires != '' AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co')\"}",
+    "sql_model_output": "{\"sql\": \"SELECT code FROM prerequisite WHERE requires IS NOT NULL AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co')\"}",
     "answer_model_output": "{\n  \"answer\": \"06036114\",\n  \"source_pages\": []\n}",
     "answer": "06036114",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ขาด 06046400, 06046401, 06046402, 06066001",
-    "seconds": 1.5
+    "why": "ขาด 06036112, 06036119, 06036122",
+    "seconds": 1.2
   },
   {
-    "question": "วิชาบังคับก่อนของวิชาพื้นฐานการเรียนรู้เชิงลึก วิชาใดที่อยู่ในแผนการเรียนปี 1 เทอม 1 (ตอบเป็นรหัสวิชา)",
-    "expect": {
-      "type": "value",
-      "value": "06046402"
-    },
-    "sql": "SELECT requires FROM prerequisite WHERE code='06026215' AND kind='pre' LIMIT 200",
-    "n_rows": 0,
-    "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06026215' AND kind='pre'\" }",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
-    "source_pages": [],
-    "page_warning": null,
-    "correct": false,
-    "why": "ไม่พบค่า 06046402 (ได้ [])",
-    "seconds": 0.7
-  },
-  {
-    "question": "ถ้าจะเรียนวิชา 06046406 ต้องผ่านวิชารหัสอะไรมาก่อนทั้งหมด รวมวิชาที่เป็นเงื่อนไขต่อกันเป็นทอด ๆ",
+    "question": "วิชา 06036114 มีวิชาบังคับก่อนไหม",
     "expect": {
       "type": "set",
       "value": [
-        "06046400",
-        "06046401",
-        "06046402"
+        "06036119",
+        "06036122"
       ]
     },
-    "sql": "SELECT requires FROM prerequisite WHERE code='06046406' AND kind='pre' LIMIT 200",
+    "sql": "SELECT requires FROM prerequisite WHERE code='06036114' AND kind='pre' LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06036114' AND kind='pre'\" }",
+    "answer_model_output": "{\n  \"answer\": \"วิชา 06036114 มีวิชาบังคับก่อนคือ 06036119 และ 06036122\",\n  \"source_pages\": []\n}",
+    "answer": "วิชา 06036114 มีวิชาบังคับก่อนคือ 06036119 และ 06036122",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.5
+  },
+  {
+    "question": "วิชา 06036127 มีวิชาบังคับก่อนไหม",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06036112"
+      ]
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='06036127' AND kind='pre' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06036127' AND kind='pre'\" }",
+    "answer_model_output": "{\n  \"answer\": \"วิชา 06036127 มีวิชาบังคับก่อนคือ 06036112\",\n  \"source_pages\": []\n}",
+    "answer": "วิชา 06036127 มีวิชาบังคับก่อนคือ 06036112",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.3
+  },
+  {
+    "question": "วิชาใดบ้างในแผนการเรียนที่มีวิชาบังคับก่อน (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06036114"
+      ]
+    },
+    "sql": "SELECT code FROM plan_item WHERE type = 'บังคับ' AND category = 'วิชาบังคับ' AND alt_group = '0' AND source_page IS NOT NULL ORDER BY code LIMIT 200",
     "n_rows": 0,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06046406' AND kind='pre'\"}",
+    "sql_model_output": "{\"sql\": \"SELECT code FROM plan_item WHERE type = 'บังคับ' AND category = 'วิชาบังคับ' AND alt_group = '0' AND source_page IS NOT NULL ORDER BY code\"}",
     "answer_model_output": null,
     "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ขาด 06046400, 06046401, 06046402",
-    "seconds": 0.6
+    "why": "ขาด 06036114",
+    "seconds": 1.0
+  },
+  {
+    "question": "ถ้าจะเรียนวิชา 06036114 ต้องผ่านวิชารหัสอะไรมาก่อนทั้งหมด รวมวิชาที่เป็นเงื่อนไขต่อกันเป็นทอด ๆ",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06036119",
+        "06036122"
+      ]
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='06036114' AND kind='pre' LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06036114' AND kind='pre'\"}",
+    "answer_model_output": "{\n  \"answer\": \"06036119, 06036122\",\n  \"source_pages\": []\n}",
+    "answer": "06036119, 06036122",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.1
   },
   {
     "question": "ภาคเรียนที่มีหน่วยกิตมากที่สุดในแผนการเรียนมีกี่หน่วยกิต",
     "expect": {
       "type": "value",
-      "value": 19
+      "value": 24
     },
     "sql": "SELECT MAX(credits) FROM v_semester_credits LIMIT 200",
     "n_rows": 1,
@@ -470,42 +475,41 @@
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 19 (ได้ ['18'])",
-    "seconds": 0.9
+    "why": "ไม่พบค่า 24 (ได้ ['18'])",
+    "seconds": 0.8
   },
   {
     "question": "มีกี่ภาคเรียนในแผนการเรียนที่มีหน่วยกิตรวมเกิน 16 หน่วยกิต",
     "expect": {
       "type": "value",
-      "value": 3
+      "value": 4
     },
     "sql": "SELECT COUNT(*) FROM v_semester_credits WHERE credits > 16 LIMIT 200",
     "n_rows": 1,
     "error": null,
     "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM v_semester_credits WHERE credits > 16\"}",
-    "answer_model_output": "{\n  \"answer\": \"5\",\n  \"source_pages\": []\n}",
-    "answer": "5",
+    "answer_model_output": "{\n  \"answer\": \"4\",\n  \"source_pages\": []\n}",
+    "answer": "4",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ไม่พบค่า 3 (ได้ ['5'])",
-    "seconds": 1.1
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
   },
   {
     "question": "วิชาในหมวดวิชาเฉพาะที่อยู่ในแผนการเรียนและมีชั่วโมงปฏิบัติมากกว่า 0 มีรหัสวิชาอะไรบ้าง",
     "expect": {
       "type": "set",
       "value": [
-        "06046403",
-        "06046408",
-        "06046440",
-        "06046441",
-        "06046442",
-        "06046443",
-        "06046444",
-        "06066300",
-        "06066301",
-        "06066303"
+        "06036100",
+        "06036112",
+        "06036114",
+        "06036116",
+        "06036118",
+        "06036119",
+        "06036125",
+        "06036147",
+        "06036148"
       ]
     },
     "sql": "SELECT p.code FROM plan_item p WHERE p.category = 'หมวดวิชาเฉพาะ' AND p.lab_h > 0 LIMIT 200",
@@ -517,37 +521,37 @@
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ขาด 06046403, 06046408, 06046440, 06046441, 06046442",
-    "seconds": 1.5
+    "why": "ขาด 06036100, 06036112, 06036114, 06036116, 06036118",
+    "seconds": 1.2
   },
   {
-    "question": "แผนการเรียนรวม (นับสหกิจศึกษาเพียงวิชาเดียว) น้อยกว่าหน่วยกิตรวมของหลักสูตรกี่หน่วยกิต",
+    "question": "แผนการเรียนรวม น้อยกว่าหน่วยกิตรวมของหลักสูตรกี่หน่วยกิต",
     "expect": {
       "type": "value",
-      "value": 15
+      "value": 21
     },
-    "sql": "SELECT (program.total_credits - SUM(plan_item.credits)) AS difference FROM program JOIN plan_item ON program.program_id = plan_item.program_id WHERE plan_item.type = 'เลือก' GROUP BY program.program_id LIMIT 200",
+    "sql": "SELECT (program.total_credits - SUM(plan_item.credits)) AS difference FROM program JOIN plan_item ON program.program_id = plan_item.program_id GROUP BY program.program_id HAVING difference > 0 LIMIT 200",
     "n_rows": 1,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT (program.total_credits - SUM(plan_item.credits)) AS difference FROM program JOIN plan_item ON program.program_id = plan_item.program_id WHERE plan_item.type = 'เลือก' GROUP BY program.program_id\"}",
-    "answer_model_output": "{\n  \"answer\": \"105\",\n  \"source_pages\": []\n}",
-    "answer": "105",
+    "sql_model_output": "{\"sql\": \"SELECT (program.total_credits - SUM(plan_item.credits)) AS difference FROM program JOIN plan_item ON program.program_id = plan_item.program_id GROUP BY program.program_id HAVING difference > 0\"}",
+    "answer_model_output": "{\n  \"answer\": \"5\",\n  \"source_pages\": []\n}",
+    "answer": "5",
     "source_pages": [],
     "page_warning": null,
     "correct": false,
-    "why": "ไม่พบค่า 15 (ได้ ['105'])",
-    "seconds": 1.6
+    "why": "ไม่พบค่า 21 (ได้ ['5'])",
+    "seconds": 1.2
   },
   {
-    "question": "วิชา 06046443 มีวิชาบังคับก่อนไหม",
+    "question": "วิชา 06036115 มีวิชาบังคับก่อนไหม",
     "expect": {
       "type": "none",
       "value": null
     },
-    "sql": "SELECT requires FROM prerequisite WHERE code='06046443' AND kind='pre' LIMIT 200",
+    "sql": "SELECT requires FROM prerequisite WHERE code='06036115' AND kind='pre' LIMIT 200",
     "n_rows": 0,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06046443' AND kind='pre'\" }",
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06036115' AND kind='pre'\" }",
     "answer_model_output": null,
     "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
     "source_pages": [],
@@ -557,46 +561,43 @@
     "seconds": 0.6
   },
   {
-    "question": "วิชาในแผนการเรียนปี 2 ที่มีวิชาบังคับก่อน มีรหัสวิชาอะไรบ้าง",
+    "question": "วิชาในแผนการเรียนปี 1 ที่มีวิชาบังคับก่อน มีรหัสวิชาอะไรบ้าง",
     "expect": {
       "type": "set",
-      "value": [
-        "06046405",
-        "06046406"
-      ]
+      "value": []
     },
-    "sql": "SELECT p.code FROM plan_item p WHERE p.year = 2 AND p.type = 'บังคับ' AND p.category = 'วิชาบังคับ' AND p.source_page IS NOT NULL ORDER BY p.code LIMIT 200",
+    "sql": "SELECT p.code FROM plan_item p WHERE p.year = 1 AND p.type = 'บังคับ' AND p.category = 'วิชาบังคับ' AND p.source_page IS NOT NULL LIMIT 200",
     "n_rows": 0,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT p.code FROM plan_item p WHERE p.year = 2 AND p.type = 'บังคับ' AND p.category = 'วิชาบังคับ' AND p.source_page IS NOT NULL ORDER BY p.code\"}",
+    "sql_model_output": "{\"sql\": \"SELECT p.code FROM plan_item p WHERE p.year = 1 AND p.type = 'บังคับ' AND p.category = 'วิชาบังคับ' AND p.source_page IS NOT NULL\"}",
     "answer_model_output": null,
     "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ขาด 06046405, 06046406",
-    "seconds": 1.2
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.9
   },
   {
-    "question": "วิชาที่ชื่อมีคำว่า 'ภาษาธรรมชาติ' มีรหัสวิชาอะไรบ้าง",
+    "question": "วิชาที่ชื่อมีคำว่า 'ดิจิทัล' มีรหัสวิชาอะไรบ้าง",
     "expect": {
       "type": "set",
       "value": [
-        "06046410",
-        "06046414",
-        "06046421"
+        "06036111",
+        "06036116",
+        "96641002"
       ]
     },
-    "sql": "SELECT code FROM course WHERE name_th LIKE '%ภาษาธรรมชาติ%' OR name_en LIKE '%natural language%' OR name_th LIKE '%natural language%' OR name_en LIKE '%ภาษาธรรมชาติ' LIMIT 200",
-    "n_rows": 0,
+    "sql": "SELECT code FROM course WHERE name_th LIKE '%ดิจิทัล%' OR name_en LIKE '%digital%' OR name_th LIKE '%digital%' OR name_en LIKE '%ดิจิทัล%' LIMIT 200",
+    "n_rows": 5,
     "error": null,
-    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th LIKE '%ภาษาธรรมชาติ%' OR name_en LIKE '%natural language%' OR name_th LIKE '%natural language%' OR name_en LIKE '%ภาษาธรรมชาติ'\"}",
-    "answer_model_output": null,
-    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th LIKE '%ดิจิทัล%' OR name_en LIKE '%digital%' OR name_th LIKE '%digital%' OR name_en LIKE '%ดิจิทัล%'\"}",
+    "answer_model_output": "{\n  \"answer\": \"96641002, 06036111, 06036116, 0:036141, 06036142\",\n  \"source_pages\": []\n}",
+    "answer": "96641002, 06036111, 06036116, 0:036141, 06036142",
     "source_pages": [],
     "page_warning": null,
-    "correct": false,
-    "why": "ขาด 06046410, 06046414, 06046421",
-    "seconds": 0.9
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.9
   }
 ]

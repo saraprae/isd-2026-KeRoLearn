@@ -424,7 +424,7 @@
       "code": "06036116",
       "name_th": "การตลาดเชิงดิจิทัล",
       "name_en": "DIGITAL MARKETING",
-      "credits": null,
+      "credits": "3(2-2-5)",
       "year": 3,
       "semester": 2,
       "category": "หมวดวิชาเฉพาะ",
@@ -500,7 +500,7 @@
     },
     {
       "code": "06036xxx",
-      "name_th": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือกลุ่มวิชาที่ 1-4",
+      "name_th": "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 2 หรือ กลุ่มวิชาที่ 1-4",
       "name_en": "ELECTIVE COURSE IN BUSINESS INFORMATION TECHNOLOGY 2 OR COURSE GROUP 1-4",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,

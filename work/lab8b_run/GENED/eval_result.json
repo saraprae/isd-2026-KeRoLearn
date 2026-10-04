@@ -1,0 +1,590 @@
+[
+  {
+    "question": "วิชารหัส 90642011 ชื่อวิชาอะไร",
+    "expect": {
+      "type": "value",
+      "value": "การคิดอย่างมีวิจารณญาณ"
+    },
+    "sql": "SELECT name_th FROM course WHERE code = '90642011' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_th FROM course WHERE code = '90642011'\" }",
+    "answer_model_output": "{\"answer\": \"การคิดอย่างมีวิจารณญาณ\", \"source_pages\": []}",
+    "answer": "การคิดอย่างมีวิจารณญาณ",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.5
+  },
+  {
+    "question": "วิชาพลเมืองดิจิทัลมีกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": 3
+    },
+    "sql": "SELECT credits FROM v_plan WHERE name_th = 'วิชาพลเมืองดิจิทัล' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_plan WHERE name_th = 'วิชาพลเมืองดิจิทัล'\"}",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า 3 (ได้ [])",
+    "seconds": 0.6
+  },
+  {
+    "question": "หลักสูตรนี้มีทั้งหมดกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": 0
+    },
+    "sql": "SELECT total_credits FROM program LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT total_credits FROM program\"}",
+    "answer_model_output": "{\n  \"answer\": \"0\",\n  \"source_pages\": []\n}",
+    "answer": "0",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.8
+  },
+  {
+    "question": "หลักสูตรนี้ใช้เวลาเรียนกี่ปี",
+    "expect": {
+      "type": "value",
+      "value": 4
+    },
+    "sql": "SELECT years FROM program LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT years FROM program\"}",
+    "answer_model_output": "{\"answer\": \"4\", \"source_pages\": []}",
+    "answer": "4",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
+  },
+  {
+    "question": "วิชา 90641009 ชื่อภาษาอังกฤษว่าอะไร",
+    "expect": {
+      "type": "value",
+      "value": "INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1"
+    },
+    "sql": "SELECT name_en FROM course WHERE code = '90641009' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_en FROM course WHERE code = '90641009'\" }",
+    "answer_model_output": "{\"answer\": \"INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1\", \"source_pages\": []}",
+    "answer": "INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.1
+  },
+  {
+    "question": "วิชาโครงงานกลุ่ม 3 มีกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": 1
+    },
+    "sql": "SELECT credits FROM v_semester_credits WHERE year=3 AND semester=1 LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=3 AND semester=1\"}",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า 1 (ได้ [])",
+    "seconds": 1.1
+  },
+  {
+    "question": "วิชาพลเมืองดิจิทัลมีรหัสวิชาอะไร",
+    "expect": {
+      "type": "value",
+      "value": "90641007"
+    },
+    "sql": "SELECT code FROM course WHERE name_th = 'วิชาพลเมืองดิจิทัล' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th = 'วิชาพลเมืองดิจิทัล'\"}",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า 90641007 (ได้ [])",
+    "seconds": 0.5
+  },
+  {
+    "question": "วิชาโครงงานกลุ่ม 3 ต้องเรียนวิชาอะไรมาก่อน (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641005"
+      ]
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ขาด 90641005",
+    "seconds": 0.5
+  },
+  {
+    "question": "วิชา 90642040 อยู่ในหมวดวิชาอะไร",
+    "expect": {
+      "type": "value",
+      "value": "หมวดวิชาศึกษาทั่วไป"
+    },
+    "sql": "SELECT category FROM v_plan WHERE code='90642040' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT category FROM v_plan WHERE code='90642040'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า หมวดวิชาศึกษาทั่วไป (ได้ [])",
+    "seconds": 0.4
+  },
+  {
+    "question": "วิชา 90641099 ชื่อวิชาอะไร",
+    "expect": {
+      "type": "none",
+      "value": null
+    },
+    "sql": "SELECT name_th FROM v_plan WHERE code='90641099' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_th FROM v_plan WHERE code='90641099'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตอบว่าไม่พบตามที่ควร",
+    "seconds": 0.4
+  },
+  {
+    "question": "ในฐานข้อมูลนี้มีวิชาทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 284
+    },
+    "sql": "SELECT COUNT(*) FROM plan_item UNION ALL SELECT COUNT(*) FROM elective_slot LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM plan_item UNION ALL SELECT COUNT(*) FROM elective_slot\"}",
+    "answer_model_output": "{\n  \"answer\": \"284\",\n  \"source_pages\": []\n}",
+    "answer": "284",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.8
+  },
+  {
+    "question": "วิชาที่ขึ้นต้นด้วยรหัส 90641 มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 7
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE code LIKE '90641%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE code LIKE '90641%'\"}",
+    "answer_model_output": "{\n  \"answer\": \"7\",\n  \"source_pages\": []\n}",
+    "answer": "7",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชาใดบ้างที่มีหน่วยกิตเป็น 0 (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641008"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE credits IS NULL OR credits = 0 LIMIT 200",
+    "n_rows": 21,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE credits IS NULL OR credits = 0\"}",
+    "answer_model_output": "{\n  \"answer\": \"90641008\",\n  \"source_pages\": []\n}",
+    "answer": "90641008",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.1
+  },
+  {
+    "question": "วิชาที่ชื่อมีคำว่า 'กาแฟ' มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90642040"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE name_th LIKE '%กาแฟ%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th LIKE '%กาแฟ%'\"}",
+    "answer_model_output": "{\n  \"answer\": \"90642040\",\n  \"source_pages\": []\n}",
+    "answer": "90642040",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.0
+  },
+  {
+    "question": "วิชาใดบ้างที่มีชั่วโมงบรรยาย 0 ชั่วโมงและชั่วโมงปฏิบัติมากกว่า 0 ชั่วโมง (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641004",
+        "90641005",
+        "90641006",
+        "90642001",
+        "90642002",
+        "90642003",
+        "90642036",
+        "90643001",
+        "90643002",
+        "90643003"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE lecture_h = 0 AND lab_h > 0 LIMIT 200",
+    "n_rows": 10,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE lecture_h = 0 AND lab_h > 0\"}",
+    "answer_model_output": "{\n  \"answer\": \"90641004\",\n  \"source_pages\": []\n}",
+    "answer": "90641004",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.1
+  },
+  {
+    "question": "วิชาที่ชื่อมีคำว่า 'กฎหมาย' มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90642029",
+        "90642030",
+        "90642031",
+        "90642032",
+        "90642033",
+        "90642034",
+        "90642164"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE name_th LIKE '%กฎหมาย%' LIMIT 200",
+    "n_rows": 7,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th LIKE '%กฎหมาย%'\"}",
+    "answer_model_output": "{\"answer\": \"90642029, 90642030, 90642031, 90642032, 90642033, 90642034, 90642164\", \"source_pages\": []}",
+    "answer": "90642029, 90642030, 90642031, 90642032, 90642033, 90642034, 90642164",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.7
+  },
+  {
+    "question": "วิชาที่ชื่อมีคำว่า 'ภาษาอังกฤษ' มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 27
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE name_th LIKE '%ภาษาอังกฤษ%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE name_th LIKE '%ภาษาอังกฤษ%'\" }",
+    "answer_model_output": "{\"answer\": \"27\", \"source_pages\": []}",
+    "answer": "27",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชาที่มีหน่วยกิตเป็น 1 มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641004",
+        "90641005",
+        "90641006",
+        "90642001",
+        "90642036",
+        "90643001"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE credits = 1 LIMIT 200",
+    "n_rows": 6,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE credits = 1\"}",
+    "answer_model_output": "{\n  \"answer\": \"90641004, 90641005, 90641006, 90642001, 90642036, 906430: 90643001\",\n  \"source_pages\": []\n}",
+    "answer": "90641004, 90641005, 90641006, 90642001, 90642036, 906430: 90643001",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.7
+  },
+  {
+    "question": "วิชาโครงงานกลุ่ม 2 มีวิชาบังคับก่อนรหัสอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641004"
+      ]
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='กลุ่ม 2' AND kind='pre' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='กลุ่ม 2' AND kind='pre'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ขาด 90641004",
+    "seconds": 0.5
+  },
+  {
+    "question": "วิชา 90642011 มีวิชาบังคับก่อนไหม",
+    "expect": {
+      "type": "none",
+      "value": null
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='90642011' AND kind='pre' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='90642011' AND kind='pre'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตอบว่าไม่พบตามที่ควร",
+    "seconds": 0.5
+  },
+  {
+    "question": "วิชาใดบ้างที่เป็นวิชาบังคับก่อนของวิชาอื่น (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641004",
+        "90641005"
+      ]
+    },
+    "sql": "SELECT code FROM prerequisite WHERE requires IS NOT NULL AND requires != '' AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co') LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM prerequisite WHERE requires IS NOT NULL AND requires != '' AND kind = 'pre' AND code NOT IN (SELECT code FROM prerequisite WHERE kind = 'co')\"}",
+    "answer_model_output": "{\n  \"answer\": \"90641005,906410: 90641005,90641006\",\n  \"source_pages\": []\n}",
+    "answer": "90641005,906410: 90641005,90641006",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ขาด 90641004",
+    "seconds": 1.6
+  },
+  {
+    "question": "ถ้าจะเรียนวิชาโครงงานกลุ่ม 3 ต้องผ่านวิชารหัสอะไรมาก่อนทั้งหมด รวมวิชาที่เป็นเงื่อนไขต่อกันเป็นทอด ๆ (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641004",
+        "90641005"
+      ]
+    },
+    "sql": "SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT requires FROM prerequisite WHERE code='06026240' AND kind='pre'\"}",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ขาด 90641004, 90641005",
+    "seconds": 0.5
+  },
+  {
+    "question": "วิชาที่ชื่อ 'ปฏิบัติงานตามทักษะด้านการจัดการ' มีกี่วิชาที่ใช้ชื่อนี้ซ้ำกัน",
+    "expect": {
+      "type": "value",
+      "value": 3
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE name_th = 'ปฏิบัติงานตามทักษะด้านการจัดการ' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE name_th = 'ปฏิบัติงานตามทักษะด้านการจัดการ'\"}",
+    "answer_model_output": "{\n  \"answer\": \"3\",\n  \"source_pages\": []\n}",
+    "answer": "3",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.1
+  },
+  {
+    "question": "วิชาที่ชื่อ 'ปฏิบัติงานตามทักษะด้านการจัดการ' มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90643001",
+        "90643002",
+        "90643003"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE name_th = 'ปฏิบัติงานตามทักษะด้านการจัดการ' LIMIT 200",
+    "n_rows": 3,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE name_th = 'ปฏิบัติงานตามทักษะด้านการจัดการ'\" }",
+    "answer_model_output": "{\"answer\": \"90643001, 906430: 90643002, 90643003\", \"source_pages\": []}",
+    "answer": "90643001, 906430: 90643002, 90643003",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.5
+  },
+  {
+    "question": "วิชาที่ไม่มีข้อมูลหน่วยกิต (credits เป็นค่าว่าง) มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 20
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE credits IS NULL OR credits = 0 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE credits IS NULL OR credits = 0\"}",
+    "answer_model_output": "{\n  \"answer\": \"21\",\n  \"source_pages\": []\n}",
+    "answer": "21",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า 20 (ได้ ['21'])",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชาที่ขึ้นต้นด้วยรหัส 90643 มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 44
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE code LIKE '90643%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE code LIKE '90643%'\"}",
+    "answer_model_output": "{\n  \"answer\": \"44\",\n  \"source_pages\": []\n}",
+    "answer": "44",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชาที่ขึ้นต้นด้วยรหัส 90644 มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 64
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE code LIKE '90644%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE code LIKE '90644%'\"}",
+    "answer_model_output": "{\"answer\": \"64\", \"source_pages\": []}",
+    "answer": "64",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
+  },
+  {
+    "question": "วิชาที่มีชั่วโมงบรรยาย 3 ชั่วโมงและชั่วโมงปฏิบัติ 0 ชั่วโมง มีทั้งหมดกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": 225
+    },
+    "sql": "SELECT COUNT(*) FROM course WHERE lecture_h = 3 AND lab_h = 0 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(*) FROM course WHERE lecture_h = 3 AND lab_h = 0\"}",
+    "answer_model_output": "{\"answer\": \"225\", \"source_pages\": []}",
+    "answer": "225",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.0
+  },
+  {
+    "question": "รหัสวิชาที่เรียงลำดับมากที่สุดในฐานข้อมูลคือรหัสอะไร",
+    "expect": {
+      "type": "value",
+      "value": "90644071"
+    },
+    "sql": "SELECT code FROM course ORDER BY code DESC LIMIT 1",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course ORDER BY code DESC LIMIT 1\"}",
+    "answer_model_output": "{\n  \"answer\": \"90644071\",\n  \"source_pages\": []\n}",
+    "answer": "90644071",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.0
+  },
+  {
+    "question": "วิชาที่มีหน่วยกิตเป็น 2 มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90642002",
+        "90642118",
+        "90643002"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE credits = 2 LIMIT 200",
+    "n_rows": 3,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE credits = 2\"}",
+    "answer_model_output": "{\n  \"answer\": \"90642002, 90642118, 906430: 90643002\",\n  \"source_pages\": []\n}",
+    "answer": "90642002, 90642118, 906430: 90643002",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.3
+  }
+]

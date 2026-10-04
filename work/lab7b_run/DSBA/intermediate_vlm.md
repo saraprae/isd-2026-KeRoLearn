@@ -1,3 +1,157 @@
+<!-- PDF_PAGE 16 -->
+<page_number>15</page_number>
+มคอ. 2
+
+3.1.3 รายวิชา
+
+ก. หมวดวิชาศึกษาทั่วไป <page_number>30</page_number> หน่วยกิต
+1) กลุ่มวิชาพื้นฐาน <page_number>6</page_number> หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>90641001</td><td>โรงเรียนสร้างเสน่ห์ CHARM SCHOOL</td><td>2 (1-2-3)</td></tr><tr><td>90641002</td><td>ความฉลาดทางดิจิทัล DIGITAL INTELLIGENCE QUOTIENT</td><td>3 (3-0-6)</td></tr><tr><td>90641003</td><td>กีฬาและนันทนาการ SPORTS AND RECREATIONAL ACTIVITIES<br/>- การประเมินผลในรายวิชาทั้ง 3 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)</td><td>1 (0-3-2)</td></tr></table>
+
+2) กลุ่มวิชาด้านภาษาและการสื่อสาร <page_number>9</page_number> หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>90644007</td><td>ภาษาอังกฤษพื้นฐาน 1 FOUNDATION ENGLISH 1</td><td>3 (3-0-6)</td></tr><tr><td>90644008</td><td>ภาษาอังกฤษพื้นฐาน 2 FOUNDATION ENGLISH 2</td><td>3 (3-0-6)</td></tr><tr><td>90644xxx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร* ELECTIVE IN LANGUAGE AND COMMUNICATION<br/>หรือ 3 (2-2-5)<br/>- การประเมินผลในรายวิชาทั้ง 2 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)<br/>* ให้นักศึกษาเลือกเรียนในกลุ่มวิชาด้านภาษาและการสื่อสาร ตามรายวิชาที่สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบังเปิดสอน (ภาคผนวก ง) อีก 1 รายวิชา</td><td>3 (3-0-6)</td></tr></table>
+
+3) กลุ่มวิชาตามเกณฑ์ของคณะ <page_number>9</page_number> หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>90642033</td><td>กฎหมายสำหรับคนรุ่นใหม่ LAW FOR NEW GENERATION</td><td>3 (3-0-6)</td></tr><tr><td>90643021</td><td>ผู้ประกอบการสมัยใหม่ MODERN ENTREPRENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90644042</td><td>การสื่อสารและการนำเสนออย่างมืออาชีพ PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td>3 (3-0-6)</td></tr></table>
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 17 -->
+<page_number>16</page_number>
+
+มคอ. 2
+
+**4) กลุ่มวิชาเลือกหมวดวิชาการศึกษาทั่วไป**
+หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td></td><td>(3-0-6)</td></tr><tr><td>9064xxxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป*</td><td>ELECTIVE IN GENERAL EDUCATION หรือ</td><td>2 (2-2-5)</td></tr></table>
+
+*   การประเมินผลในรายวิชาทั้ง 2 รายวิชา จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)
+
+**ข. หมวดวิชาเฉพาะ**
+หน่วยกิต
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td></td><td>(3-0-6)</td></tr><tr><td colspan="4">1) กลุ่มวิชาแกน</td></tr><tr><td colspan="4">- กลุ่มคณิตศาสตร์และสถิติ</td></tr><tr><td>06026200</td><td>แคลคูลัส 1</td><td>CALCULUS 1</td><td>3 (3-0-6)</td></tr><tr><td>06026201</td><td>แคลคูลัส 2</td><td>CALCULUS 2</td><td>3 (3-0-6)</td></tr><tr><td>06026202</td><td>พีชคณิตเชิงเส้น</td><td>LINEAR ALGEBRA</td><td>3 (3-0-6)</td></tr><tr><td colspan="4">06066000 คณิตศาสตร์ไม่ต่อเนื่อง DISCRETE MATHEMATICS</td></tr><tr><td>06066001</td><td>ความน่าจะเป็นและสถิติ</td><td>PROBABILITY AND STATISTICS</td><td>3 (3-0-6)</td></tr><tr><td colspan="4">- กลุ่มพื้นฐานเทคโนโลยีสารสนเทศ</td></tr><tr><td>06026203</td><td>การโปรแกรมคอมพิวเตอร์</td><td>COMPUTER PROGRAMMING</td><td>3 (2-2-5)</td></tr><tr><td>06026204</td><td>เครือข่ายและความมั่นคงทางไซเบอร์เบื้องต้น</td><td>INTRODUCTION TO NETWORKS AND CYBERSECURITY</td><td>3 (3-0-6)</td></tr><tr><td colspan="4">06066100 การบริหารโครงการเทคโนโลยีสารสนเทศ INFORMATION TECHNOLOGY PROJECT MANAGEMENT</td></tr></table>
+
+หน่วยกิต
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>(3-0-6)</td></tr><tr><td colspan="4">วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ</td></tr><tr><td colspan="4">คณะเทคโนโลยีสารสนเทศ สจล.</td></tr></table>
+
+---
+
+<!-- PDF_PAGE 18 -->
+<page_number>17</page_number>
+
+มคอ. 2
+
+<table><tr><td>06066101</td><td>พื้นฐานทางธุรกิจสำหรับเทคโนโลยีสารสนเทศ<br/>BUSINESS FUNDAMENTALS FOR INFORMATION TECHNOLOGY</td><td>3 (3-0-6)</td></tr><tr><td>06066102</td><td>ระบบสารสนเทศเพื่อการจัดการ<br/>MANAGEMENT INFORMATION SYSTEMS</td><td>3 (3-0-6)</td></tr><tr><td>06066300</td><td>แนวคิดระบบฐานข้อมูล<br/>DATABASE SYSTEM CONCEPTS</td><td>3 (2-2-5)</td></tr><tr><td>06066301</td><td>โครงสร้างข้อมูลและอัลกอริทึม<br/>DATA STRUCTURES AND ALGORITHMS</td><td>3 (2-2-5)</td></tr><tr><td>06066302</td><td>การเขียนโปรแกรมเว็บพื้นฐาน<br/>FUNDAMENTAL WEB PROGRAMMING</td><td>3 (2-2-5)</td></tr><tr><td>06066303</td><td>การแก้ปัญหาและการโปรแกรมคอมพิวเตอร์<br/>PROBLEM SOLVING AND COMPUTER PROGRAMMING</td><td>3 (2-2-5)</td></tr><tr><td>06066304</td><td>การวิเคราะห์และออกแบบระบบสารสนเทศ<br/>INFORMATION SYSTEM ANALYSIS AND DESIGN</td><td>3 (3-0-6)</td></tr></table>
+
+2) กลุ่มพื้นฐานวิชาชีพ
+หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026205</td><td>การตลาดเบื้องต้น<br/>INTRODUCTION TO MARKETING</td><td>3 (3-0-6)</td></tr><tr><td>06026206</td><td>การวิเคราะห์ข้อมูลและการโปรแกรม<br/>DATA ANALYTICS AND PROGRAMMING</td><td>3 (2-2-5)</td></tr><tr><td>06026207</td><td>ระบบฐานข้อมูลแบบโนเอสคิวแอล<br/>NOSQL DATABASE SYSTEMS</td><td>3 (2-2-5)</td></tr><tr><td>06026208</td><td>พื้นฐานวิทยาการข้อมูล<br/>FUNDAMENTALS OF DATA SCIENCE</td><td>3 (3-0-6)</td></tr><tr><td>06026209</td><td>การแสดงข้อมูลด้วยแผนภาพ<br/>DATA VISUALIZATION</td><td>3 (2-2-5)</td></tr><tr><td>06026210</td><td>การหาค่าที่เหมาะที่สุด<br/>OPTIMIZATION</td><td>3 (3-0-6)</td></tr><tr><td>06026211</td><td>การเรียนรู้ของเครื่องเชิงประยุกต์<br/>APPLIED MACHINE LEARNING</td><td>3 (2-2-5)</td></tr><tr><td>06026212</td><td>การสร้างคลังข้อมูล<br/>DATA WAREHOUSING</td><td>3 (2-2-5)</td></tr></table>
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 19 -->
+<page_number>18</page_number>
+
+มคอ. 2
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026213</td><td>ระบบข้อมูลมหัต</td><td>3 (2-2-5)</td></tr><tr><td>06026214</td><td>BIG DATA SYSTEMS โครงงานวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ 1 PROJECT IN DATA SCIENCE AND BUSINESS ANALYTICS 1</td><td>3 (0-9-0)</td></tr><tr><td>06026215</td><td>โครงงานวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ 2 PROJECT IN DATA SCIENCE AND BUSINESS ANALYTICS 2</td><td>3 (0-9-0)</td></tr></table>
+
+# 3) กลุ่มวิชาชีพเฉพาะด้าน
+
+<table><tr><td colspan="4">หน่วยกิต</td></tr><tr><td>- กลุ่มวิทยาการข้อมูล</td><td>12</td><td>หน่วยกิต</td><td>12</td></tr><tr><td>06026216</td><td>ปัญญาประดิษฐ์ ARTIFICIAL INTELLIGENCE</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026217</td><td>การเรียนรู้ของเครื่อง MACHINE LEARNING</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026218</td><td>การเรียนรู้เชิงลึก DEEP LEARNING</td><td>3 (2-2-5)</td><td></td></tr><tr><td>06026219</td><td>การประมวลผลภาษาธรรมชาติ NATURAL LANGUAGE PROCESSING</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026220</td><td>การทำเหมืองข้อมูลกระบวนการ PROCESS MINING</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026221</td><td>การค้นคืนสารสนเทศ INFORMATION RETRIEVAL</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026222</td><td>คอมพิวเตอร์รีวิชัน COMPUTER VISION</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026223</td><td>การประมวลผลภาพ IMAGE PROCESSING</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026224</td><td>การแปลงข้อมูลและการรู้จำรูปภาพ IMAGE TRANSFORMATION AND RECOGNITION</td><td>3 (3-0-6)</td><td></td></tr><tr><td>06026225</td><td>การเรียนรู้เชิงลึกสำหรับการวิเคราะห์ภาพและวีดีโอทางการแพทย์ DEEP LEARNING IN MEDICAL IMAGE AND VIDEO ANALYSIS</td><td>3 (2-2-5)</td><td></td></tr><tr><td>06026226</td><td>หัวข้อพิเศษทางวิทยาการข้อมูล 1 SPECIAL TOPICS IN DATA SCIENCE 1</td><td>3 (3-0-6)</td><td></td></tr></table>
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 20 -->
+<page_number>19</page_number>
+
+มคอ. 2
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026227</td><td>หัวข้อพิเศษทางวิทยาการข้อมูล 2</td><td>3 (3-0-6)</td></tr><tr><td>06026228</td><td>SPECIAL TOPICS IN DATA SCIENCE 2</td><td>(2-2-5)</td></tr><tr><td>06026229</td><td>ปฏิบัติการพิเศษทางวิทยาการข้อมูล 1</td><td>3 (2-2-5)</td></tr><tr><td colspan="3">SPECIAL WORKSHOP IN DATA SCIENCE 1</td></tr><tr><td colspan="3">ปฏิบัติการพิเศษทางวิทยาการข้อมูล 2</td></tr><tr><td>06026290</td><td>SPECIAL WORKSHOP IN DATA SCIENCE 2</td><td>(2-2-5)</td></tr></table>
+
+**กลุ่มการวิเคราะห์เชิงสถิติ**
+12
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026230</td><td>อนุกรมเวลาและการพยากรณ์</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">TIME SERIES AND FORECASTING</td></tr><tr><td>06026231</td><td>สถิติเชิงเบย์</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">BAYESIAN STATISTICS</td></tr><tr><td>06026232</td><td>กระบวนการสโตแคลติกเบื้องต้น</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">INTRODUCTION TO STOCHASTIC PROCESS</td></tr><tr><td>06026233</td><td>การวิเคราะห์ข้อมูลหลายตัวแปร</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">MULTIVARIATE DATA ANALYSIS</td></tr><tr><td>06026234</td><td>การออกแบบการทดลอง</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">EXPERIMENTAL DESIGN</td></tr><tr><td>06026235</td><td>หัวข้อพิเศษทางการวิเคราะห์เชิงสถิติ 1</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">SPECIAL TOPICS IN STATISTICAL ANALYTICS 1</td></tr><tr><td>06026236</td><td>หัวข้อพิเศษทางการวิเคราะห์เชิงสถิติ 2</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">SPECIAL TOPICS IN STATISTICAL ANALYTICS 2</td></tr><tr><td>06026237</td><td>ปฏิบัติการพิเศษทางการวิเคราะห์เชิงสถิติ 1</td><td>3 (2-2-5)</td></tr><tr><td colspan="3">SPECIAL WORKSHOP IN STATISTICAL ANALYTICS 1</td></tr><tr><td>06026238</td><td>ปฏิบัติการพิเศษทางการวิเคราะห์เชิงสถิติ 2</td><td>3 (2-2-5)</td></tr><tr><td colspan="3">SPECIAL WORKSHOP IN STATISTICAL ANALYTICS 2</td></tr></table>
+
+**กลุ่มวิศวกรรมข้อมูล**
+12
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026239</td><td>สถาปัตยกรรมข้อมูลแบบไปป์ไลน์</td><td>3 (3-0-6)</td></tr><tr><td colspan="3">DATA PIPELINE ARCHITECTURE</td></tr><tr><td>06026240</td><td>การพัฒนาระบบอัจฉริยะ</td><td>(2-2-5)</td></tr><tr><td colspan="3">INTELLIGENT SYSTEM DEVELOPMENT</td></tr></table>
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 21 -->
+<page_number>20</page_number>
+
+มคอ. 2
+
+<table><tr><td>06026241</td><td>การดำเนินงานการเรียนรู้ของเครื่อง MACHINE LEARNING OPERATIONS</td><td>3 (3-0-6)</td></tr><tr><td>06026242</td><td>โครงสร้างพื้นฐานด้านเทคโนโลยีกลุ่มเมฆ CLOUD TECHNOLOGY INFRASTRUCTURE</td><td>3 (3-0-6)</td></tr><tr><td>06026243</td><td>ระบบฐานข้อมูลขั้นสูง ADVANCED DATABASE SYSTEMS</td><td>3 (3-0-6)</td></tr><tr><td>06026244</td><td>การดูแลและบำรุงรักษาระบบฐานข้อมูล DATABASE SYSTEM MAINTENANCE AND ADMINISTRATION</td><td>3 (2-2-5)</td></tr><tr><td>06026245</td><td>ระบบฐานข้อมูลแบบกระจาย DISTRIBUTED DATABASE SYSTEMS</td><td>3 (3-0-6)</td></tr><tr><td>06026246</td><td>หัวข้อพิเศษทางวิศวกรรมข้อมูล 1 SPECIAL TOPICS IN DATA ENGINEERING 1</td><td>3 (3-0-6)</td></tr><tr><td>06026247</td><td>หัวข้อพิเศษทางวิศวกรรมข้อมูล 2 SPECIAL TOPICS IN DATA ENGINEERING 2</td><td>3 (3-0-6)</td></tr><tr><td>06026248</td><td>ปฏิบัติการพิเศษทางวิศวกรรมข้อมูล 1 SPECIAL WORKSHOP IN DATA ENGINEERING 1</td><td>3 (2-2-5)</td></tr><tr><td>06026249</td><td>ปฏิบัติการพิเศษทางวิศวกรรมข้อมูล 2 SPECIAL WORKSHOP IN DATA ENGINEERING 2</td><td>3 (2-2-5)</td></tr></table>
+
+# 4) กลุ่มวิชาการศึกษาทางเลือก
+
+6
+หน่วยกิต
+
+สำหรับแผนการศึกษาที่ไม่เข้าร่วมโครงการสหกิจศึกษา
+
+## - กลุ่มวิชาเลือก
+
+6
+หน่วยกิต
+
+<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>06026250</td><td>วิทยาการข้อมูลสำหรับธุรกิจ DATA SCIENCE FOR BUSINESS</td><td>3 (2-2-5)</td></tr><tr><td>06026251</td><td>บัญชีการเงิน FINANCIAL ACCOUNTING</td><td>3 (3-0-6)</td></tr><tr><td>06026252</td><td>การวิเคราะห์ด้านการเงิน FINANCIAL ANALYTICS</td><td>3 (2-2-5)</td></tr><tr><td>06026253</td><td>การวิเคราะห์ด้านการตลาด MARKETING ANALYTICS</td><td>3 (2-2-5)</td></tr><tr><td>06026254</td><td>เทคโนโลยีสุขภาพสนเทศศาสตร์เบื้องต้น INTRODUCTION TO HEALTH ANALYTICS</td><td>3 (2-2-5)</td></tr></table>
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
+<!-- PDF_PAGE 22 -->
+<page_number>21</page_number>
+
+มคอ. 2
+
+<table><tr><td>06026255</td><td colspan="3">การได้มาและการจัดการข้อมูลทางด้านคลินิก<br/>CLINICAL DATA ACQUISITION AND MANAGEMENT</td></tr><tr><td>06026256</td><td colspan="3">การจัดการการปฏิบัติการ<br/>OPERATIONS MANAGEMENT</td></tr><tr><td>06026257</td><td colspan="3">การบริหารเชิงกลยุทธ์และสมรรถะของธุรกิจ<br/>BUSINESS STRATEGIC AND PERFORMANCE MANAGEMENT</td></tr><tr><td>06026258</td><td colspan="3">การวิเคราะห์เครือข่ายสังคม<br/>SOCIAL NETWORK ANALYSIS</td></tr></table>
+
+นักศึกษาเลือกลงทะเบียนเรียนวิชาในกลุ่มวิชาเลือก หรือกลุ่มวิชาชีพเฉพาะด้าน
+กลุ่มใดก็ได้ จำนวนรวม 6 หน่วยกิต
+
+สำหรับแผนการศึกษาที่เข้าร่วมโครงการสหกิจศึกษา
+
+<table><tr><td></td><td>- สหกิจศึกษา</td><td>6</td><td>หน่วยกิต</td></tr><tr><td rowspan="2">รหัสวิชา<br/>06026259</td><td colspan="3">ชื่อวิชา หน่วยกิต (บรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง)</td></tr><tr><td>สหกิจศึกษาทางวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ<br/>COOPERATIVE EDUCATION IN DATA SCIENCE AND BUSINESS ANALYTICS</td><td colspan="2">6 (0-35-0)</td></tr><tr><td>06026260</td><td colspan="3">สหกิจศึกษาต่างประเทศทางวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ<br/>OVERSEA COOPERERATIVE EDUCATION IN DATA SCIENCE AND BUSINESS ANALYTICS</td></tr></table>
+
+นักศึกษาเลือกลงทะเบียนเรียนวิชาสหกิจศึกษาหรือสหกิจศึกษาต่างประเทศทาง
+วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจวิชาใดวิชาหนึ่ง จำนวนรวม 6 หน่วยกิต
+กำหนดระยะเวลาในการทำสหกิจศึกษาเป็นเวลาอย่างน้อย 16 สัปดาห์หรือ 1 ภาค
+การศึกษา
+
+ค. หมวดวิชาเลือกเสรี
+
+นักศึกษาสามารถเลือกเรียนในรายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณ
+ทหารลาดกระบัง จำนวนไม่น้อยกว่า 6 หน่วยกิต
+
+วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ
+คณะเทคโนโลยีสารสนเทศ สจล.
+
+---
+
 <!-- PDF_PAGE 23 -->
 <page_number>22</page_number>
 มคอ. 2

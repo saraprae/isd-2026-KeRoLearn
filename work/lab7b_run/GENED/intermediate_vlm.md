@@ -1,3 +1,280 @@
+<!-- PDF_PAGE 12 -->
+<page_number>8</page_number>
+มคอ.2
+
+### 3.2.1.2 รายวิชา
+
+**กลุ่มทักษะส่งเสริมอัตลักษณ์สถาบันฯ**
+
+<table><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>*90641004</td><td>โครงงานกลุ่ม 1<br/>TEAM-PROJECT 1</td><td>1 (0-2-1)</td></tr><tr><td>*90641005</td><td>โครงงานกลุ่ม 2<br/>TEAM-PROJECT 2</td><td>1 (0-2-1)</td></tr><tr><td>*90641006</td><td>โครงงานกลุ่ม 3<br/>TEAM-PROJECT 3</td><td>1 (0-2-1)</td></tr><tr><td>*90641007</td><td>พลเมืองดิจิทัล<br/>DIGITAL CITIZEN</td><td>3 (3-0-6)</td></tr><tr><td>** 90641008 **</td><td>พื้นฐานทักษะการสื่อสารภาษาอังกฤษ<br/>INTRODUCTION TO ENGLISH COMMUNICATION SKILLS</td><td>0 (0-0-45)</td></tr><tr><td>*90641009</td><td>ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 1<br/>INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1</td><td>3 (3-0-6)</td></tr><tr><td>*90641010</td><td>ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 2<br/>INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 2</td><td>3 (3-0-6)</td></tr></table>
+
+*การประเมินผลใน 7 รายวิชา 90641004 - 90641010 จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)
+** 90641008 พื้นฐานทักษะการสื่อสารภาษาอังกฤษ เป็นรายวิชาบังคับก่อน ที่ไม่นับหน่วยกิต ใช้การเทียบผ่านจากการสอบ
+วัดระดับมาตรฐานตามประกาศของสถาบันฯ เพื่อการจัดการเรียนที่ตรงตามสมรรถนะของนักศึกษา
+
+**กลุ่มวิชาเลือกด้านภาษาและการสื่อสาร**
+
+<table><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>9064xxxx หรือ<br/>909644xx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร<br/>(LANGUAGE AND COMMUNICATION COURSES)</td><td>3 (x-x-x)</td></tr></table>
+
+**กลุ่มวิชาเลือกหมวดวิชาศึกษาทั่วไป**
+
+<table><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>9064xxxx หรือ<br/>90964xxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป<br/>(GENERAL EDUCATION COURSES)</td><td>9 (x-x-x)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 13 -->
+<page_number>9</page_number>
+มคอ.2
+
+3.2.2 แผน ข.
+เลือกใช้รายวิชาของหลักสูตรหรือคณะ ที่มีผลลัพธ์การเรียนรู้เทียบกับรายวิชา 90641004 - 90641006 โครงงานกลุ่ม 1-3 (Team-Project 1-3)
+
+### 3.2.1.1 โครงสร้างหลักสูตร
+
+<table><tr><td>ก. หมวดวิชาศึกษาทั่วไป</td><td></td></tr><tr><td>- กลุ่มทักษะส่งเสริมอัตลักษณ์สถาบันฯ</td><td>24 หน่วยกิต</td></tr><tr><td>- กลุ่มวิชาเลือกด้านภาษาและการสื่อสาร</td><td>9 หน่วยกิต</td></tr><tr><td>- กลุ่มวิชาเลือกหมวดวิชาศึกษาทั่วไป</td><td>3 หน่วยกิต</td></tr><tr><td colspan="2">**3.2.1.2 รายวิชา**</td></tr><tr><td colspan="2"><strong>กลุ่มทักษะส่งเสริมอัตลักษณ์สถาบันฯ</strong></td></tr><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>*90641007</td><td>พลเมืองดิจิทัล</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">DIGITAL CITIZEN</td><td></td></tr><tr><td>**90641008**</td><td>พื้นฐานทักษะการสื่อสารภาษาอังกฤษ<br/>INTRODUCTION TO ENGLISH COMMUNICATION SKILLS</td><td>0 (0-0-45)</td></tr><tr><td>*90641009</td><td>ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 1<br/>INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1</td><td>3 (3-0-6)</td></tr><tr><td>*90641010</td><td>ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 2<br/>INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 2</td><td>3 (3-0-6)</td></tr></table>
+
+*การประเมินผลใน 4 รายวิชา 90641007 - 90641010 จะใช้เกณฑ์ผลการเรียนเป็นผ่าน (S) หรือไม่ผ่าน (U)
+**90641008 พื้นฐานทักษะการสื่อสารภาษาอังกฤษ เป็นรายวิชาบังคับก่อน ที่ไม่นับหน่วยกิต ใช้การเทียบผ่านจากการสอบ
+วัดระดับมาตรฐานตามประกาศของสถาบันฯ เพื่อการจัดการเรียนที่ตรงตามสมรรถนะของนักศึกษา
+
+### กลุ่มวิชาเลือกด้านภาษาและการสื่อสาร
+
+<table><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>9064xxxx หรือ<br/>909644xx</td><td>วิชาเลือกด้านภาษาและการสื่อสาร<br/>(LANGUAGE AND COMMUNICATION COURSES)</td><td>3 (x-x-x)</td></tr></table>
+
+### กลุ่มวิชาเลือกหมวดวิชาศึกษาทั่วไป
+
+<table><tr><td>รหัสวิชา</td><td>รายวิชา</td><td>หน่วยกิต</td></tr><tr><td>9064xxxx หรือ<br/>90964xxx</td><td>วิชาเลือกหมวดวิชาศึกษาทั่วไป<br/>(GENERAL EDUCATION COURSES)</td><td>12 (x-x-x)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 14 -->
+<page_number>10</page_number>
+มคอ.2
+
+3.3 คำอธิบายระบบรหัสวิชา
+รายละเอียดของระบบรหัศึกษาในหลักสูตรฉบับปรับปรุงนี้ มีรายละเอียดดังนี้
+- รหัสตำแหน่งที่ 1 - 2 หมายถึง รหัสประจำหมวดวิชาศึกษาทั่วไป กำหนดเป็น 90 = สำหรับหลักสูตรภาษาไทย (Thai Program)
+- รหัสตำแหน่งที่ 3 - 4 หมายถึง ปี พ.ศ. ที่เริ่มกำหนดใช้รายวิชา
+64 = รายวิชา บังคับใช้ตั้งแต่ปี พ.ศ. 2564
+- รหัสตำแหน่งที่ 5 หมายถึง รหัสประจำกลุ่มทักษะ
+1 = กลุ่มทักษะส่งเสริมอัตลักษณ์สถาบันฯ (KMITL Identity Skills)
+2 = กลุ่มทักษะบุคคลและส่งเสริมวิชาชีพ (Personal and Professional Skills)
+3 = กลุ่มทักษะการจัดการและภาวะความเป็นผู้นำ (Management and Leadership Skills)
+4 = กลุ่มทักษะภาษาและการสื่อสาร (Language and Communication Skills)
+- รหัสตำแหน่งที่ 6 - 8 หมายถึง ลำดับที่ของรายวิชา กำหนดเป็น 001 - 999 ในกลุ่มทักษะต่าง ๆ
+
+3.4 รายวิชาในหมวดวิชาศึกษาทั่วไป
+**กลุ่มทักษะส่งเสริมอัตลักษณ์สถาบันฯ (KMITL IDENTITY SKILLS)**
+90641004 โครงงานกลุ่ม 1 TEAM-PROJECT 1 1 (0-2-1)
+90641005 โครงงานกลุ่ม 2 TEAM-PROJECT 2 1 (0-2-1)
+90641006 โครงงานกลุ่ม 3 TEAM-PROJECT 3 1 (0-2-1)
+90641007 พลเมืองดิจิทัล DIGITAL CITIZEN 3 (3-0-6)
+90641008 พื้นฐานทักษะการสื่อสารภาษาอังกฤษ INTRODUCTION TO ENGLISH COMMUNICATION SKILLS 0 (0-0-45)
+90641009 ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 1 INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 3 (3-0-6)
+90641010 ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 2 INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 3 (3-0-6)
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 15 -->
+<page_number>11</page_number>
+มคอ.2
+
+กลุ่มทักษะบุคคลและส่งเสริมวิชาชีพ (PERSONAL AND PROFESSIONAL SKILLS)
+90642001 ปฏิบัติงานตามทักษะด้านบุคคลและสนับสนุนวิชาชีพ 1 PRACTICE UNDER PERSONAL AND PROFESSIONAL SKILLS 1 1 (0-2-1)
+90642002 ปฏิบัติงานตามทักษะด้านบุคคลและสนับสนุนวิชาชีพ 2 PRACTICE UNDER PERSONAL AND PROFESSIONAL SKILLS 2 2 (0-4-2)
+90642003 ปฏิบัติงานตามทักษะด้านบุคคลและสนับสนุนวิชาชีพ 3 PRACTICE UNDER PERSONAL AND PROFESSIONAL SKILLS 3 3 (0-6-3)
+90642011 การคิดอย่างมีวิจารณญาณ CRITICAL THINKING 3 (3-0-6)
+90642012 กระบวนการคิดเชิงออกแบบ DESIGN THINKING 3 (3-0-6)
+90642013 บูรณาการแห่งการคิด INTEGRATED THINKING 3 (3-0-6)
+90642014 การคิดเชิงระบบและเชิงนวัตกรรม INNOVATIVE AND SYSTEM THINKING 3 (3-0-6)
+90642015 การคิดสร้างสรรค์และนวัตกรรม CREATIVE THINKING AND INNOVATION 3 (3-0-6)
+90642017 แกะกล่องนวัตกรรม INNOVATION UNBOXED 3 (3-0-6)
+90642018 เทคโนโลยีการผลิตงานสร้างสรรค์ CREATIVE PRODUCTION TECHNOLOGY 3 (3-0-6)
+90642019 การออกแบบสะเต็มอย่างสร้างสรรค์ขั้นพื้นฐาน BASIC CREATIVE STEM DESIGN 3 (3-0-6)
+90642020 การออกแบบสะเต็มอย่างสร้างสรรค์ขั้นสูง ADVANCE CREATIVE STEM DESIGN 3 (3-0-6)
+90642021 ไอเดียขยะ JUNK DESIGN 3 (3-0-6)
+90642022 ปรัชญาวิทยาศาสตร์ PHILOSOPHY OF SCIENCE 3 (3-0-6)
+90642024 การวิเคราะห์ข้อมูลทางวิชาชีพและการนำเสนอทางวิชาการ PROFESSIONAL INFORMATION ANALYSIS AND ACADEMIC PRESENTATION 3 (3-0-6)
+90642025 วิเคราะห์ความจริงจากตัวเลข FACTS BEHIND NUMBERS 3 (3-0-6)
+90642026 การพัฒนาทักษะเชิงวิจัย RESEARCH SKILL DEVELOPMENT 3 (3-0-6)
+90642028 รู้เท่าทันการพนัน GAMBLING LITERACY 3 (3-0-6)
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 16 -->
+<page_number>12</page_number>
+มคอ.2
+
+<table><tr><td>90642029</td><td>จริยธรรมและกฎหมายว่าด้วยความเป็นมืออาชีพทางการแพทย์ MEDICAL ETHICS, LAWS AND PROFESSIONALISM</td><td>3 (2-2-5)</td></tr><tr><td>90642030</td><td>จรรยาบรรณและกฎหมายวิศวกรรม ENGINEERING ETHICS AND LAW</td><td>3 (3-0-6)</td></tr><tr><td>90642031</td><td>จริยธรรมและกฎหมายแห่งวิชาชีพ PROFESSIONAL ETHICS AND LAWS</td><td>3 (3-0-6)</td></tr><tr><td>90642032</td><td>กฎหมายสำหรับผู้ประกอบการ LAW FOR ENTREPRENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90642033</td><td>กฎหมายสำหรับคนรุ่นใหม่ LAW FOR NEW GENERATION</td><td>3 (3-0-6)</td></tr><tr><td>90642034</td><td>กฎหมายและระเบียบในอุตสาหกรรมการบิน LAW AND REGULATION IN AVIATION INDUSTRY</td><td>3 (3-0-6)</td></tr><tr><td>90642035</td><td>ประสบการณ์ในอุตสาหกรรมสำหรับวิศวกร INDUSTRIAL EXPERIENCE FOR ENGINEERS</td><td>3 (0-18-0)</td></tr><tr><td>90642036</td><td>เตรียมความพร้อมสำหรับวิศวกร PRE-ACTIVITIES FOR ENGINEERS</td><td>1 (0-3-0)</td></tr><tr><td>90642037</td><td>ประเด็นและทักษะวิชาชีพ PROFESSIONAL SKILLS AND ISSUES</td><td>3 (3-0-6)</td></tr><tr><td>90642038</td><td>ความปลอดภัยในที่ทำงาน OCCUPATIONAL SAFETY AND HEALTH</td><td>3 (3-0-6)</td></tr><tr><td>90642039</td><td>ซ่อมได้ภายในบ้าน QUICK-FIX @ HOME</td><td>3 (3-0-6)</td></tr><tr><td>90642040</td><td>คอกาแฟ COFFEE MANIA</td><td>3 (3-0-6)</td></tr><tr><td>90642041</td><td>ครัวเด็กหอ DORM CHEF</td><td>3 (3-0-6)</td></tr><tr><td>90642042</td><td>ศาสตร์และศิลป์ของเนื้อสัตว์ SCIENCE AND ART OF MEATS</td><td>3 (3-0-6)</td></tr><tr><td>90642043</td><td>ศาสตร์ของเบอร์เกอร์ SCIENCE OF BURGER</td><td>3 (3-0-6)</td></tr><tr><td>90642044</td><td>โลกของไส้กรอก WORLD OF SAUSAGES</td><td>3 (3-0-6)</td></tr><tr><td>90642045</td><td>เรื่องเหล้า BE MY BEV.</td><td>3 (3-0-6)</td></tr><tr><td>90642046</td><td>ไร้ซ์-สาระ RICE-SARA</td><td>3 (3-0-6)</td></tr><tr><td>90642047</td><td>หมอต้นไม้ TREE DOCTOR</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 17 -->
+<page_number>13</page_number>
+มคอ.2
+
+<table><tr><td>90642048</td><td>ยาและสมุนไพรพาเพลิน<br/>FUN WITH DRUGS AND HERBS</td><td>3 (3-0-6)</td></tr><tr><td>90642049</td><td>การใช้ประโยชน์จากจุลินทรีย์ในชีวิตประจำวัน<br/>MICROBIAL UTILIZATION FOR DAILY LIFE</td><td>3 (3-0-6)</td></tr><tr><td>90642050</td><td>พืชพรรณที่เป็นยา<br/>MEDICINAL PLANTS</td><td>3 (3-0-6)</td></tr><tr><td>90642051</td><td>เทคโนโลยีชีวภาพเพื่อความเป็นอยู่ที่ดีขึ้น<br/>BIOTECHNOLOGY FOR BETTER LIVING</td><td>3 (3-0-6)</td></tr><tr><td>90642052</td><td>จากเส้นสาย DNA สู่พันธุกรรม<br/>GENES &amp; GENETICS : FROM HELIX TO HEREDITARY</td><td>3 (3-0-6)</td></tr><tr><td>90642053</td><td>สาระน่ารู้อัญพันธุศาสตร์<br/>INTERESTING MOLECULAR GENETICS</td><td>3 (3-0-6)</td></tr><tr><td>90642054</td><td>สิ่งพิทักษ์ร่างกาย<br/>GUARDIANS OF OUR BODIES</td><td>3 (3-0-6)</td></tr><tr><td>90642055</td><td>จุลินทรีย์ร่วมชีพ<br/>LIVING WITH MICROBES</td><td>3 (3-0-6)</td></tr><tr><td>90642056</td><td>โรคระบาดในศตวรรษที่ 21<br/>EPIDEMICS IN THE 21ST CENTURY</td><td>3 (3-0-6)</td></tr><tr><td>90642057</td><td>ภูมิคุ้มกัน<br/>IMMUNITY THROUGH MEDIA</td><td>3 (3-0-6)</td></tr><tr><td>90642058</td><td>ความเข้าใจในนโยบายสุขภาพและสวัสดิภาพของประชาชน<br/>UNDERSTANDING HEALTH POLICY AND PUBLIC WELFARE</td><td>3 (3-0-6)</td></tr><tr><td>90642059</td><td>การแพทย์และวรรณกรรม<br/>MEDICINE AND LITERATURE</td><td>3 (3-0-6)</td></tr><tr><td>90642060</td><td>ค้นหาตัวตน<br/>SELF-DISCOVERY</td><td>3 (3-0-6)</td></tr><tr><td>90642061</td><td>โลกของแมลง<br/>WORLD OF INSECTS</td><td>3 (3-0-6)</td></tr><tr><td>90642062</td><td>เรื่องกินเรื่องใหญ่<br/>ALL ABOUT FOOD</td><td>3 (3-0-6)</td></tr><tr><td>90642063</td><td>การพัฒนาสุขภาพแบบองค์รวม<br/>HOLISTIC HEALTH DEVELOPMENT</td><td>3 (3-0-6)</td></tr><tr><td>90642074</td><td>อีสปอร์ต<br/>E-SPORTS</td><td>3 (2-2-5)</td></tr><tr><td>90642080</td><td>การประพันธ์เพลงเบื้องต้น<br/>INTRODUCTION TO MUSIC COMPOSITION</td><td>3 (3-0-6)</td></tr><tr><td>90642081</td><td>สุนทรียะเพลงแรป<br/>RAP APPRECIATION</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 18 -->
+<page_number>14</page_number>
+มคอ.2
+
+<table><tr><td>90642082</td><td>สุนทรียะดนตรี</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">MUSIC APPRECIATION</td><td></td></tr><tr><td>90642083</td><td>ศิลปะแห่งภาพยนตร์</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">FILM APPRECIATION</td><td></td></tr><tr><td>90642084</td><td>สุนทรียะภาพถ่าย</td><td>3 (2-2-5)</td></tr><tr><td colspan="2">PHOTOGRAPHY APPRECIATION</td><td></td></tr><tr><td>90642085</td><td>วัฒนธรรมร่วมสมัย</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">CONTEMPORARY CULTURE</td><td></td></tr><tr><td>90642086</td><td>วัฒนธรรมการออกแบบเบื้องต้น</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">INTRODUCTION TO DESIGN CULTURE</td><td></td></tr><tr><td>90642087</td><td>วัฒนธรรมรอบโลก</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">WORLD CULTURE</td><td></td></tr><tr><td>90642088</td><td>วัฒนธรรมจีนดั้งเดิม</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">TRADITIONAL CHINESE CULTURE</td><td></td></tr><tr><td>90642089</td><td>สังคม เศรษฐกิจ และการเมืองจีน</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">CHINESE SOCIETY, ECONOMY AND POLITICS</td><td></td></tr><tr><td>90642090</td><td>เจาะลึกประเด็นโลก</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">GLOBAL INSIDE</td><td></td></tr><tr><td>90642091</td><td>เอเชียนศึกษา</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">ASIAN STUDY</td><td></td></tr><tr><td>90642092</td><td>การศึกษาเพื่อสร้างพลเมือง</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">CIVIC EDUCATION</td><td></td></tr><tr><td>90642093</td><td>สานสัมพันธ์กับชุมชน</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">COMMUNITY ENGAGEMENT</td><td></td></tr><tr><td>90642094</td><td>หลักการพัฒนาชุมชน</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">PRINCIPLES OF COMMUNITY DEVELOPMENT</td><td></td></tr><tr><td>90642095</td><td>การพัฒนาความมั่นคงแห่งชาติ</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">NATIONAL SECURITY DEVELOPMENT</td><td></td></tr><tr><td>90642096</td><td>วิทยาการทางทหาร</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">MILITARY SCIENCE</td><td></td></tr><tr><td>90642097</td><td>ภูมิปัญญาไทยประยุกต์</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">APPLIED THAI WISDOMS</td><td></td></tr><tr><td>90642098</td><td>พลวัตสังคมไทย</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">DYNAMICS OF THAI SOCIETY</td><td></td></tr><tr><td>90642099</td><td>สังคมสูงวัยเชิงรุก</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">ACTIVE AGING SOCIETY</td><td></td></tr><tr><td>90642101</td><td>นักรีวิว</td><td>3 (3-0-6)</td></tr><tr><td colspan="2">REVIEWER</td><td></td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 19 -->
+<page_number>15</page_number>
+มคอ.2
+
+<table><tr><td>90642102</td><td>นักสื่อสารผ่านยูทูป<br/>YOUTUBER</td><td>3 (3-0-6)</td></tr><tr><td>90642103</td><td>การดำรงชีพในสังคมดิจิทัล<br/>LIVING IN DIGITAL SOCIETY</td><td>3 (3-0-6)</td></tr><tr><td>90642106</td><td>เล่าเรื่องการเดินทางแบบดิจิทัล<br/>DIGITAL STORYTELLING IN JOURNEY</td><td>3 (3-0-6)</td></tr><tr><td>90642107</td><td>การผลิตสื่อดิจิทัล<br/>DIGITAL MEDIA PRODUCTION</td><td>3 (3-0-6)</td></tr><tr><td>90642108</td><td>เทคโนโลยีการถ่ายภาพดิจิทัล<br/>DIGITAL PHOTOGRAPHY TECHNOLOGY</td><td>3 (2-2-5)</td></tr><tr><td>90642109</td><td>การออกแบบอินโฟกราฟิก<br/>INFOGRAPHIC DESIGN</td><td>3 (3-0-6)</td></tr><tr><td>90642110</td><td>สนุกกับวิทยาศาสตร์ข้อมูล<br/>FUN WITH DATA SCIENCE</td><td>3 (3-0-6)</td></tr><tr><td>90642111</td><td>สนุกกับการเขียนโค้ด<br/>FUN WITH CODING</td><td>3 (3-0-6)</td></tr><tr><td>90642112</td><td>สนุกกับปัญญาประดิษฐ์<br/>FUN WITH AI</td><td>3 (3-0-6)</td></tr><tr><td>90642113</td><td>หุ่นยนต์และปัญญาประดิษฐ์<br/>ROBOTICS AND AI</td><td>3 (3-0-6)</td></tr><tr><td>90642114</td><td>ฟาร์มอัจฉริยะ<br/>SMART FARMING</td><td>3 (3-0-6)</td></tr><tr><td>90642115</td><td>เทคโนโลยีสีเขียวและพลังงานทดแทน<br/>GREEN TECHNOLOGY AND ALTERNATIVE ENERGY</td><td>3 (3-0-6)</td></tr><tr><td>90642116</td><td>เมืองอัจฉริยะและนวัตกรรมเมือง<br/>SMART CITY AND CITY INNOVATION</td><td>3 (3-0-6)</td></tr><tr><td>90642117</td><td>ทักษะการรู้สารสนเทศแห่งศตวรรษที่ 21<br/>INFORMATION LITERACY SKILLS FOR THE 21st CENTURY</td><td>3 (3-0-6)</td></tr><tr><td>90642118</td><td>โปรแกรมคอมพิวเตอร์ประยุกต์ทางธุรกิจ<br/>APPLICATION SOFTWARE FOR BUSSINESS</td><td>2 (1-2-3)</td></tr><tr><td>90642120</td><td>เอ็กเซลเพื่อความเป็นมืออาชีพ<br/>FROM EXCEL TO EXCELLENT</td><td>3 (3-0-6)</td></tr><tr><td>90642121</td><td>การวิเคราะห์และจัดการข้อมูลด้วยโปรแกรมคอมพิวเตอร์<br/>DATA ANALYSIS AND MANAGEMENT WITH COMPUTATIONAL PROGRAM</td><td>3 (3-0-6)</td></tr><tr><td>90642122</td><td>การใช้แอปพลิเคชัน ไมโครคอมพิวเตอร์<br/>INTRODUCTION TO MICROCOMPUTER APPLICATION</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 20 -->
+<page_number>16</page_number>
+มคอ.2
+
+<table><tr><td>90642123</td><td>เทคโนโลยีคอมพิวเตอร์ดนตรี</td><td>3 (3-0-6)</td></tr><tr><td>90642124</td><td>เทคโนโลยีและนวัตกรรมทางวิทยาศาสตร์สำหรับ SDGs<br/>SCIENCE TECHNOLOGY AND SCIENCE INNOVATION FOR SDGS</td><td>3 (3-0-6)</td></tr><tr><td>90642125</td><td>การดำรงชีพท่ามกลางภัยพิบัติและวิกฤติในอนาคต<br/>LIVING IN FUTURE DISASTER AND CRISIS</td><td>3 (3-0-6)</td></tr><tr><td>90642126</td><td>วิชาเอาตัวรอด<br/>SURVIVORS</td><td>3 (3-0-6)</td></tr><tr><td>90642127</td><td>รักษ์โลก<br/>THINK EARTH</td><td>3 (3-0-6)</td></tr><tr><td>90642128</td><td>นิเวศวิทยาและการรักษาสิ่งแวดล้อม<br/>ECOLOGY, CONSERVATION AND ENVIRONMENTALISM</td><td>3 (3-0-6)</td></tr><tr><td>90642129</td><td>การท่องเที่ยวทางเลือก<br/>ALTTERNATIVE TOURISM</td><td>3 (3-0-6)</td></tr><tr><td>90642130</td><td>การท่องเที่ยวเชิงกีฬา<br/>SPORTS TOURISM</td><td>3 (3-0-6)</td></tr><tr><td>90642131</td><td>วัฒนธรรมไทยกับการท่องเที่ยว<br/>THAI CULTURE AND TOURISM</td><td>3 (3-0-6)</td></tr><tr><td>90642132</td><td>ชุมพรศึกษาเพื่อการท่องเที่ยว<br/>CHUMPON STUDY FOR TOURISM</td><td>3 (3-0-6)</td></tr><tr><td>90642133</td><td>รอบรั้วชุมพรศึกษา<br/>CHUMPON AREA STUDY</td><td>3 (3-0-6)</td></tr><tr><td>90642134</td><td>แผ่นดินพระจอมเกล้าฯ ศึกษา<br/>KING MONGKUT'S REIGN STUDY</td><td>3 (3-0-6)</td></tr><tr><td>90642135</td><td>ปรัชญาเศรษฐกิจพอเพียง<br/>PHILOSOPHY OF SUFFICIENCY ECONOMY</td><td>3 (3-0-6)</td></tr><tr><td>90642136</td><td>จริยศาสตร์และสุนทรียศาสตร์<br/>ETHICS AND AESTHETICS</td><td>3 (3-0-6)</td></tr><tr><td>90642137</td><td>ดูละครแล้วย้อนดูตัว<br/>SERIES IN DAILY LIFE</td><td>3 (3-0-6)</td></tr><tr><td>90642138</td><td>สมาธิเพื่อพัฒนาชีวิต<br/>MEDITATION FOR LIFE DEVELOPMENT</td><td>3 (3-0-6)</td></tr><tr><td>90642140</td><td>ภูมิคุ้มกันทางใจ<br/>IMMUUNITY OF MIND</td><td>3 (3-0-6)</td></tr><tr><td>90642142</td><td>จิตวิทยาสำหรับการสื่อสาร<br/>PSYCHOLOGY IN COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90642143</td><td>ชีวิตออกแบบได้<br/>DESIGNING YOUR LIFE</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 21 -->
+<page_number>17</page_number>
+มคอ.2
+
+<table><tr><td>90642144</td><td>กระจกส่องใจ<br/>MAGIC MIRROR</td><td>3 (3-0-6)</td></tr><tr><td>90642145</td><td>พลังแห่งบุคลิกภาพ<br/>POWER OF PERSONALITY</td><td>3 (3-0-6)</td></tr><tr><td>90642146</td><td>เปลี่ยนความคิด ชีวิตเปลี่ยน<br/>POWER OF CHANGE</td><td>3 (3-0-6)</td></tr><tr><td>90642147</td><td>ทักษะแห่งความสุข<br/>HAPPINESS SKILLS</td><td>3 (3-0-6)</td></tr><tr><td>90642148</td><td>ศิลปะการพัฒนาอารมณ์<br/>ARTS OF EMOTION DEVELOPMENT</td><td>3 (3-0-6)</td></tr><tr><td>90642149</td><td>ศิลปะสร้างสรรค์เพื่อพัฒนาอารมณ์และจิตวิญญาณ<br/>IMAGINATIVE ART</td><td>3 (3-0-6)</td></tr><tr><td>90642150</td><td>ศิลปะในชีวิตประจำวัน<br/>ART IN EVERYDAY LIFE</td><td>3 (3-0-6)</td></tr><tr><td>90642151</td><td>มนุษย์กับศิลปะ<br/>MAN AND ART</td><td>3 (3-0-6)</td></tr><tr><td>90642152</td><td>ปันสุข<br/>JOY OF SHARING</td><td>3 (3-0-6)</td></tr><tr><td>90642153</td><td>ความเข้าใจในพฤติกรรมมนุษย์<br/>UNDERSTANDING HUMAN BEHAVIOR</td><td>3 (3-0-6)</td></tr><tr><td>90642154</td><td>ล้มให้เป็น<br/>FAIL-ABLE</td><td>3 (3-0-6)</td></tr><tr><td>90642156</td><td>ฮวงจุ้ย<br/>FENG SHUI</td><td>3 (3-0-6)</td></tr><tr><td>90642157</td><td>โหราศาสตร์ไทย<br/>THAI ASTROLOGY</td><td>3 (3-0-6)</td></tr><tr><td>90642158</td><td>มุมมองวิทยาศาสตร์และเทคโนโลยีร่วมสมัย<br/>CONTEMPORARY SCIENCE AND TECHNOLOGY</td><td>3 (3-0-6)</td></tr><tr><td>90642159</td><td>จิตวิทยาเบื้องต้น<br/>INTRODUCTION TO PSYCHOLOGY</td><td>3 (3-0-6)</td></tr><tr><td>90642160</td><td>การเตรียมความพร้อมสหกิจศึกษา<br/>COOPERATIVE EDUCATION PREPARATION</td><td>3(3-0-6)</td></tr><tr><td>90642161</td><td>ดนตรีอิเล็กทรอนิกส์<br/>ELECTRONIC MUSIC HISTORY</td><td>3 (3-0-6)</td></tr><tr><td>90642162</td><td>พร้อมสู่วัยทำงาน<br/>READY TO WORK</td><td>3 (3-0-6)</td></tr><tr><td>90642163</td><td>โดดเด่นด้วยจุดแข็ง<br/>STAND OUT WITH STRENGTHS</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 22 -->
+<page_number>18</page_number>
+มคอ.2
+
+<table><tr><td>90642164</td><td>กฎหมายทรัพย์สินทางปัญญาสำหรับผู้ประกอบการ<br/>INTELLECTUAL PROPERTY LAWS FOR ENTREPRENEUR</td><td>3 (3-0-6)</td></tr><tr><td>90642167</td><td>จังหวะชีวิต<br/>SLICE OF LIFE</td><td>3 (3-0-6)</td></tr><tr><td>90642168</td><td>เรื่องน่ารู้ของพืชสมุนไพรเพื่อสุขภาพและความงาม<br/>INTERESTING TOPICS IN MEDICINAL PLANTS FOR WELLNESS AND AESTHETICS</td><td>3 (3-0-6)</td></tr><tr><td>90642169</td><td>กัญชาเพื่อชีวิต<br/>CANNABIS FOR LIFE</td><td>3 (3-0-6)</td></tr><tr><td>90642170</td><td>ตรรกศาสตร์เบื้องต้น<br/>INTRODUCTION TO LOGIC</td><td>3 (3-0-6)</td></tr><tr><td>90642175</td><td>เปตอง<br/>PETANQUE</td><td>3 (2-2-5)</td></tr><tr><td>90642176</td><td>รักบี้ฟุตบอล<br/>RUGBY FOOTBALL</td><td>3 (2-2-5)</td></tr><tr><td>90642177</td><td>ฟุตบอล<br/>SOCCER</td><td>3 (2-2-5)</td></tr><tr><td>90642178</td><td>ซอฟบอลและเบสบอล<br/>SOFTBALL &amp; BASEBALL</td><td>3 (2-2-5)</td></tr><tr><td>90642179</td><td>เทนนิส<br/>TENNIS</td><td>3 (2-2-5)</td></tr><tr><td>90642180</td><td>วอลเลย์บอล<br/>VOLLEYBALL</td><td>3 (2-2-5)</td></tr><tr><td>90642181</td><td>กอล์ฟ<br/>GOLF</td><td>3 (2-2-5)</td></tr><tr><td>90642182</td><td>แบดมินตัน<br/>BADMINTON</td><td>3 (2-2-5)</td></tr><tr><td>90642183</td><td>บาสเกตบอล<br/>BASKETBALL</td><td>3 (2-2-5)</td></tr><tr><td>90642184</td><td>หมากกระดาน<br/>CHESS</td><td>3 (2-2-5)</td></tr><tr><td>90642185</td><td>คาราเต้<br/>KARATE</td><td>3 (2-2-5)</td></tr><tr><td>90642186</td><td>ยิงปืน<br/>SHOOTING</td><td>3 (2-2-5)</td></tr><tr><td>90642187</td><td>เทเบิลเทนนิส<br/>TABLE TENNIS</td><td>3 (2-2-5)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 23 -->
+<page_number>19</page_number>
+มคอ.2
+
+<table><tr><td>90642188</td><td>เทควันโด<br/>TAEKWONDO</td><td>3 (2-2-5)</td></tr><tr><td>90642189</td><td>ยูโด<br/>JUDO</td><td>3 (2-2-5)</td></tr><tr><td>90642190</td><td>วิธีการออกแบบเพื่อสร้างนวัตกรรม<br/>DESIGN METHODS FOR INNOVATION</td><td>3 (3-0-6)</td></tr><tr><td>90642191</td><td>การตีความและการใช้เหตุและผล<br/>INTERPRETATION AND ARGUMENT</td><td>3 (3-0-6)</td></tr><tr><td>90642192</td><td>ฟันดาบสากล<br/>FENCING</td><td>3 (2-2-5)</td></tr><tr><td>90642193</td><td>ฟุตซอล<br/>FUTSAL</td><td>3 (2-2-5)</td></tr><tr><td>90642194</td><td>ลีลาศ<br/>DANCESPORT</td><td>3 (2-2-5)</td></tr><tr><td>90642195</td><td>บริดจ์<br/>BRIDGE</td><td>3 (2-2-5)</td></tr><tr><td>90642196</td><td>ผู้ฝึกสอนการออกกำลังกายส่วนบุคคล<br/>PERSONAL TRAINER</td><td>3 (2-2-5)</td></tr><tr><td>90642197</td><td>การดำน้ำเพื่อการท่องเที่ยวเชิงอนุรักษ์<br/>DIVING FOR ECOTOURISM</td><td>3 (2-2-5)</td></tr><tr><td>90642198</td><td>ขับร้องประสานเสียง<br/>CHORUS</td><td>3 (2-2-5)</td></tr><tr><td>90642199</td><td>บูรณาการงานสร้างสรรค์ทางศิลปะและการออกแบบ<br/>INTEGRATED CREATIVE ART AND DESIGN</td><td>3 (1-4-4)</td></tr><tr><td>90642200</td><td>ดาราโหราศาสตร์<br/>ASTROLOGY</td><td>3 (3-0-6)</td></tr></table>
+
+กลุ่มทักษะบุคคลและส่งเสริมวิชาชีพ (เพิ่มเติม ได้รับความเห็นชอบจากสภาวิชาการ ครั้งที่ 5/2566)
+<table><tr><td>90642201</td><td>รู้ลักษณ์<br/>ENNEAGRAM</td><td>3 (3-0-6)</td></tr></table>
+
+กลุ่มทักษะบุคคลและส่งเสริมวิชาชีพ (เพิ่มเติม ได้รับความเห็นชอบจากสภาวิชาการ ครั้งที่ 2/2567)
+<table><tr><td>90642203</td><td>ยิ้มนี้เพื่อเธอ<br/>MIRACLE SMILE</td><td>3 (3-0-6)</td></tr><tr><td>90642204</td><td>ความสัมพันธ์ที่ดี<br/>HEALTHY RELATIONSHIP</td><td>3 (3-0-6)</td></tr><tr><td>90642205</td><td>ภัยไซเบอร์และการรักษาความปลอดภัย<br/>CYBER THREATS AND SECURITY</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 24 -->
+<page_number>20</page_number>
+มคอ.2
+
+<table><tr><td>90642206</td><td>พลังรัก<br/>LOVE AND PASSION</td><td>3 (3-0-6)</td></tr><tr><td>90642207</td><td>เรียนรู้อยู่กับเพื่อนคู่ใจ<br/>A GOOD LIFE PARTNER</td><td>3 (3-0-6)</td></tr><tr><td>90642208</td><td>ปั้นเดฟให้เป็นดาว<br/>FROM DEV TO THE MOON</td><td>3 (3-0-6)</td></tr><tr><td>90642209</td><td>น้องหมาที่รัก<br/>MY DOG'S MY BOSS</td><td>3 (3-0-6)</td></tr><tr><td>90642210</td><td>น้องแมวที่รัก<br/>MY CAT'S MY BOSS</td><td>3 (3-0-6)</td></tr></table>
+
+กลุ่มทักษะบุคคลและส่งเสริมวิชาชีพ (เพิ่มเติม ได้รับความเห็นชอบจากสภาวิชาการ ครั้งที่ 2/2566)
+
+<table><tr><td>90642999</td><td>โรงเรียนสร้างเสน่ห์<br/>CHARM SCHOOL</td><td>3 (3-0-6)</td></tr></table>
+
+กลุ่มทักษะการจัดการและภาวะความเป็นผู้นำ (MANAGEMENT AND LEADERSHIP SKILLS)
+
+<table><tr><td>90643001</td><td>ปฏิบัติงานตามทักษะด้านการจัดการ 1<br/>PRACTICE UNDER MANAGEMENT SKILLS 1</td><td>1 (0-2-1)</td></tr><tr><td>90643002</td><td>ปฏิบัติงานตามทักษะด้านการจัดการ 2<br/>PRACTICE UNDER MANAGEMENT SKILLS 2</td><td>2 (0-4-2)</td></tr><tr><td>90643003</td><td>ปฏิบัติงานตามทักษะด้านการจัดการ 3<br/>PRACTICE UNDER MANAGEMENT SKILLS 3</td><td>3 (0-6-3)</td></tr><tr><td>90643004</td><td>ผู้นำพลังบวก<br/>POSITIVE POWER LEADER</td><td>3 (3-0-6)</td></tr><tr><td>90643005</td><td>นักเปลี่ยนโลก<br/>THE DISRUPTOR</td><td>3 (3-0-6)</td></tr><tr><td>90643006</td><td>การจัดการและผู้นำสมัยใหม่<br/>MODERN MANAGEMENT AND LEADERSHIP</td><td>3 (3-0-6)</td></tr><tr><td>90643007</td><td>ภาวะผู้นำสำหรับคนรุ่นใหม่<br/>NEXT GEN LEADERSHIP</td><td>3 (3-0-6)</td></tr><tr><td>90643008</td><td>ศาสตร์การต่อรอง<br/>SCIENCE OF NEGOTIATION</td><td>3 (3-0-6)</td></tr><tr><td>90643010</td><td>การตลาดร่วมสมัย<br/>CONTEMPORARY MARKETING</td><td>3 (3-0-6)</td></tr><tr><td>90643012</td><td>การทำงานเป็นทีม<br/>TEAMWORK</td><td>3 (3-0-6)</td></tr><tr><td>90643013</td><td>การจัดการเชิงอุตสาหกรรม<br/>INDUSTRIAL MANAGEMENT</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 25 -->
+<page_number>21</page_number>
+มคอ.2
+
+<table><tr><td>90643014</td><td>ความรู้ทั่วไปเกี่ยวกับธุรกิจ<br/>GENERAL BUSINESS</td><td>3 (3-0-6)</td></tr><tr><td>90643015</td><td>การบัญชีทางธุรกิจสำหรับคนรุ่นใหม่<br/>BUSINESS ACCOUNTING FOR NEW GEN</td><td>3 (3-0-6)</td></tr><tr><td>90643016</td><td>สนุกกับธุรกิจอ่อนไลน์<br/>FUN WITH ONLINE BUSINESS</td><td>3 (3-0-6)</td></tr><tr><td>90643018</td><td>ธุรกิจระหว่างประเทศ<br/>INTERNATIONAL BUSINESS</td><td>3 (3-0-6)</td></tr><tr><td>90643019</td><td>เศรษฐศาสตร์กับการเป็นผู้ประกอบการ<br/>ECONOMICS AND ENTREPRENEURSHIP</td><td>3 (3-0-6)</td></tr><tr><td>90643020</td><td>นักพัฒนาธุรกิจสร้างสรรค์<br/>INNOVATIVE ENTREPRENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90643021</td><td>ผู้ประกอบการสมัยใหม่<br/>MODERN ENTREPRENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90643022</td><td>ผู้ประกอบการทางสังคม<br/>SOCIAL ENTREPRENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90643023</td><td>ผู้ประกอบการเทคโนโลยี<br/>TECHNOPREENEURS</td><td>3 (3-0-6)</td></tr><tr><td>90643024</td><td>ฟาร์มสุข<br/>HAPPINESS FARMS</td><td>3 (3-0-6)</td></tr><tr><td>90643025</td><td>เส้นทางสู่ IPO<br/>ROAD TO IPO</td><td>3 (3-0-6)</td></tr><tr><td>90643026</td><td>การวางแผนเพื่อการลงทุน<br/>INVESTMENT PLANNING</td><td>3 (3-0-6)</td></tr><tr><td>90643027</td><td>มนุษย์ เงิน และคณิตศาสตร์<br/>MAN, MONEY AND MATH</td><td>3 (3-0-6)</td></tr><tr><td>90643028</td><td>มือใหม่ (หัด) เล่นหุ้น<br/>SMART TIPS FOR BEGINNING INVESTERS</td><td>3 (3-0-6)</td></tr><tr><td>90643029</td><td>เศรษฐกิจดิจิทัล<br/>DIGITAL ECONOMY</td><td>3 (3-0-6)</td></tr><tr><td>90643030</td><td>เศรษฐศาสตร์ทั่วไป และการศึกษาความเป็นไปได้ของโครงการ<br/>GENERAL ECONOMICS AND PROJECT FEASIBILITY STUDY</td><td>3 (3-0-6)</td></tr><tr><td>90643031</td><td>วิถีชีวิตตามแนวคิดเศรษฐกิจหมุนเวียนในศตวรรษที่ 21<br/>CIRCULAR ECONOMIC LIFESTYLE FOR 21ST CENTURY</td><td>3 (3-0-6)</td></tr><tr><td>90643032</td><td>ปักหมุดเศรษฐกิจ<br/>BCG ECONOMY IN ACTION</td><td>3 (3-0-6)</td></tr><tr><td>90643034</td><td>การจัดการกับความคิดสร้างสรรค์<br/>MANAGEMENT AND CREATIVITY</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 26 -->
+<page_number>22</page_number>
+มคอ.2
+
+<table><tr><td>90643035</td><td colspan="2">การจัดการความรู้เพื่อการพัฒนานวัตกรรม 3 (3-0-6)</td></tr><tr><td></td><td colspan="2">KNOWLEDGE MANAGEMENT FOR INNOVATION DEVELOPMENT</td></tr><tr><td>90643036</td><td colspan="2">การจัดการความรู้เพื่อการบริหารโครงการ 3 (3-0-6)</td></tr><tr><td></td><td colspan="2">KNOWLEDGE MANAGEMENT FOR PROJECT MANAGEMENT</td></tr><tr><td>90643037</td><td colspan="2">การบริหารงานภาครัฐและนโยบายสาธารณะในศตวรรษที่ 21 3 (3-0-6)</td></tr><tr><td></td><td>PUBLIC ADMINISTRATION AND PUBLIC POLICY IN THE 21st CENTURY</td><td></td></tr><tr><td>90643038</td><td colspan="2">ศัลยกรรมชีวิต 3 (3-0-6)</td></tr><tr><td></td><td colspan="2">REBRANDING</td></tr><tr><td>90643039</td><td colspan="2">นวัตกรรม สจล. 3 (3-0-6)</td></tr><tr><td></td><td>KMITL INNOVATION</td><td></td></tr><tr><td>90643040</td><td colspan="2">ผู้นำในฐานะโค้ช 3 (3-0-6)</td></tr><tr><td></td><td colspan="2">LEADERSHIP AS A COACH</td></tr><tr><td>90643041</td><td colspan="2">ธรรมาภิบาลสากล 3 (3-0-6)</td></tr><tr><td></td><td colspan="2">GLOBAL GOVERNANCE</td></tr><tr><td>90643042</td><td colspan="2">ฮาร์ดเพาเวอร์และซอฟท์เพาเวอร์ 3 (3-0-6)</td></tr><tr><td></td><td>HARD POWER AND SOFT POWER</td><td></td></tr><tr><td>90643043</td><td colspan="2">ธุรกิจดนตรี 3 (3-0-6)</td></tr><tr><td></td>MUSIC BUSINESS</td><td></td></tr><tr><td>90643044</td><td colspan="2">ลีนสตาร์ทอัพและแนวคิดธุรกิจแบบคล่องตัว 3 (3-0-6)</td></tr><tr><td></td>LEAN STARTUP AND AGILE BUSINESS</td><td></td></tr><tr><td>90643045</td><td colspan="2">การจัดการนวัตกรรม 3 (3-0-6)</td></tr><tr><td></td>InNOVATION MANAGEMENT</td><td></td></tr><tr><td colspan="3">กลุ่มทักษะการจัดการและภาวะความเป็นผู้นำ</td></tr><tr><td>(เพิ่มเติม ได้รับความเห็นชอบจากสภาวิชาการ ครั้งที่ 10/2566)</td><td colspan="2"></td></tr><tr><td>90643046</td><td colspan="2">การสร้างจิตสำนึกของความยั่งยืน 3 (3-0-6)</td></tr><tr><td></td>RASING OF SUSTAINABLE AWARENESS</td><td></td></tr><tr><td colspan="3">กลุ่มทักษะการจัดการและภาวะความเป็นผู้นำ</td></tr><tr><td>(เพิ่มเติม ได้รับความเห็นชอบจากสภาวิชาการ ครั้งที่ 2/2567)</td><td colspan="2"></td></tr><tr><td>90643047</td><td colspan="2">กองทุนรวมสำหรับมือใหม่ 3 (3-0-6)</td></tr><tr><td></td>MUTUAL FUND FOR ROOKIE</td><td></td></tr><tr><td>90643048</td><td colspan="2">การคำนวณเชิงธุรกิจและการแสดงข้อมูลเชิงธุรกิจด้วยแผนภาพ 3 (3-0-6)</td></tr><tr><td></td>BUSINESS COMPUTING AND VISUALIZATION</td><td></td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 27 -->
+<page_number>23</page_number>
+มคอ.2
+
+กลุ่มทักษะภาษาและการสื่อสาร (LANGUAGE AND COMMUNICATION SKILLS)
+
+<table><tr><td>90644001</td><td>ปฏิบัติงานตามทักษะด้านการสื่อสาร 1<br/>PRACTICE UNDER LANGUAGE AND COMMUNICATION SKILLS 1</td><td>1 (0-2-1)</td></tr><tr><td>90644002</td><td>ปฏิบัติงานตามทักษะด้านการสื่อสาร 2<br/>PRACTICE UNDER LANGUAGE AND COMMUNICATION SKILLS 2</td><td>2 (0-4-2)</td></tr><tr><td>90644003</td><td>ปฏิบัติงานตามทักษะด้านการสื่อสาร 3<br/>PRACTICE UNDER LANGUAGE AND COMMUNICATION SKILLS 3</td><td>3 (0-6-3)</td></tr><tr><td>90644009</td><td>การออกเสียงภาษาอังกฤษเบื้องต้น<br/>BASIC ENGLISH PRONUNCIATION</td><td>3 (3-0-6)</td></tr><tr><td>90644010</td><td>การพัฒนาทักษะการอ่านและการเขียนภาษาอังกฤษ<br/>DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH</td><td>3 (3-0-6)</td></tr><tr><td>90644011</td><td>ภาษาอังกฤษเชิงวิชาการ<br/>ENGLISH FOR ACADEMIC PURPOSES</td><td>3 (3-0-6)</td></tr><tr><td>90644012</td><td>ภาษาอังกฤษเพื่อการสื่อสาร<br/>ENGLISH FOR COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90644013</td><td>การเขียนภาษาอังกฤษเพื่อการสื่อสาร<br/>ENGLISH FOR COMMUNICATIVE WRITING</td><td>3 (3-0-6)</td></tr><tr><td>90644014</td><td>ภาษาอังกฤษเพื่อการสื่อสารทางวิชาชีพ<br/>ENGLISH FOR PROFESSIONAL COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90644015</td><td>ภาษาอังกฤษเพื่อการศึกษาต่อ<br/>ENGLISH FOR FURTHER STUDIES</td><td>3 (3-0-6)</td></tr><tr><td>90644016</td><td>อังกฤษเพื่ออุตสาหกรรม<br/>ENGLISH FOR INDUSTRY</td><td>3 (3-0-6)</td></tr><tr><td>90644017</td><td>ภาษาอังกฤษสำหรับธุรกิจ<br/>ENGLISH FOR BUSINESS</td><td>3 (3-0-6)</td></tr><tr><td>90644018</td><td>ภาษาอังกฤษเพื่อการตลาด<br/>ENGLISH FOR MARKETING</td><td>3 (3-0-6)</td></tr><tr><td>90644019</td><td>ภาษาอังกฤษเพื่อการจัดการ<br/>ENGLISH FOR MANAGEMENT</td><td>3 (3-0-6)</td></tr><tr><td>90644020</td><td>ภาษาอังกฤษเพื่อความเข้าใจข่าวสาร<br/>ENGLISH FOR MEDIA</td><td>3 (3-0-6)</td></tr><tr><td>90644022</td><td>ภาษาอังกฤษสำหรับมืออาชีพ<br/>ENGLISH FOR PROFESSIONAL PURPOSES</td><td>3 (3-0-6)</td></tr><tr><td>90644023</td><td>ภาษาอังกฤษเพื่อเตรียมตัวทำงาน<br/>ENGLISH FOR WORK PREPARATION</td><td>3 (3-0-6)</td></tr><tr><td>90644024</td><td>ภาษาอังกฤษเพื่อการท่องเที่ยวและการเดินทาง<br/>ENGLISH FOR TOURISM AND TRAVELLING</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 28 -->
+<page_number>24</page_number>
+มคอ.2
+
+<table><tr><td>90644025</td><td>ภาษาอังกฤษเพื่อการสื่อสารในงานสถาปัตยกรรม<br/>ENGLISH FOR ARCHITECTURAL ARTS &amp; DESIGN COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90644026</td><td>ภาษาอังกฤษเพื่อการนำเสนอในงานสถาปัตยกรรม<br/>ENGLISH FOR ARCHITECTURAL ARTS &amp; DESIGN PRESENTATION</td><td>3 (3-0-6)</td></tr><tr><td>90644027</td><td>ภาษาอังกฤษสำหรับการเขียนพรรณนา<br/>ENGLISH FOR NARRATIVE WRITING</td><td>3 (3-0-6)</td></tr><tr><td>90644028</td><td>ภาษาอังกฤษเพื่อการออกแบบ<br/>ENGLISH FOR DESIGN</td><td>3 (3-0-6)</td></tr><tr><td>90644029</td><td>ภาษาอังกฤษสำหรับวิชาชีพสุขภาพ<br/>ENGLISH FOR HEALTH PROFESSIONS</td><td>3 (2-2-5)</td></tr><tr><td>90644030</td><td>ภาษาอังกฤษเพื่อการประชาสัมพันธ์<br/>ENGLISH FOR PUBLIC RELATIONS</td><td>3 (3-0-6)</td></tr><tr><td>90644031</td><td>ภาษาอังกฤษสำหรับวิทยาศาสตร์และเทคโนโลยี<br/>ENGLISH FOR SCIENCE AND TECHNOLOGY</td><td>3 (3-0-6)</td></tr><tr><td>90644032</td><td>ภาษาอังกฤษสำหรับการบิน<br/>ENGLISH FOR AVIATION</td><td>3 (3-0-6)</td></tr><tr><td>90644033</td><td>การเขียนและการพูดในงานอาชีพ<br/>WRITING AND SPEAKING IN THE PROFESSIONS</td><td>3 (3-0-6)</td></tr><tr><td>90644034</td><td>การเขียนทางเทคนิค<br/>TECHNICAL WRITING</td><td>3 (3-0-6)</td></tr><tr><td>90644035</td><td>การอ่านและเขียนเชิงวิชาการสำหรับวิทยาศาสตร์สุขภาพ<br/>ACADEMIC READING AND WRITING FOR HEALTH SCIENCES</td><td>3 (2-2-5)</td></tr><tr><td>90644036</td><td>การพัฒนาทักษะทางภาษาอังกฤษเพื่อการเรียนรู้ตลอดชีวิต<br/>ENGLISH SKILL DEVELOPMENT FOR LIFE-LONG LEARNING</td><td>3 (3-0-6)</td></tr><tr><td>90644037</td><td>การสื่อสารข้ามวัฒนธรรม<br/>CROSS CULTURAL COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90644039</td><td>ทักษะการสื่อสารผ่านการอภิปราย<br/>COMMUNICATION SKILLS THROUGH DEBATE</td><td>3 (3-0-6)</td></tr><tr><td>90644040</td><td>ทักษะการสื่อสารผ่านละคร<br/>COMMUNICATION SKILLS THROUGH DRAMA</td><td>3 (3-0-6)</td></tr><tr><td>90644041</td><td>ภาษาอังกฤษจากสื่อบันเทิง<br/>ENGLISH FROM ENTERTAINMENT MEDIA</td><td>3 (3-0-6)</td></tr><tr><td>90644042</td><td>การสื่อสารและการนำเสนออย่างมืออาชีพ<br/>PROFESSIONAL COMMUNICATION AND PRESENTATION</td><td>3 (3-0-6)</td></tr><tr><td>90644043</td><td>การพูดในที่สาธารณะ<br/>PUBLIC SPEAKING</td><td>3 (3-0-6)</td></tr><tr><td>90644044</td><td>พูดได้ พูดดี พูดเป็น<br/>BEST SPEECH</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 29 -->
+<page_number>25</page_number>
+มคอ.2
+
+<table><tr><td>90644045</td><td colspan="3">การค้นคว้าและการเขียนรายงาน 3 (3-0-6)</td></tr><tr><td>90644046</td><td colspan="3">RESEARCH PAPER WRITING การฟังและการอ่านเพื่อพัฒนาคุณภาพชีวิต 3 (3-0-6)</td></tr><tr><td>90644047</td><td colspan="3">LISTENING AND READING FOR IMPROVING LIFE QUALITY การพัฒนาทักษะการเขียนภาษาไทยเชิงสร้างสรรค์ 3 (3-0-6)</td></tr><tr><td>90644048</td><td colspan="2">DEVELOPMENT OF THAI CREATIVE WRITING SKILLS ภาษาในสังคมไทย 3 (3-0-6)</td></tr><tr><td>90644049</td><td colspan="2">LANGUAGE IN THAI SOCIETY ภาษาไทยเพื่อการสร้างสรรค์ 3 (3-0-6)</td></tr><tr><td>90644050</td><td colspan="2">THAI LANGUAGE FOR CREATIVITY การเขียนภาษาไทยในที่ทำงาน 3 (3-0-6)</td></tr><tr><td>90644051</td><td colspan="2">THAI WRITING IN WORKPLACE ภาษาไทยสำหรับทันตแพทย์ 3 (3-0-6)</td></tr><tr><td>90644052</td><td colspan="2">THAI FOR DENTAL PROFESSIONS ศิลปะการสื่อสารสำหรับมืออาชีพด้านอาหาร 3 (3-0-6)</td></tr><tr><td>90644053</td><td colspan="2">COMMUNICATION IN THAI FOR CULINARY PROFESSIONALS การฟังและการพูดภาษาจีนพื้นฐาน 3 (3-0-6)</td></tr><tr><td>90644054</td><td>FUNDAMENTAL CHINESE</td><td colspan="2">FOR LISTENING AND SPEAKING การอ่านและเขียนภาษาจีนพื้นฐาน 3 (3-0-6)</td></tr><tr><td>90644055</td><td>FUNDAMENTAL CHINESE</td><td colspan="2">READING AND WRITING ไวยากรณ์ภาษาจีนพื้นฐาน และสำนวนและสุภาษิตภาษาจีน 3 (3-0-6)</td></tr><tr><td>90644056</td><td colspan="2">BASIC CHINESE GRAMMAR AND CHINESE IDIOMS AND PROVERBS วัฒนธรรม สำนวนและสุภาษิตจีน 3 (3-0-6)</td></tr><tr><td>90644057</td><td colspan="2">CHINESE CULTURE IDIOMS AND PROVERBS ภาษาจีนเพื่อการสื่อสาร 3 (3-0-6)</td></tr><tr><td>90644058</td><td colspan="2">CHINESE FOR COMMUNICATION ภาษาจีนฉบับแฟนด้อม 3 (3-0-6)</td></tr><tr><td>90644059</td><td colspan="2">CHINESE FANDOM CHINESE FOR TRAVEL ภาษาจีนเพื่อการท่องเที่ยว 3 (3-0-6)</td></tr><tr><td>90644060</td><td colspan="2">GERMAN FOR COMMUNICATION ภาษาเยอรมันเพื่อการสื่อสาร 3 (3-0-6)</td></tr><tr><td>90644061</td><td colspan="2">GERMAN FOR WORK AND BUSINESS ภาษาเยอรมันเพื่อการทำงานและธุรกิจ 3 (3-0-6)</td></tr><tr><td>90644062</td><td colspan="2">JAPANESE FOR COMMUNICATION ภาษาญี่ปุ่นเพื่อการสื่อสาร 3 (3-0-6)</td></tr><tr><td>90644063</td><td colspan="2">JAPANESE FOR TRAVEL ภาษาญี่ปุ่นเพื่อการท่องเที่ยว 3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
+<!-- PDF_PAGE 30 -->
+<page_number>26</page_number>
+มคอ.2
+
+<table><tr><td>90644064</td><td>ภาษาเกาหลีเพื่อการท่องเที่ยว<br/>KOREAN FOR TRAVEL</td><td>3 (3-0-6)</td></tr><tr><td>90644065</td><td>ภาษาเวียดนามเพื่อการท่องเที่ยว<br/>VIETNAMESE FOR TRAVEL</td><td>3 (3-0-6)</td></tr><tr><td>90644066</td><td>ภาษามาเลย์เพื่อการท่องเที่ยว<br/>MALAY FOR TRAVEL</td><td>3 (3-0-6)</td></tr><tr><td>90644067</td><td>สนทนาภาษาจีนเพื่อไอที<br/>CHINESE CONVERSATION FOR IT</td><td>3 (3-0-6)</td></tr><tr><td>90644068</td><td>รู้จีนให้ได้เงิน<br/>HOW TO MAKE MONEY WITH CHINESE</td><td>3 (3-0-6)</td></tr><tr><td>90644069</td><td>ภาษาญี่ปุ่นพื้นฐาน<br/>FOUNDATION JAPANESE</td><td>3 (3-0-6)</td></tr><tr><td>90644070</td><td>การสื่อสารนวัตกรรม<br/>INNOVATIVE COMMUNICATION</td><td>3 (3-0-6)</td></tr><tr><td>90644071</td><td>ภาษามือเบื้องต้นเพื่อการสื่อสาร<br/>INTRODUCTION TO SIGN LANGUAGE FOR COMMUNICATION</td><td>3 (3-0-6)</td></tr></table>
+
+หมวดวิชาศึกษาทั่วไป สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
+
+---
+
 <!-- PDF_PAGE 39 -->
 ภาคผนวก ก คำอธิบายรายวิชา
 

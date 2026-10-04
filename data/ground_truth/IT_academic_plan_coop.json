@@ -372,7 +372,7 @@
       "code": "06016425",
       "name_th": "พื้นฐานการออกแบบทัศนศิลป์สำหรับสื่อปฏิสัมพันธ์",
       "name_en": "VISUAL DESIGN FUNDAMENTALS FOR INTERACTIVE MEDIA",
-      "credits": "3(3-0-6)",
+      "credits": "3(2-2-5)",
       "year": 2,
       "semester": 2,
       "category": "หมวดวิชาเฉพาะ",
@@ -455,7 +455,7 @@
       "semester": 1,
       "category": "หมวดวิชาเฉพาะ",
       "type": "บังคับ",
-      "prerequisite": "ไม่มี",
+      "prerequisite": "06016408",
       "flexible_year_semester": null,
       "note": "กลุ่มวิชาด้านการพัฒนาซอฟต์แวร์"
     },
@@ -468,7 +468,7 @@
       "semester": 1,
       "category": "หมวดวิชาเฉพาะ",
       "type": "บังคับ",
-      "prerequisite": "ไม่มี",
+      "prerequisite": "06016413",
       "flexible_year_semester": null,
       "note": "กลุ่มวิชาด้านโครงสร้างพื้นฐานเทคโนโลยีสารสนเทศ"
     },
@@ -767,7 +767,7 @@
       "semester": 0,
       "category": "หมวดวิชาเฉพาะ",
       "type": "เลือก",
-      "prerequisite": "06016413",
+      "prerequisite": "06066304",
       "flexible_year_semester": "4/1",
       "note": null
     },
@@ -903,7 +903,7 @@
     },
     {
       "code": "06016443",
-      "name_th": "การวิเคราะห์ข้อมูลและแอปพลิเคชันสำหรับอินเตอร์เน็ตแห่งสรรพสิ่ง",
+      "name_th": "การวิเคราะห์ข้อมูลและแอปพลิเคชันสำหรับอินเทอร์เน็ตแห่งสรรพสิ่ง",
       "name_en": "INTERNET OF THINGS DATA ANALYTICS AND APPLICATIONS",
       "credits": "3(2-2-5)",
       "year": 0,
@@ -1150,7 +1150,7 @@
     },
     {
       "code": "06016462",
-      "name_th": "เทคโนโลยีสื่อสารการเคลื่อนที่",
+      "name_th": "เทคโนโลยีสื่อสารเคลื่อนที่",
       "name_en": "MOBILE COMMUNICATION TECHNOLOGY",
       "credits": "3(3-0-6)",
       "year": 0,

@@ -239,6 +239,12 @@ def process_lab8_stage(run_id: str, program_meta: str | None, gt_dir: str | None
 
     import_cmd = [LAB8, "import-lab7b", "-i", prediction,
                   "--program", run_id, "--split-dir", lab8_out]
+    # ส่ง markdown ดิบให้ Lab 8B: ถ้าไม่ส่ง จะไม่กู้ทางเลือกจากตารางดิบและไม่ซ่อมหน่วยกิต null
+    source_md = lab7_out / "intermediate_vlm.md"
+    if source_md.exists():
+        import_cmd += ["--source-md", source_md]
+    else:
+        print(f"  ! ไม่พบ {source_md} — import-lab7b จะใช้ตาราง legacy")
     if program_meta:
         import_cmd += ["--program-meta", program_meta]
     # ไม่มี --track ที่นี่เช่นกัน (ดูเหตุผลใน run_single) — nocoop/coop อยู่ใน program_id แล้ว
@@ -340,8 +346,8 @@ def main() -> None:
         "LAB7_CHUNK": "1",
         "LAB7B_NUM_CTX": "8192",
         "LAB7B_NUM_PREDICT": "2000",
-        "LAB7B_OCR_NUM_CTX": "4096",
-        "LAB7B_OCR_NUM_PREDICT": "1200",
+        "LAB7B_OCR_NUM_CTX": "8192",
+        "LAB7B_OCR_NUM_PREDICT": "3000",
     })
 
     if args.all_runs:

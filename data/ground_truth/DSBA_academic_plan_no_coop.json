@@ -45,7 +45,7 @@
     },
     {
       "code": "06066303",
-      "name_th": "การแก้ปัญหาและโปรแกรมคอมพิวเตอร์",
+      "name_th": "การแก้ปัญหาและการโปรแกรมคอมพิวเตอร์",
       "name_en": "PROBLEM SOLVING AND COMPUTER PROGRAMMING",
       "credits": "3(2-2-5)",
       "year": 1,
@@ -58,7 +58,7 @@
     },
     {
       "code": "90641001",
-      "name_th": "โรงเรียนสร้างเสน่าห์",
+      "name_th": "โรงเรียนสร้างเสน่ห์",
       "name_en": "CHARM SCHOOL",
       "credits": "2(1-2-3)",
       "year": 1,
@@ -240,7 +240,7 @@
     },
     {
       "code": "06066304",
-      "name_th": "การวิเคราะห์และอออกแบบระบบสารสนเทศ",
+      "name_th": "การวิเคราะห์และออกแบบระบบสารสนเทศ",
       "name_en": "INFORMATION SYSTEM ANALYSIS AND DESIGN",
       "credits": "3(3-0-6)",
       "year": 2,
@@ -253,7 +253,7 @@
     },
     {
       "code": "90644xxx",
-      "name_th": "วิชาเลือกภาษาและการสื่อสาร",
+      "name_th": "วิชาเลือกด้านภาษาและการสื่อสาร",
       "name_en": "ELECTIVE IN LANGUAGE AND COMMUNICATION",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 2,
@@ -466,7 +466,7 @@
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 1,
-      "category": "หมวดวิชาเฉพาะ",
+      "category": "หมวดวิชาศึกษาทั่วไป",
       "type": "เลือก",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
@@ -630,7 +630,7 @@
     },
     {
       "code": "06026xxx",
-      "name_th": "วิชาเลือกในกลุ่มวิชาเลือกหรือกลุ่มวิชาเฉพาะด้าน 1",
+      "name_th": "วิชาเลือกในกลุ่มวิชาเลือกหรือกลุ่มวิชาชีพเฉพาะด้าน 1",
       "name_en": "ELECTIVE IN ELECTIVE OR SPECIFIC PROFESSIONAL COURSES 1",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,
@@ -643,7 +643,7 @@
     },
     {
       "code": "06026xxx",
-      "name_th": "วิชาเลือกในกลุ่มวิชาเลือกหรือกลุ่มวิชาเฉพาะด้าน 2",
+      "name_th": "วิชาเลือกในกลุ่มวิชาเลือกหรือกลุ่มวิชาชีพเฉพาะด้าน 2",
       "name_en": "ELECTIVE IN ELECTIVE OR SPECIFIC PROFESSIONAL COURSES 2",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,

@@ -578,7 +578,7 @@
       "code": "06026xxx",
       "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 1",
       "name_en": "ELECTIVE IN DATA SCIENCE",
-      "credits": "3(3-0-6)",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 1,
       "category": null,
@@ -593,13 +593,85 @@
       "source_page": 27
     },
     {
-      "code": "9064xxxx",
-      "name_th": "06026xxx",
-      "name_en": null,
-      "credits": "2",
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 1",
+      "name_en": "ELECTIVE IN STATISTICAL ANALYSIS 1",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 1,
-      "category": "หมวดวิชาศึกษาทั่วไป",
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        27,
+        34
+      ],
+      "source_page": 27
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 1",
+      "name_en": "ELECTIVE IN DATA ENGINEERING 1",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 1,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        27,
+        34
+      ],
+      "source_page": 27
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 2",
+      "name_en": "ELECTIVE IN DATA SCIENCE 2",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 1,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        27,
+        34
+      ],
+      "source_page": 27
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 2",
+      "name_en": "ELECTIVE IN STATISTICAL ANALYTICS 2",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 1,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        27,
+        34
+      ],
+      "source_page": 27
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 2",
+      "name_en": "ELECTIVE IN DATA ENGINEERING 2",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 1,
+      "category": null,
       "type": "เลือก",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
@@ -641,7 +713,8 @@
       "flexible_year_semester": null,
       "note": null,
       "pages": [
-        27
+        27,
+        34
       ],
       "source_page": 27
     },
@@ -689,7 +762,43 @@
       "code": "06026xxx",
       "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 3",
       "name_en": "ELECTIVE IN DATA SCIENCE 3",
-      "credits": "3(3-0-6)",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        28,
+        35
+      ],
+      "source_page": 28
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 3",
+      "name_en": "ELECTIVE IN STATISTICAL ANALYTICS 3",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        28,
+        35
+      ],
+      "source_page": 28
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 3",
+      "name_en": "ELECTIVE IN DATA ENGINEERING 3",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 2,
       "category": null,
@@ -707,7 +816,7 @@
       "code": "06026xxx",
       "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 4",
       "name_en": "ELECTIVE IN DATA SCIENCE 4",
-      "credits": "3(3-0-6)",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 2,
       "category": null,
@@ -718,6 +827,40 @@
       "pages": [
         28,
         35
+      ],
+      "source_page": 28
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มการวิเคราะห์เชิงสถิติ 4",
+      "name_en": "ELECTIVE IN STATISTICAL ANALYTICS 4",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        28
+      ],
+      "source_page": 28
+    },
+    {
+      "code": "06026xxx",
+      "name_th": "วิชาเลือกกลุ่มวิศวกรรมข้อมูล 4",
+      "name_en": "ELECTIVE IN DATA ENGINEERING 4",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 3,
+      "semester": 2,
+      "category": null,
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        28
       ],
       "source_page": 28
     },
@@ -822,29 +965,44 @@
       "type": "เลือก",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
-      "note": "เลือกอย่างใดอย่างหนึ่ง: 9064xxxx หรือ xxxxxxxx",
+      "note": null,
       "pages": [
         29
       ],
-      "alt_group": "alt_y4s2_1",
       "source_page": 29
     },
     {
       "code": "xxxxxxxx",
-      "name_th": "วิชาเลือกหมวดวิชาศึกษาทั่วไป",
-      "name_en": "ELECTIVE IN GENERAL EDUCATION",
+      "name_th": "วิชาเลือกเสรี 1",
+      "name_en": "FREE ELECTIVE COURSE 1",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,
       "semester": 2,
-      "category": "หมวดวิชาศึกษาทั่วไป",
+      "category": "หมวดวิชาเลือกเสรี",
       "type": "เลือก",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
-      "note": "เลือกอย่างใดอย่างหนึ่ง: 9064xxxx หรือ xxxxxxxx",
+      "note": null,
       "pages": [
         29
       ],
-      "alt_group": "alt_y4s2_1",
+      "source_page": 29
+    },
+    {
+      "code": "xxxxxxxx",
+      "name_th": "วิชาเลือกเสรี 2",
+      "name_en": "FREE ELECTIVE COURSE 2",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 4,
+      "semester": 2,
+      "category": "หมวดวิชาเลือกเสรี",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        29
+      ],
       "source_page": 29
     },
     {
@@ -868,7 +1026,24 @@
       "code": "xxxxxxxx",
       "name_th": "วิชาเลือกเสรี 1",
       "name_en": "FREE ELECTIVE COURSE 1",
-      "credits": "3(3-0-6)",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
+      "year": 4,
+      "semester": 1,
+      "category": "หมวดวิชาเลือกเสรี",
+      "type": "เลือก",
+      "prerequisite": "ไม่มี",
+      "flexible_year_semester": null,
+      "note": null,
+      "pages": [
+        36
+      ],
+      "source_page": 36
+    },
+    {
+      "code": "xxxxxxxx",
+      "name_th": "วิชาเลือกเสรี 2",
+      "name_en": "FREE ELECTIVE COURSE 2",
+      "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 4,
       "semester": 1,
       "category": "หมวดวิชาเลือกเสรี",
@@ -889,7 +1064,7 @@
       "year": 4,
       "semester": 2,
       "category": null,
-      "type": "เลือก",
+      "type": "บังคับ",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
       "note": "เลือกอย่างใดอย่างหนึ่ง: 06026259 หรือ 06026260",
@@ -909,7 +1084,7 @@
       "year": 4,
       "semester": 2,
       "category": null,
-      "type": "เลือก",
+      "type": "บังคับ",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,
       "note": "เลือกอย่างใดอย่างหนึ่ง: 06026259 หรือ 06026260",
@@ -920,23 +1095,6 @@
       "alt_group": "alt_y4s2_1",
       "description_th": "วิชาสหกิจศึกษา เป็นโปรแกรมความร่วมมือทางด้านวิชาการระหว่างสถานศึกษากับหน่วยงานต่างๆ ในต่างประเทศที่ยินยอมให้นักศึกษาได้นำความรู้ที่ได้เรียนในห้องเรียน ไปประยุกต์ใช้ในการปฏิบัติงานจริงที่หน่วยงานนั้น ๆ โดยโครงการของนักศึกษาที่ทำระหว่างปฏิบัติงานจะต้อง วท.บ (วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ) สาขาวิชาวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ",
       "source_page": 36
-    },
-    {
-      "code": "06026xxx",
-      "name_th": "วิชาเลือกกลุ่มวิทยาการข้อมูล 2",
-      "name_en": "ELECTIVE IN DATA SCIENCE 2",
-      "credits": "3(3-0-6)",
-      "year": 3,
-      "semester": 2,
-      "category": null,
-      "type": "เลือก",
-      "prerequisite": "ไม่มี",
-      "flexible_year_semester": null,
-      "note": "อนุมานจากเลขลำดับที่ขาด + ยอดรวมหน่วยกิตของภาค (OCR ไม่ได้อ่านแถวนี้)",
-      "pages": [
-        35
-      ],
-      "source_page": 35
     },
     {
       "code": "06026216",
@@ -1123,7 +1281,7 @@
     {
       "code": "06026226",
       "name_th": "หัวข้อพิเศษทางด้านวิทยาการข้อมูล 1",
-      "name_en": "SPECIAL TOPICS IN DATA SCIENCE1",
+      "name_en": "SPECIAL TOPICS IN DATA SCIENCE 1",
       "credits": "3(3-0-6)",
       "year": 0,
       "semester": 0,
@@ -1818,8 +1976,8 @@
         {
           "page": 27,
           "term": "3/1",
-          "rows": 7,
-          "sum": 19,
+          "rows": 10,
+          "sum": 30,
           "declared": 18,
           "plan": "nocoop",
           "year": 3,
@@ -1829,13 +1987,13 @@
         {
           "page": 28,
           "term": "3/2",
-          "rows": 6,
-          "sum": 18,
+          "rows": 10,
+          "sum": 30,
           "declared": 18,
           "plan": "nocoop",
           "year": 3,
           "sem": 2,
-          "ok": true
+          "ok": false
         },
         {
           "page": 29,
@@ -1851,13 +2009,13 @@
         {
           "page": 29,
           "term": "4/2",
-          "rows": 2,
-          "sum": 3,
+          "rows": 3,
+          "sum": 9,
           "declared": 9,
           "plan": "nocoop",
           "year": 4,
           "sem": 2,
-          "ok": false
+          "ok": true
         },
         {
           "page": 30,
@@ -1886,7 +2044,7 @@
           "term": "2/1",
           "rows": 6,
           "sum": 18,
-          "declared": null,
+          "declared": 18,
           "plan": "coop",
           "year": 2,
           "sem": 1,
@@ -1906,8 +2064,8 @@
         {
           "page": 34,
           "term": "3/1",
-          "rows": 6,
-          "sum": 16,
+          "rows": 11,
+          "sum": 33,
           "declared": 18,
           "plan": "coop",
           "year": 3,
@@ -1917,8 +2075,8 @@
         {
           "page": 35,
           "term": "3/2",
-          "rows": 7,
-          "sum": 21,
+          "rows": 8,
+          "sum": 24,
           "declared": 18,
           "plan": "coop",
           "year": 3,
@@ -1929,12 +2087,12 @@
           "page": 36,
           "term": "4/1",
           "rows": 4,
-          "sum": 11,
+          "sum": 12,
           "declared": 12,
           "plan": "coop",
           "year": 4,
           "sem": 1,
-          "ok": false
+          "ok": true
         },
         {
           "page": 36,
@@ -1962,7 +2120,185 @@
         "90644008",
         "90644042"
       ],
-      "skipped_tables": []
+      "skipped_tables": [
+        {
+          "page": 16,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "90641001",
+            "90641002",
+            "90641003"
+          ]
+        },
+        {
+          "page": 16,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "90644007",
+            "90644008",
+            "90644xxx"
+          ]
+        },
+        {
+          "page": 16,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "90642033",
+            "90643021",
+            "90644042"
+          ]
+        },
+        {
+          "page": 17,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "9064xxxx"
+          ]
+        },
+        {
+          "page": 17,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026200",
+            "06026201",
+            "06026202",
+            "06066000",
+            "06066001",
+            "06026203",
+            "06026204",
+            "06066100"
+          ]
+        },
+        {
+          "page": 18,
+          "reason": "ไม่เจอ header 'รหัสวิชา' และไม่รู้ปี/ภาค",
+          "codes": [
+            "06066101",
+            "06066102",
+            "06066300",
+            "06066301",
+            "06066302",
+            "06066303",
+            "06066304"
+          ]
+        },
+        {
+          "page": 18,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026205",
+            "06026206",
+            "06026207",
+            "06026208",
+            "06026209",
+            "06026210",
+            "06026211",
+            "06026212"
+          ]
+        },
+        {
+          "page": 19,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026213",
+            "06026214",
+            "06026215"
+          ]
+        },
+        {
+          "page": 19,
+          "reason": "ไม่เจอ header 'รหัสวิชา' และไม่รู้ปี/ภาค",
+          "codes": [
+            "06026216",
+            "06026217",
+            "06026218",
+            "06026219",
+            "06026220",
+            "06026221",
+            "06026222",
+            "06026223",
+            "06026224",
+            "06026225",
+            "06026226"
+          ]
+        },
+        {
+          "page": 20,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026227",
+            "06026228",
+            "06026229",
+            "06026290"
+          ]
+        },
+        {
+          "page": 20,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026230",
+            "06026231",
+            "06026232",
+            "06026233",
+            "06026234",
+            "06026235",
+            "06026236",
+            "06026237",
+            "06026238"
+          ]
+        },
+        {
+          "page": 20,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026239",
+            "06026240"
+          ]
+        },
+        {
+          "page": 21,
+          "reason": "ไม่เจอ header 'รหัสวิชา' และไม่รู้ปี/ภาค",
+          "codes": [
+            "06026241",
+            "06026242",
+            "06026243",
+            "06026244",
+            "06026245",
+            "06026246",
+            "06026247",
+            "06026248",
+            "06026249"
+          ]
+        },
+        {
+          "page": 21,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026250",
+            "06026251",
+            "06026252",
+            "06026253",
+            "06026254"
+          ]
+        },
+        {
+          "page": 22,
+          "reason": "ไม่เจอ header 'รหัสวิชา' และไม่รู้ปี/ภาค",
+          "codes": [
+            "06026255",
+            "06026256",
+            "06026257",
+            "06026258"
+          ]
+        },
+        {
+          "page": 22,
+          "reason": "เจอตารางแต่ยังไม่รู้ปี/ภาค (year=None, sem=None) — หัวข้อ 'ปีที่ N ภาคที่ M' ก่อนตารางนี้อ่านไม่ออก/ไม่เจอ",
+          "codes": [
+            "06026260"
+          ]
+        }
+      ]
     }
   }
 }

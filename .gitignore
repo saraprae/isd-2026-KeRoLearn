@@ -13,3 +13,7 @@ work/lab8b_run/page255_retry
 work/lab7b_run/BIT_patch
 eval_gt.json
 *.env
+temp.md
+chk1_diag.py
+find_rows.py
+handoff_new.md

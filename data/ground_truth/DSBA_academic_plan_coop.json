@@ -240,7 +240,7 @@
     },
     {
       "code": "06066304",
-      "name_th": "การวิเคราะห์และอออกแบบระบบสารสนเทศ",
+      "name_th": "การวิเคราะห์และออกแบบระบบสารสนเทศ",
       "name_en": "INFORMATION SYSTEM ANALYSIS AND DESIGN",
       "credits": "3(3-0-6)",
       "year": 2,
@@ -253,7 +253,7 @@
     },
     {
       "code": "90644xxx",
-      "name_th": "วิชาเลือกภาษาและการสื่อสาร",
+      "name_th": "วิชาเลือกด้านภาษาและการสื่อสาร",
       "name_en": "ELECTIVE IN LANGUAGE AND COMMUNICATION",
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 2,
@@ -466,7 +466,7 @@
       "credits": "3(3-0-6) หรือ 3(2-2-5)",
       "year": 3,
       "semester": 1,
-      "category": "หมวดวิชาเฉพาะ",
+      "category": "หมวดวิชาศึกษาทั่วไป",
       "type": "เลือก",
       "prerequisite": "ไม่มี",
       "flexible_year_semester": null,

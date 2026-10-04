@@ -142,11 +142,17 @@ class RunSpec:
 
 
 RUN_REGISTRY: list[RunSpec] = [
-    RunSpec("IT",    None, [(31, 44), (324, 360)]),   # nocoop 31-37 + coop 38-44
-    RunSpec("DSBA",  None, [(23, 36), (314, 341)]),   # nocoop 23-29 + coop 30-36
-    RunSpec("BIT",   None, [(26, 35), (238, 257)]),   # nocoop 26-30 + coop 31-35
-    RunSpec("AIT",   None, [(23, 26), (287, 304)]),
-    RunSpec("GENED", None, [(39, 117)]),
+    RunSpec("IT",    None, [(21, 44), (324, 360)]),   # nocoop 31-37 + coop 38-44
+    RunSpec("DSBA",  None, [(16, 36), (314, 341)]),   # nocoop 23-29 + coop 30-36
+    RunSpec("BIT",   None, [(20, 35), (238, 257)]),   # nocoop 26-30 + coop 31-35
+    RunSpec("AIT",   None, [(18, 26), (287, 304)]),
+    RunSpec("GENED", None, [(12, 30), (39, 117)]),   # ไม่มีแผนของตัวเอง — courses + course_list
+    # --- books 2560 (added; originals above untouched) ---
+    RunSpec("IT_2560",   None, [(19, 40), (223, 269)]),
+    RunSpec("DSBA_2560", None, [(19, 34), (176, 207)]),
+    RunSpec("BIT_2560",  None, [(18, 30), (171, 192)]),
+    RunSpec("GENED_2559", None, [(14, 23), (42, 85)]),
+    RunSpec("GENED_2564", None, [(16, 30), (44, 117)]),
 ]
 RUNS_BY_ID: dict[str, RunSpec] = {r.run_id: r for r in RUN_REGISTRY}
 PROGRAMS: list[str] = sorted({r.program for r in RUN_REGISTRY})
@@ -1025,6 +1031,12 @@ def parse_prerequisites_from_description(text: str) -> dict[str, str]:
 import html as _html
 
 EXTRACT_MODE = os.getenv("LAB7_EXTRACT", "rules").strip().lower()     # rules | llm
+MERGE_CRED = os.getenv("LAB7_MERGE_SPLIT_CREDITS", "1") != "0"   # รวมเศษหน่วยกิต \"A หรือ B\" ที่ OCR ฉีกข้ามแถว
+SPACE_TRAILING_NUM = os.getenv("LAB7_SPACE_TRAILING_NUM", "1") != "0"   # SCIENCE1 -> SCIENCE 1 เมื่อชื่อไทยมี "␣1"
+ALT_PAIR_REQUIRED = os.getenv("LAB7_ALT_PAIR_REQUIRED", "1") != "0"   # คู่รหัสจริงในช่องแผน = ช่องบังคับ
+LIST_TABLE_FALLBACK = os.getenv("LAB7_LIST_TABLE_FALLBACK", "1") != "0"   # แคตตาล็อกไม่มีตารางแผน: วิชาที่หน้าคำอธิบายหาย/อ่านไม่ได้ -> เติมจากตารางรายชื่อวิชา
+PAD_WILD_CODES = os.getenv("LAB7_PAD_WILDCARD_CODES", "1") != "0"   # ชื่อเกินจำนวนรหัสตัวแทนในช่องเดียว
+DUPCONT = os.getenv("LAB7_DUP_NAME_CONTINUATION", "1") != "0"
 ALT_MODE = os.getenv("LAB7_ALT_MODE", "split").strip().lower()        # split | single
 
 _THAI_RE = re.compile(r"[\u0E00-\u0E7F]")
@@ -1130,10 +1142,20 @@ def _table_grid(table_html: str) -> list[tuple[list[str], list[bool]]]:
     table_html = _repair_table_html(table_html)
     grid: list[tuple[list[str], list[bool]]] = []
     carry: dict[int, list] = {}        # col -> [แถวที่เหลือ, ข้อความ]
+    width = 0                          # ความกว้างตาราง = จำนวนคอลัมน์ของแถวแรก (หลังขยาย colspan)
     for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", table_html, re.DOTALL | re.IGNORECASE):
         cells = re.findall(r"<t[dh]([^>]*)>(.*?)</t[dh]>", tr, re.DOTALL | re.IGNORECASE)
         row: list[str] = []
         inh: list[bool] = []
+        # rowspan ที่ VLM ประกาศยาวเกินจริง (เช่น rowspan=4 แต่ครอบแค่ 3 แถว) จะรั่วเข้าแถวถัดไป
+        # แล้วดันเซลล์จริงของแถวนั้นไปคอลัมน์ขวา (แถวกว้างเกินตาราง) -> ยกเลิก carry ที่เกินก่อน
+        n_own = 0
+        for attrs, _ in cells:
+            cs_ = re.search(r"colspan\s*=\s*[\"']?(\d+)", attrs, re.IGNORECASE)
+            n_own += int(cs_.group(1)) if cs_ else 1
+        if width and carry and n_own + len(carry) > width:
+            for c in sorted(carry)[: n_own + len(carry) - width]:
+                del carry[c]
 
         def flush() -> None:
             while len(row) in carry:
@@ -1158,6 +1180,8 @@ def _table_grid(table_html: str) -> list[tuple[list[str], list[bool]]]:
                 inh.append(False)
         flush()
         if row:
+            if not width:
+                width = len(row)
             grid.append((row, inh))
     return grid
 
@@ -1564,6 +1588,15 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     continue
                 codes = _split_codes(first)
                 if not codes:
+                    # ช่องรหัสว่าง (rowspan ของ OCR): แถวนี้อาจมีแค่ "หรือ" / หน่วยกิตใบที่สอง ของกลุ่มก่อนหน้า
+                    # -> เก็บเป็นเศษหน่วยกิตของกลุ่มนั้น (ไม่สร้างแถวใหม่)
+                    if groups and not first.strip():
+                        _frag = cells[i_cred] if i_cred < len(cells) and not inh[i_cred] else ""
+                        _nmc = (cells[i_name] if i_name < len(cells) else "").strip()
+                        if _frag:
+                            groups[-1].setdefault("frags", []).append(_frag)
+                        if re.fullmatch(r"หรือ", _nmc):
+                            groups[-1]["has_or"] = True
                     continue
                 name_cell = cells[i_name] if i_name < len(cells) else ""
                 cred_cell = (cells[i_cred] if i_cred < len(cells) else "") or shared_credit
@@ -1576,8 +1609,11 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     name_cell = name_cell[:tm.start()].strip()
                     if tm.group(1).replace(" ", "") not in cred_cell.replace(" ", ""):
                         cred_cell = f"{cred_cell} หรือ {tm.group(1)}".strip()
-                if inh[i_code] and name_cell.strip() == "รวม":      # แถว 'รวม' ที่ rowspan รหัสลากมาทับ
-                    declared_total = _table_page_credit(cells[i_cred]) if i_cred < len(cells) else None
+                # แถว 'รวม' / 'รวม N' ที่ rowspan รหัสลากมาทับ (รหัสสืบทอดมา ชื่อเป็นคำว่า รวม ล้วน ๆ)
+                tot_m = re.fullmatch(r"รวม\s*(\d*)", name_cell.strip())
+                if inh[i_code] and tot_m:
+                    declared_total = (int(tot_m.group(1)) if tot_m.group(1)
+                                      else (_table_page_credit(cells[i_cred]) if i_cred < len(cells) else None))
                     continue
                 lead = _LEAD_CODE_RE.match((name_cell.split("\n") or [""])[0])
                 if inh[i_code] and groups and lead and lead.group(2) and not (i_name < len(inh) and inh[i_name]):
@@ -1592,7 +1628,21 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     # rowspan ของ OCR มักทำให้ได้แถวเกิน: ช่องชื่อที่ว่าง / ซ้ำแถวก่อน (สืบทอดมา) /
                     # เป็นหน่วยกิตล้วน ไม่ใช่ชื่อวิชา -> ไม่นับเป็นชื่อเพิ่ม
                     nm = re.sub(r"\s+", " ", name_cell).strip()
-                    if (nm and not (i_name < len(inh) and inh[i_name])
+                    g_ = groups[-1]
+                    own_c = cells[i_cred] if i_cred < len(cells) and not inh[i_cred] else ""
+                    if own_c:
+                        g_.setdefault("frags", []).append(own_c)
+                    if re.fullmatch(r"หรือ", nm):
+                        g_["has_or"] = True
+                    or_open = (g_.get("has_or") or "หรือ" in (g_.get("credits") or "")
+                               or any("หรือ" in f_ for f_ in g_.get("frags", [])))
+                    # ชื่อเดียวกับชื่อที่มีอยู่แล้วในกลุ่ม + หน่วยกิตของกลุ่มยังเปิดด้วย \"หรือ\" = แถวต่อของ
+                    # ช่องเดิมที่ OCR ฉีกเป็นสองบรรทัด ไม่ใช่วิชาใหม่ (เศษหน่วยกิตถูกเก็บไว้แล้วด้านบน)
+                    dup_cont = (nm and or_open
+                                and _sq(nm) in {_sq(x_) for x_ in g_["names"]})
+                    if DUPCONT and dup_cont:
+                        pass
+                    elif (nm and not (i_name < len(inh) and inh[i_name])
                             and not re.fullmatch(r"(?:\s*หรือ\s*|\s*\d+\s*\([0-9xX\s-]+\)\s*)+", nm)):
                         groups[-1]["names"].append(name_cell)
                         own = (cells[i_cred] if i_cred < len(cells) and not inh[i_cred] else "")
@@ -1611,6 +1661,15 @@ def parse_plan_tables(pages: list[tuple[int, str]]
             alt_no = 0
             for g in groups:
                 codes, names = g["codes"], g["names"]
+                # OCR ฉีกช่องหน่วยกิตเดียว (\"3 (3-0-6) หรือ 3 (2-2-5)\") ไปหลายแถวของกลุ่ม rowspan เดียวกัน
+                # -> รวมเศษทั้งหมดแล้วให้ทุกแถวในกลุ่มใช้ค่าเต็มเหมือนกัน (เฉพาะเมื่อมี \"หรือ\" จริง)
+                if MERGE_CRED and g.get("frags"):
+                    _open = (g.get("has_or") or "หรือ" in (g.get("credits") or "")
+                             or any("หรือ" in f_ for f_ in g["frags"]))
+                    _m = _norm_credits(" ".join([g.get("credits") or ""] + g["frags"])) if _open else None
+                    if _m and " หรือ " in _m:
+                        g["merged_credit"] = _m
+                        g["credits"] = _m
                 credits = _norm_credits(g["credits"])
                 alt_key = None
                 # รหัสหลายบรรทัดใน rowspan เดียว (ไม่มีคำว่า "หรือ") ที่จำนวนชื่อเท่าจำนวนรหัส = คนละแถวต่อเนื่องกัน
@@ -1618,6 +1677,14 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                 # และยอดรวมหน่วยกิตของภาคขาด เพราะนับกลุ่มทางเลือกเป็นวิชาเดียว)
                 if (len(codes) > 1 and len(set(codes)) > 1 and "หรือ" not in (g.get("first") or "")
                         and len(names) == len(codes)):
+                    g["sep_rows"] = True
+                # ช่องรหัสเดียวมีรหัสตัวแทน (มี x) หลายตัวคั่นบรรทัด ไม่มี "หรือ" แต่ชื่อวิชามีมากกว่าจำนวนรหัส
+                # (เช่น "9064xxxxx / XXXXXXX" ครอบชื่อ 3 แถว) = คนละแถวตามลำดับ ชื่อที่เกินใช้รหัสตัวสุดท้ายร่วมกัน
+                # แทนที่จะเหลือแค่ชื่อแรกซ้ำกับทุกรหัสแล้วชื่อที่เหลือหาย
+                if (PAD_WILD_CODES and len(codes) > 1 and len(names) > len(codes)
+                        and all(_is_wild(c_) for c_ in codes) and len(set(codes)) > 1
+                        and "หรือ" not in (g.get("first") or "")):
+                    codes = codes + [codes[-1]] * (len(names) - len(codes))
                     g["sep_rows"] = True
                 same_code = len(codes) > 1 and (len(set(codes)) == 1 or bool(g.get("sep_rows")))
                 if same_code and len(set(codes)) == 1:
@@ -1654,7 +1721,7 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     # ชื่อที่เหลือ = แถวที่ OCR ทำ "รหัส" หาย/ยุบรวม -> ค่อยหารหัสจากชื่อทีหลัง (code=None)
                     entries = []
                     for k, (th_k, en_k) in enumerate(parsed):
-                        entries.append((codes[0] if k == 0 else None, th_k, en_k))
+                        entries.append((codes[0] if (k == 0 or _is_wild(codes[0])) else None, th_k, en_k))
                 else:
                     th, en = parsed[0]
                     entries = [(c, th, en) for c in codes]
@@ -1671,6 +1738,8 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                     own = _norm_credits((g.get("ncred") or {}).get(k_e) or "")
                     if own:
                         cred_e = own
+                    if g.get("merged_credit"):
+                        cred_e = g["merged_credit"]
                     row = {
                         "code": code, "name_th": th, "name_en": en,
                         "credits": cred_e, "year": year, "semester": sem,
@@ -2262,7 +2331,9 @@ def repair_plan_rows(plan_rows: list[dict], desc: dict[str, dict], checks: list[
     for r in rows:
         if _is_wild(r["code"]):
             stem, num = _stem_num(r["name_th"])
-            if num is not None:
+            # เลขลำดับช่องเลือกจริงมีไม่กี่ตัว (1..20) และต้องมีชื่อนำหน้า — ชื่อที่เป็นรหัสล้วน
+            # (เช่น "90644042") จะได้ num=90644042 แล้ว range(1, max+1) ข้างล่างกินหน่วยความจำจนโปรเซสตาย
+            if num is not None and stem and 1 <= num <= 20:
                 series[(r.get("plan"), r["code"], stem)].append(r)
     for (plan, code, stem), members in series.items():
         nums = {_stem_num(m["name_th"])[1] for m in members}
@@ -2397,6 +2468,15 @@ def rules_extract(md_pages: list[str], page_nums: list[int] | None) -> dict | No
             r["category"] = r["category"] or _fallback_category(code, r["name_th"])
         r["source_page"] = table_pages[id(r)][0]
 
+    # ช่อง "รหัสจริง หรือ รหัสจริง" ที่ตารางแผนวางไว้ในภาค/ปีที่แน่นอน (เช่น สหกิจศึกษา / สหกิจศึกษาต่างประเทศ)
+    # = นักศึกษาต้องเรียนหนึ่งในสองวิชานี้ในภาคนั้น จึงเป็นช่องบังคับ แม้ประเภทจากหน้าคำอธิบายจะไหลมาจากหัวกลุ่มวิชาเลือกก่อนหน้า
+    # (ไม่แตะช่อง wildcard และไม่แตะแถวที่ไม่มีปี/ภาค)
+    if ALT_PAIR_REQUIRED:
+        for r in table_courses:
+            if (r.get("alt_group") and r.get("year") and r.get("semester")
+                    and r.get("code") and not _is_wild(r["code"])):
+                r["type"] = "บังคับ"
+
     # ── วิชาที่มีแต่ในหน้าคำอธิบาย = วิชาเลือกที่ไม่ผูกปี/ภาค ─────────────────
     # เล่มที่มีสองแผน (ไม่สหกิจ/สหกิจ): วิชาที่มีแต่ในแผนสหกิจ (เช่น สหกิจศึกษา) ก็เป็น "วิชาเลือกที่ไม่ผูกปี/ภาค"
     # ของแผนไม่สหกิจด้วย (เฉลยแผนไม่สหกิจใส่ไว้เป็น year=0) จึงเพิ่มแถว year=0 อีกหนึ่งแถวโดยคงแถวในตารางสหกิจไว้
@@ -2448,6 +2528,41 @@ def rules_extract(md_pages: list[str], page_nums: list[int] | None) -> dict | No
             "description_th": d.get("description_th"),
             "pages": list(d["pages"]), "source_page": d["pages"][0],
         })
+
+    # แคตตาล็อกวิชา (ไม่มีตารางแผนเลย เช่น GENED): ตารางรายชื่อวิชา (รหัส | ชื่อไทย<br/>ชื่ออังกฤษ | หน่วยกิต)
+    # ถูก \"ข้ามตาราง\" เพราะไม่มี header — แต่ถ้าหน้าคำอธิบายของวิชาใดหาย (OCR ตัดรหัส/ชื่อตอนขึ้นหน้าใหม่)
+    # หรืออ่านชื่อไม่ได้ วิชานั้นจะหายจากผลทั้งที่ตารางรายชื่อมีครบ -> เติมจากตารางเฉพาะรหัสที่ยังไม่มีแถว
+    # ใช้เป็นแหล่งสำรองเท่านั้น: ไม่แตะแถวที่มีอยู่แล้ว (ไม่ใช้ชื่อในตารางทับชื่อจากคำอธิบาย)
+    n_listfb = 0
+    if LIST_TABLE_FALLBACK and skipped_tables and not table_courses:
+        have = {c["code"] for c in extra} | in_plan
+        skip_pgs = {s_["page"] for s_ in skipped_tables}
+        _row_re = re.compile(r"<tr[^>]*>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>\s*</tr>",
+                             re.DOTALL | re.IGNORECASE)
+        for pg_, txt_ in pages:
+            if pg_ not in skip_pgs:
+                continue
+            for m_ in _row_re.finditer(txt_):
+                cs_ = _split_codes(_clean_cell(m_.group(1)))
+                if len(cs_) != 1 or "x" in cs_[0].lower() or cs_[0] in have:
+                    continue
+                th_, en_ = _name_from_cell(_clean_cell(m_.group(2)))
+                if not th_:
+                    continue
+                code_ = cs_[0]
+                extra.append({
+                    "code": code_, "name_th": th_, "name_en": en_,
+                    "credits": _norm_credits(_clean_cell(m_.group(3))), "year": 0, "semester": 0,
+                    "category": _fallback_category(code_, th_), "type": "เลือก",
+                    "prerequisite": None, "flexible_year_semester": None,
+                    "note": "เติมจากตารางรายชื่อวิชา (หน้าคำอธิบายของวิชานี้หาย/อ่านไม่ได้)",
+                    "description_th": None, "pages": [pg_], "source_page": pg_,
+                })
+                have.add(code_)
+                n_listfb += 1
+        if n_listfb:
+            print(f"    ℹ เติมวิชาจากตารางรายชื่อวิชา {n_listfb} วิชา (หน้าคำอธิบายหาย/อ่านไม่ได้): "
+                  + ", ".join(c["code"] for c in extra[-n_listfb:]))
 
     courses = table_courses + extra
 
@@ -2506,6 +2621,13 @@ def rules_extract(md_pages: list[str], page_nums: list[int] | None) -> dict | No
         # ตัวอักษรซ้ำที่ OCR/เล่มพิมพ์เกินในคำว่า COOPERATIVE (ไม่ใช่คำจริงในภาษาอังกฤษ) — แก้ทุกรหัส ไม่ผูกกับเล่มใด
         if c.get("name_en"):
             c["name_en"] = re.sub(r"COOPER[A-Z]*?ATIVE", "COOPERATIVE", c["name_en"])
+        # เลขลำดับท้ายชื่ออังกฤษที่ OCR/เล่มพิมพ์ติดคำ (\"DATA SCIENCE1\") ทั้งที่ชื่อไทยของวิชาเดียวกันเว้นวรรคก่อนเลขเดียวกัน
+        # (\"...วิทยาการข้อมูล 1\") -> เว้นวรรคให้ตรงกัน เฉพาะเมื่อเลขท้ายสองชื่อเท่ากัน (ไม่แตะ H2O, MP3 ฯลฯ)
+        if SPACE_TRAILING_NUM and c.get("name_en") and c.get("name_th"):
+            _mt = re.search(r"\s(\d{1,2})$", c["name_th"].strip())
+            _me = re.search(r"(?<=[A-Za-z])(\d{1,2})$", c["name_en"].strip())
+            if _mt and _me and _mt.group(1) == _me.group(1):
+                c["name_en"] = c["name_en"].strip()[:_me.start()] + " " + _me.group(1)
         if c.get("name_th"):
             for bad, good in _THAI_OCR_FIXES.items():
                 c["name_th"] = c["name_th"].replace(bad, good)

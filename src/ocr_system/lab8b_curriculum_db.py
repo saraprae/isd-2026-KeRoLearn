@@ -55,14 +55,26 @@ from typing import Any
 OLLAMA_URL = os.environ.get("LAB8_OLLAMA_URL", "http://127.0.0.1:11434")
 MODEL_TEXT = os.environ.get("LAB8_MODEL_TEXT", "qwen3:4b")
 
-# ช่วงหน้าเริ่มต้นของแต่ละโปรแกรม อิงตัวคั่น --- Page N --- ที่ pipeline.py ฝังไว้แล้ว
+# ตารางนี้เป็น "fallback เดิม" เท่านั้น — ค่าเริ่มต้นตอนนี้คือ detect_sections() ซึ่งจับ
+# ช่วงหน้าจากป้ายหัวข้อภาษาไทย ("รายวิชา" / "แผนการศึกษา" / "คำอธิบายรายวิชา") ในเนื้อหาเอง
+# แทนที่จะพึ่งเลขหน้าที่จดไว้ล่วงหน้า (ดูคอมเมนต์ยาวเหนือ detect_sections() ด้านบนของไฟล์)
+# ตารางนี้ยังใช้เป็นทางสำรองในจุดที่ยังไม่มี Markdown ต้นทางให้สแกน เช่น import-lab7b
+# --split-dir ตอนที่ไม่ได้ระบุ --source-md (มีแต่ pred JSON จาก Lab 7B ไม่มี markdown ดิบ)
 # key ระดับในสุดคือชื่อ section: nocoop / coop / plan / courses
 PROGRAM_PAGE_RANGES: dict[str, dict[str, tuple[int, int]]] = {
-    "IT":    {"nocoop": (31, 37), "coop": (38, 44), "courses": (324, 360)},
-    "DSBA":  {"nocoop": (23, 29), "coop": (30, 36), "courses": (314, 341)},
-    "BIT":   {"nocoop": (26, 30), "coop": (31, 35), "courses": (238, 257)},
-    "AIT":   {"plan": (23, 26), "courses": (287, 304)},
-    "GENED": {"courses": (39, 117)},   # ไม่มีแผนของตัวเอง — courses อย่างเดียว
+    "IT":    {"nocoop": (31, 37), "coop": (38, 44), "courses": (324, 360), "course_list": (21, 30)},
+    "DSBA":  {"nocoop": (23, 29), "coop": (30, 36), "courses": (314, 341), "course_list": (16, 22)},
+    "BIT":   {"nocoop": (26, 30), "coop": (31, 35), "courses": (238, 257), "course_list": (20, 25)},
+    "AIT":   {"plan": (23, 26), "courses": (287, 304), "course_list": (18, 22)},
+    "GENED": {"courses": (39, 117), "course_list": (12, 30)},   # ไม่มีแผนของตัวเอง — courses + course_list
+    # --- books 2560 (added; originals above untouched) ---
+    # nocoop/coop split inside the first range is not known -> not hard-coded. With --source-md
+    # (run_lab8b passes it) the split is detected from the headings; this table is only the fallback.
+    "IT_2560":   {"courses": (223, 269), "course_list": (19, 40)},
+    "DSBA_2560": {"courses": (176, 207), "course_list": (19, 34)},
+    "BIT_2560":  {"courses": (171, 192),  "course_list": (18, 30)},
+    "GENED_2559": {"courses": (42, 85),  "course_list": (14, 23)},
+    "GENED_2564": {"courses": (44, 117), "course_list": (16, 30)},
 }
 
 # ชื่อ section -> ส่วนท้ายชื่อไฟล์เฉลย เช่น IT_academic_plan_no_coop.json
@@ -200,9 +212,12 @@ def build_models():
         lecture_h: int | None = Field(default=None, ge=0, le=60)
         lab_h: int | None = Field(default=None, ge=0, le=60)
         self_h: int | None = Field(default=None, ge=0, le=60)
+        # ข้อความหน่วยกิตเต็มเมื่อเล่มให้หลายแบบ เช่น "3(3-0-6) หรือ 3(2-2-5)" (ตัวเลขด้านบนเก็บแบบแรก)
+        credits_text: str | None = None
         description_th: str | None = None
-        # เลขหน้าในเล่มหลักสูตรที่พบข้อมูลนี้ — ใช้อ้างอิงตอนตอบคำถาม
-        source_page: int | None = None
+        # เลขหน้าทั้งหมดในเล่มหลักสูตรที่พบข้อมูลนี้ (เช่น หน้าตารางแผน + หน้าคำอธิบายรายวิชา)
+        # — ใช้อ้างอิงตอนตอบคำถาม (แทน source_page เดิมที่เก็บได้หน้าเดียว)
+        pages: list[int] | None = None
 
         @field_validator("code")
         @classmethod
@@ -234,7 +249,7 @@ def build_models():
         credits: int = Field(ge=0, le=12)
         alt_group: str | None = None
         note: str | None = None
-        source_page: int | None = None
+        pages: list[int] | None = None
         category: str | None = None
         type: str | None = None
 
@@ -257,10 +272,11 @@ def build_models():
         name_th: str | None = None
         name_en: str | None = None
         credits: int | None = Field(default=None, ge=0, le=12)
+        credits_text: str | None = None
         category: str | None = None
         type: str | None = None
         note: str | None = None
-        source_page: int | None = None
+        pages: list[int] | None = None
 
         @field_validator("code")
         @classmethod
@@ -337,7 +353,7 @@ CREATE TABLE IF NOT EXISTS course (
     lab_h          INTEGER,
     self_h         INTEGER,
     description_th TEXT,
-    source_page INTEGER
+    pages          TEXT      -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
 );
 
 CREATE TABLE IF NOT EXISTS plan_item (
@@ -354,7 +370,7 @@ CREATE TABLE IF NOT EXISTS plan_item (
     category   TEXT,          -- หมวดวิชาเฉพาะ / หมวดวิชาศึกษาทั่วไป / เลือกเสรี
     type       TEXT,          -- บังคับ / เลือก
     note       TEXT,
-    source_page INTEGER
+    pages      TEXT          -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
 );
 
 CREATE TABLE IF NOT EXISTS prerequisite (
@@ -377,7 +393,7 @@ CREATE TABLE IF NOT EXISTS elective_slot (
     category      TEXT,
     type          TEXT,
     note          TEXT,
-    source_page   INTEGER,
+    pages         TEXT,       -- JSON array ของเลขหน้าในเล่ม เช่น [23, 287]; NULL = ไม่รู้
     UNIQUE (program_id, code)
 );
 
@@ -391,7 +407,7 @@ CREATE INDEX IF NOT EXISTS ix_slot_code ON elective_slot(code);
 CREATE VIEW IF NOT EXISTS v_plan AS
 SELECT p.id, p.year, p.semester, p.code, c.name_th, c.name_en,
        p.credits, p.alt_group, p.category, p.type, p.note,
-       COALESCE(p.source_page, c.source_page) AS source_page
+       COALESCE(p.pages, c.pages) AS pages
 FROM plan_item p
 LEFT JOIN course c ON c.code = p.code;
 
@@ -401,12 +417,12 @@ CREATE VIEW IF NOT EXISTS v_course_terms AS
 SELECT p.code AS code, c.name_th AS name_th,
        (p.year || '/' || p.semester) AS terms,
        p.credits AS credits, 'plan' AS source,
-       COALESCE(p.source_page, c.source_page) AS source_page
+       COALESCE(p.pages, c.pages) AS pages
 FROM plan_item p LEFT JOIN course c ON c.code = p.code
 UNION ALL
 SELECT e.code, COALESCE(c.name_th, e.name_th),
        e.allowed_terms, COALESCE(e.credits, c.credits), 'elective_slot',
-       COALESCE(e.source_page, c.source_page)
+       COALESCE(e.pages, c.pages)
 FROM elective_slot e LEFT JOIN course c ON c.code = e.code;
 
 -- VIEW ที่สองนี้สำคัญกว่าที่เห็น
@@ -473,19 +489,155 @@ def ollama_generate(prompt: str, fmt: Any | None = None,
     return (r.json().get("message") or {}).get("content", "")
 
 PAGE_MARKER_RE = re.compile(r"--- Page (\d+) ---")
+# ตัวคั่นหน้าดิบที่ intermediate_vlm.md (ผลลัพธ์ VLM/OCR ก่อนเข้า Lab 7B) ใช้จริง — คนละแบบกับ
+# --- Page N --- ที่ pipeline.py ฝังใน curriculum.md ที่ Lab 7B ทำความสะอาดแล้ว
+_PDF_PAGE_MARKER_RE = re.compile(r"<!--\s*PDF_PAGE\s+(\d+)\s*-->")
+
+
+def _iter_pages(text: str) -> list[tuple[int, str]]:
+    """แยกข้อความเป็น [(เลขหน้า, เนื้อหาของหน้ารวมตัวคั่นเอง), ...]
+
+    รองรับตัวคั่นทั้งสองแบบที่พบในไฟล์จริงของแล็บนี้ — ลอง --- Page N --- (curriculum.md
+    จาก Lab 7B) ก่อน ถ้าไม่เจอเลยค่อยลอง <!-- PDF_PAGE N --> (intermediate_vlm.md ดิบ)
+    ทำให้ทั้ง slice_pages() และ detect_sections() ใช้ไฟล์จากขั้นไหนของ pipeline ก็ได้
+    """
+    parts = PAGE_MARKER_RE.split(text)
+    if len(parts) > 1:
+        return [(int(parts[i]), f"--- Page {parts[i]} ---{parts[i + 1]}")
+                for i in range(1, len(parts), 2)]
+    markers = list(_PDF_PAGE_MARKER_RE.finditer(text))
+    if not markers:
+        return []
+    pages = []
+    for i, m in enumerate(markers):
+        start_pos = m.start()
+        end_pos = markers[i + 1].start() if i + 1 < len(markers) else len(text)
+        pages.append((int(m.group(1)), text[start_pos:end_pos]))
+    return pages
+
 
 def slice_pages(text: str, start: int, end: int) -> str:
-    """ตัด Markdown เหลือเฉพาะช่วงหน้า [start, end] จากตัวคั่น --- Page N ---"""
-    parts = PAGE_MARKER_RE.split(text)   # [pre, "N1", chunk1, "N2", chunk2, ...]
-    out = []
-    for i in range(1, len(parts), 2):
-        page_no = int(parts[i])
-        if start <= page_no <= end:
-            out.append(f"--- Page {page_no} ---{parts[i + 1]}")
+    """ตัด Markdown เหลือเฉพาะช่วงหน้า [start, end] จากตัวคั่นหน้า (ดู _iter_pages)"""
+    pages = _iter_pages(text)
+    if not pages:
+        raise ValueError("ไม่พบตัวคั่นหน้าในเอกสาร (รองรับ --- Page N --- หรือ "
+                         "<!-- PDF_PAGE N -->) — ตรวจว่าไฟล์มาจาก pipeline.py/Lab 7B จริงหรือไม่")
+    out = [chunk for page_no, chunk in pages if start <= page_no <= end]
     if not out:
-        raise ValueError(f"ไม่พบตัวคั่นหน้าในช่วง {start}-{end} "
-                         f"— ตรวจว่า pipeline.py ฝัง --- Page N --- มาจริงหรือไม่")
+        raise ValueError(f"ไม่พบตัวคั่นหน้าในช่วง {start}-{end}")
     return "\n".join(out)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  จับ section จากป้ายหัวข้อภาษาไทยในเนื้อหาเอง แทนตาราง PROGRAM_PAGE_RANGES
+# ═══════════════════════════════════════════════════════════════════════
+#
+#  ทำไมเปลี่ยนจากตาราง hardcode เลขหน้า มาเป็นจับป้ายหัวข้อ
+#    ตารางเดิมต้องนั่งไล่หาเลขหน้าเองทุกครั้งที่มีโปรแกรมใหม่ หรือเล่มหลักสูตรพิมพ์ใหม่
+#    แล้วเลขหน้าขยับ (เช่นเพิ่ม/ลดวิชา) ตารางเก่าก็ผิดทันทีโดยไม่มีอะไรเตือน
+#    ป้ายหัวข้อ "รายวิชา" / "แผนการศึกษา" / "คำอธิบายรายวิชา" อยู่ในเนื้อหาเองอยู่แล้ว
+#    ขยับไปกับเล่มเสมอ ไม่ต้องแก้โค้ดตามทุกครั้ง
+#
+#  ข้อควรระวังที่เจอจริงตอนตรวจกับ BIT/IT/DSBA/AIT/GENED ทั้ง 5 โปรแกรม
+#    1) "3.1.9 คำอธิบายรายวิชา (ภาคผนวก จ)" เป็นแค่ตัวชี้ไปภาคผนวก ไม่ใช่หัวข้อจริง
+#       ตัวจริงคือ "คำอธิบายรายวิชาเฉพาะ" หรือหัวข้อ # เปล่า ๆ "# คำอธิบายรายวิชา"
+#       หรือ "ภาคผนวก ก คำอธิบายรายวิชา" (ดู DESC_START_RE)
+#    2) DSBA มีประโยคแทรก "สำหรับแผนการศึกษาที่ไม่เข้าร่วมโครงการสหกิจศึกษา" อยู่ในหมวด
+#       รายวิชา (component 1) ก่อนถึงหัวข้อแผนจริง "...ที่ไม่เข้าโครงการสหกิจศึกษา"
+#       (ไม่มี "ร่วม") — ตัวจริงกับตัวหลอกต่างกันแค่คำว่า "ร่วม" เท่านั้น
+#       ดู negative lookahead (?!ร่วม) ใน NOCOOP_RE/COOP_RE
+#    3) หัวข้อ "แผนการศึกษา" เฉย ๆ (ไม่ระบุ นอกจาก/ใน โครงการสหกิจ) เป็นแค่หัวข้อแม่ที่
+#       บางเล่มพิมพ์นำหน้า nocoop/coop (เช่น IT: "3.1.4 แผนการศึกษา" ตามด้วย "3.1.4.1 ...")
+#       ใช้เป็น section เดี่ยว "plan" เฉพาะตอนที่เล่มนั้นไม่มี nocoop/coop แยกเลย (เช่น AIT)
+#    4) ท้ายแต่ละแผนการศึกษาจะมีบรรทัด "รวมตลอดหลักสูตร N หน่วยกิต" เสมอ (พิมพ์ซ้ำท้ายทุก
+#       แผน ถ้ามีมากกว่าหนึ่งแผน) ใช้เป็นจุดตัดท้าย section แผน แทนการเดาว่า "จบตรงก่อนหน้า
+#       section ถัดไป" เพราะระหว่างท้ายแผนกับหัวข้อคำอธิบายรายวิชามักมีเนื้อหาอื่นคั่นอยู่
+#       (รหัสวิชา, ระบบการศึกษา, ฯลฯ) หลายสิบหน้าที่ไม่ใช่ของ section ไหนเลย
+#
+#  ตรวจแล้วว่าให้ผลตรงกับตาราง PROGRAM_PAGE_RANGES (hand-tuned) เป๊ะทั้ง 16 ค่าใน 5 โปรแกรม
+DESC_START_RE = re.compile(
+    r"(?:^#{1,4}\s*คำอธิบายรายวิชา\s*$"          # หัวข้อ markdown เปล่า ๆ (AIT/DSBA)
+    r"|คำอธิบายรายวิชาเฉพาะ"                       # "...เฉพาะ" (BIT/IT)
+    r"|ภาคผนวก\s*[ก-ฮ]\.?\s*คำอธิบายรายวิชา)",   # ภาคผนวกที่มีเนื้อหาเต็ม (GENED)
+    re.M)
+
+COURSE_LIST_RE = re.compile(
+    r"(?:^\s*#{0,4}\s*\d+(?:\.\d+)*\.?\s+รายวิชา(?:ในหมวด[^\n]*)?\s*$"  # "3.1.3 รายวิชา" ฯลฯ
+    r"|^\s*#{0,4}\s*รายวิชา\s*$"                                        # หัวข้อเปล่า ๆ
+    r"|\*\*\s*\d+(?:\.\d+)*\.?\s+รายวิชา\s*\*\*)",                      # ตัวหนาในตาราง (GENED)
+    re.M)
+
+NOCOOP_RE = re.compile(r"แผนการศึกษาที่ไม่เข้า(?!ร่วม)โครงการสหกิจศึกษา")
+COOP_RE = re.compile(r"แผนการศึกษา(?:สำหรับ|ที่เข้า(?!ร่วม))?โครงการสหกิจศึกษา")   # DSBA_2560 พิมพ์ \"แผนการศึกษาโครงการสหกิจศึกษา\" (ไม่มี สำหรับ/ที่เข้า)
+GENERIC_PLAN_RE = re.compile(r"แผนการศึกษา")
+TOTAL_CREDITS_RE = re.compile(r"รวมตลอดหลักสูตร")
+
+_PLAN_KEYS = ("nocoop", "coop", "plan")
+
+
+def detect_sections(text: str) -> dict[str, tuple[int, int]]:
+    """หาช่วงหน้าของแต่ละ section จากป้ายหัวข้อภาษาไทยในเนื้อหาเอง
+
+    คืน dict คีย์ที่อาจปรากฏ (มีเฉพาะ key ที่หาเจอจริงในเอกสารนี้เท่านั้น):
+      course_list — หมวด "รายวิชา" (รหัส/ชื่อ/หน่วยกิต ไม่มีปี/เทอม; key ใหม่ ตารางเดิมไม่มี)
+      nocoop/coop — หมวด "แผนการศึกษา" สองแผน (สหกิจ/ไม่สหกิจ) ถ้าเล่มแยกไว้
+      plan        — หมวด "แผนการศึกษา" แผนเดียว ถ้าเล่มไม่แยกสหกิจ/ไม่สหกิจ (เช่น AIT)
+      courses     — หมวด "คำอธิบายรายวิชา" (คำอธิบาย/วิชาบังคับก่อน; ชื่อคีย์ตามตารางเดิม
+                    PROGRAM_PAGE_RANGES เพื่อให้โค้ดเดิมที่เรียก sections["courses"] ใช้ได้ต่อ)
+
+    ผู้เรียกต้องเช็คว่า key ที่ต้องการมีอยู่จริงก่อนใช้ เหมือนตอนเช็ค
+    PROGRAM_PAGE_RANGES[program] เดิม — เอกสารบางแบบ (เช่น GENED) ไม่มีหมวดแผนการศึกษาเลย
+    """
+    pages = _iter_pages(text)
+    if not pages:
+        raise ValueError("ไม่พบตัวคั่นหน้าในเอกสาร (รองรับ --- Page N --- หรือ "
+                         "<!-- PDF_PAGE N -->) — ใช้ --start-page/--end-page เองถ้าไฟล์นี้ไม่มี"
+                         "ตัวคั่นหน้า")
+
+    first_hit: dict[str, int] = {}
+    generic_plan_pages: list[int] = []
+    total_pages: list[int] = []
+
+    for page_no, chunk in pages:
+        if "courses" not in first_hit and DESC_START_RE.search(chunk):
+            first_hit["courses"] = page_no
+        if "course_list" not in first_hit and COURSE_LIST_RE.search(chunk):
+            first_hit["course_list"] = page_no
+        if "nocoop" not in first_hit and NOCOOP_RE.search(chunk):
+            first_hit["nocoop"] = page_no
+        if "coop" not in first_hit and COOP_RE.search(chunk):
+            first_hit["coop"] = page_no
+        if GENERIC_PLAN_RE.search(chunk):
+            generic_plan_pages.append(page_no)
+        if TOTAL_CREDITS_RE.search(chunk):
+            total_pages.append(page_no)
+
+    # "plan" (แผนเดียว) ใช้เฉพาะตอนไม่มี nocoop/coop แยกเลยในทั้งเอกสาร — ถ้ามีอย่างใด
+    # อย่างหนึ่งแล้ว แปลว่าหัวข้อ "แผนการศึกษา" เปล่า ๆ ที่เจอเป็นแค่หัวข้อแม่ ไม่ใช่ section ใหม่
+    if "nocoop" not in first_hit and "coop" not in first_hit and generic_plan_pages:
+        first_hit["plan"] = generic_plan_pages[0]
+
+    if not first_hit:
+        raise ValueError(
+            "ไม่พบหัวข้อ 'รายวิชา' / 'แผนการศึกษา' / 'คำอธิบายรายวิชา' ในเอกสารนี้เลย — "
+            "ตรวจว่าเป็น Markdown จาก Lab 7B จริงหรือไม่ หรือใช้ --start-page/--end-page เอง")
+
+    last_page = max(p for p, _ in pages)
+    ordered = sorted(first_hit.items(), key=lambda kv: kv[1])
+    ranges: dict[str, tuple[int, int]] = {}
+    for idx, (key, start) in enumerate(ordered):
+        next_start = ordered[idx + 1][1] if idx + 1 < len(ordered) else None
+        fallback_end = (next_start - 1) if next_start is not None else last_page
+        if key in _PLAN_KEYS:
+            # section แผนการศึกษา: จบที่บรรทัด "รวมตลอดหลักสูตร" ถัดไปหลังจุดเริ่ม ไม่ใช่แค่
+            # ก่อนหน้า section ถัดไป — กันไม่ให้กินเนื้อหาอื่นที่คั่นอยู่ระหว่างกลาง (ดูข้อ 4 ด้านบน)
+            candidates = [p for p in total_pages
+                         if p >= start and (next_start is None or p < next_start)]
+            end = min(candidates) if candidates else fallback_end
+        else:
+            end = fallback_end
+        ranges[key] = (start, end)
+    return ranges
 
 def parse_json_loose(s: str) -> dict:
     """ดึง JSON ออกจากคำตอบ แม้จะมี <think> หรือ fence ปนมา"""
@@ -637,14 +789,29 @@ def cmd_extract(args) -> None:
 
     if args.start_page and args.end_page:
         text = slice_pages(text, args.start_page, args.end_page)
-    elif args.program:
-        ranges = PROGRAM_PAGE_RANGES[args.program]
+    elif not args.no_detect:
+        # ค่าเริ่มต้น: จับ section จากป้ายหัวข้อภาษาไทยในไฟล์เอง (ดู detect_sections())
+        # แทนตาราง PROGRAM_PAGE_RANGES ที่ hardcode เลขหน้าไว้ล่วงหน้า
+        try:
+            ranges = detect_sections(text)
+        except ValueError as exc:
+            if args.program:
+                # เอกสารนี้จับป้ายหัวข้อไม่ได้ (เช่นไม่มีตัวคั่นหน้า) — ถอยไปใช้ตาราง
+                # legacy ถ้าผู้ใช้ระบุ --program ไว้ ไม่งั้นก็ส่ง error ของ detect_sections ต่อ
+                ranges = PROGRAM_PAGE_RANGES.get(args.program)
+                if ranges is None:
+                    raise SystemExit(str(exc)) from exc
+                print(f"  ! จับป้ายหัวข้อในเนื้อหาไม่ได้ ({exc}) — ใช้ตาราง legacy "
+                      f"ของ {args.program} แทน")
+            else:
+                raise SystemExit(str(exc)) from exc
         section = args.section or next(iter(ranges))
         if section not in ranges:
-            raise SystemExit(f"โปรแกรม {args.program} ไม่มี section '{section}' "
-                             f"(มีแค่ {list(ranges)})")
+            raise SystemExit(f"ไม่พบ section '{section}' ในเอกสารนี้ "
+                             f"(เจอแค่ {list(ranges)})")
         start, end = ranges[section]
-        print(f"  ตัดเฉพาะหน้า {start}-{end} ({args.program}/{section})")
+        print(f"  ตัดเฉพาะหน้า {start}-{end} (section: {section}"
+              f"{f', โปรแกรม {args.program}' if args.program else ''})")
         text = slice_pages(text, start, end)
 
     if args.max_chars and len(text) > args.max_chars:
@@ -682,6 +849,106 @@ def _normalize_name_th(name_th: str | None) -> str | None:
     return _FACULTY_ELECTIVE_PREFIX_RE.sub("", name_th).strip() or name_th
 
 
+# ── ตัดข้อความที่ Lab 7B ดึงติดท้ายชื่อวิชา กลับเป็นชื่อตามเล่ม ──────────────────
+# บั๊กที่พบจริงกับ IT (หน้า 29, รายการโมดูลอาชีพ M1/M2/M3): bullet สุดท้ายของแต่ละโมดูล
+# ถูกต่อด้วยย่อหน้าถัดไปเป็นส่วนหนึ่งของ name_th เช่น
+#   06016430 "...แอปพลิเคชัน" + "M2: โมดูล / ประกอบด้วยรายวิชาดังต่อไปนี้"
+#   06016441 "...เครือข่ายและระบบ" + "M3: โมดูลประกอบด้วย..."
+#   06016448 "...เกมเอนจิ้น" + "วิชาเลือกทางเทคโนโลยีสารสนเทศจากกลุ่มวิชาบังคับเฉพาะสาขา"
+# markdown ต้นทางสะอาด (ชื่ออยู่บรรทัดของตัวเอง) จึงใช้ชื่อในเล่มเป็นหลักฐาน: ตัดเฉพาะเมื่อ
+# name_th ขึ้นต้นด้วยชื่อที่พบในเล่มและยาวกว่า — ไม่เขียนทับชื่อที่แค่สะกดต่างกัน
+_CODE_NAME_LINE_RE = re.compile(
+    r"(?m)^[\s\*\-]*\**(\d{8})\s+([^\n*]+?)\s*(?:\d\(\d-\d-\d\))?\**\s*$")
+
+
+def build_canonical_names(md_text: str) -> dict[str, list[str]]:
+    names: dict[str, list[str]] = {}
+    for m in _CODE_NAME_LINE_RE.finditer(md_text or ""):
+        names.setdefault(m.group(1), []).append(m.group(2).strip())
+    return names
+
+
+def trim_names_to_canonical(courses: list[dict], md_text: str
+                            ) -> tuple[list[dict], list[str]]:
+    canon = build_canonical_names(md_text)
+    notes: list[str] = []
+    out: list[dict] = []
+    for src in courses:
+        row = dict(src)
+        name = str(row.get("name_th") or "")
+        code = str(row.get("code") or "").strip()
+        best = max((o for o in canon.get(code, [])
+                    if name.startswith(o) and name != o), key=len, default=None)
+        if best:
+            notes.append(f"{code}: ตัดข้อความที่ติดท้ายชื่อวิชาออก "
+                         f"({name!r} -> {best!r}) ตามชื่อในเล่มดิบ")
+            row["name_th"] = best
+        out.append(row)
+    return out, notes
+
+
+# ── คืนช่องว่างในชื่อวิชา (BIT) ──────────────────────────────────────────────────────────
+# พบจริงกับ BIT: เล่มพิมพ์ "วิชาเลือกหมวดวิชาศึกษาทั่วไป สำหรับหลักสูตรนานาชาติ 1" และ
+# "วิชาเลือกทางเทคโนโลยีสารสนเทศทางธุรกิจ 1 หรือ กลุ่มวิชาที่ 1-4" (เฉลยมีช่องว่าง) แต่ name_th ที่ออกมาติดกันหมด
+# สาเหตุ: เล่มพิมพ์ชื่อเดียวกันซ้ำหลายตาราง บางสำเนาตัดบรรทัดด้วย <br/> กลางชื่อ (".. ทั่วไป<br/>สำหรับ.."
+# ".. 1 หรือ<br/>กลุ่มวิชาที่ 1-4") และ Lab 7B ต่อสองบรรทัดโดยไม่ใส่ช่องว่าง ตัวไปป์ไลน์เองไม่ได้ลบช่องว่าง
+# (ตรวจแล้ว: ไม่มีขั้นใดใน convert_lab7b ตัดช่องว่างของ name_th)
+# ฟังก์ชันนี้อ่านชื่อจากเซลล์ที่ชื่ออยู่บรรทัดเดียว (ไม่ถูก <br/> ตัดกลางชื่อ) แล้วคืนช่องว่างให้ name_th ที่
+# ตัวอักษรเหมือนกันทุกตัว ต่างกันแค่ช่องว่าง -- ไม่แก้ตัวสะกดและไม่เติมคำ
+# ใช้ชื่อที่เล่มพิมพ์เป็นคีย์ (ไม่ใช้รหัส) เพราะแถว placeholder (9664xxxx, 06036xxx) ไม่มีรหัสจริง
+NAME_SPACING_RESTORE_PROGRAMS: set[str] = {"BIT"}
+
+
+def _table_single_line_name_variants(md_text: str) -> dict[str, set[str]]:
+    """ชื่อไทยแบบมีช่องว่างตามที่เล่มพิมพ์ จัดกลุ่มด้วยรูปที่ตัดช่องว่างทิ้ง (เฉพาะเซลล์ที่ชื่อไทยอยู่บรรทัดเดียว)"""
+    out: dict[str, set[str]] = {}
+    for tbl in re.findall(r"<table>.*?</table>", md_text or "", flags=re.S):
+        for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tbl, flags=re.S):
+            txt = re.sub(r"<[^>]+>", " ", re.sub(r"<br\s*/?>", "\n", cell))
+            lines = [re.sub(r"\s+", " ", ln).strip() for ln in txt.split("\n")]
+            lines = [ln for ln in lines if ln]
+            if not lines or not re.search(r"[\u0E00-\u0E7F]", lines[0]):
+                continue
+            # บรรทัดแรกต้องเป็นชื่อไทยทั้งบรรทัด และบรรทัดถัดไป (ถ้ามี) ต้องเป็นชื่ออังกฤษ ไม่ใช่ไทยที่ถูกตัดต่อ
+            if len(lines) > 1 and re.search(r"[\u0E00-\u0E7F]", lines[1]) and not re.match(r"[A-Z]", lines[1]):
+                continue
+            th = lines[0]
+            if len(lines) == 1:      # ชื่อไทย+อังกฤษอยู่บรรทัดเดียว: ตัดที่คำอังกฤษตัวพิมพ์ใหญ่คำแรก (รวมคำสั้นอย่าง 'GE')
+                cut = re.search(r"\s[A-Z]{2,}\b", th)
+                th = th[:cut.start()] if cut else th
+            th = th.strip()
+            if th and " " in th:
+                out.setdefault(re.sub(r"\s+", "", th), set()).add(th)
+    return out
+
+
+def restore_name_spacing_from_tables(courses: list[dict], program: str | None, text: str | None
+                                     ) -> tuple[list[dict], list[str]]:
+    """name_th ที่เหมือนชื่อในตารางทุกตัวอักษรแต่ไม่มีช่องว่าง -> ใช้ชื่อมีช่องว่างตามที่เล่มพิมพ์
+
+    กันพลาด: ต้องมีรูปแบบเดียวที่เล่มพิมพ์ (ถ้ามีหลายรูปแบบ -> ไม่แตะ) และรูปนั้นต้องมีช่องว่างมากกว่าค่าเดิม
+    """
+    if not text or program not in NAME_SPACING_RESTORE_PROGRAMS:
+        return courses, []
+    variants = _table_single_line_name_variants(text)
+    notes: list[str] = []
+    out: list[dict] = []
+    for src in courses:
+        row = dict(src)
+        name = str(row.get("name_th") or "")
+        cands = variants.get(re.sub(r"\s+", "", name)) or set()
+        if len(cands) == 1:
+            good = next(iter(cands))
+            if good != name and good.count(" ") > name.count(" "):
+                notes.append(f"{row.get('code')}: name_th คืนช่องว่างตามที่เล่มพิมพ์ ({name!r} -> {good!r})")
+                row["name_th"] = good
+        elif len(cands) > 1 and name not in cands:
+            notes.append(f"{row.get('code')}: เล่มพิมพ์ชื่อ {name!r} ไว้หลายแบบช่องว่าง {sorted(cands)} -- ไม่แก้ ให้คนตรวจ")
+        out.append(row)
+    return out, notes
+
+
+
 def _normalize_category(category: str | None) -> str | None:
     """แม็ปชื่อย่อหมวดวิชาที่ไม่ตรงเฉลยให้เป็นชื่อเต็มมาตรฐาน"""
     if not category:
@@ -708,6 +975,8 @@ def _credit_parts(value: Any) -> tuple[int | None, int | None, int | None, int |
     m = re.fullmatch(r"(\d{1,2})(?:\s*หน่วยกิต)?", text)
     if not m:
         raise ValueError(f"อ่านหน่วยกิตไม่ได้: {value!r}")
+    if int(m.group(1)) > 12:   # schema: credits <= 12 -> เลขเดี่ยวเกิน 12 = อ่านผิด (เช่น 21 จาก "ศตวรรษที่ 21")
+        raise ValueError(f"หน่วยกิต {m.group(1)} เกิน 12 (น่าจะอ่านผิด): {value!r}")
     return int(m.group(1)), None, None, None
 
 
@@ -836,6 +1105,26 @@ def _placeholder_code(raw_code: str) -> str | None:
     return None
 
 
+def _lab7b_pages(src: dict) -> list[int] | None:
+    """เลขหน้าทั้งหมดของแถว Lab 7B (ไม่ซ้ำ คงลำดับตามที่ Lab 7B ให้มา) — None = ไม่รู้
+
+    อ่านจาก pages (list) ก่อน แล้วค่อยถอยไป source_page/page/page_no/page_number
+    เพื่อให้ pred JSON เวอร์ชันเก่าที่มีแต่เลขหน้าเดียวยังใช้ได้
+    """
+    out: list[int] = []
+    for key in ("pages", "source_page", "page", "page_no", "page_number"):
+        value = src.get(key)
+        if value in (None, "", []):
+            continue
+        for item in (value if isinstance(value, list) else [value]):
+            m = re.search(r"\d+", str(item))
+            if m and int(m.group()) > 0 and int(m.group()) not in out:
+                out.append(int(m.group()))
+        if out:
+            break
+    return out or None
+
+
 def _lab7b_page(src: dict) -> int | None:
     """
     ดึงเลขหน้าจากเรกคอร์ดของ Lab 7B
@@ -870,10 +1159,30 @@ def _lab7b_page(src: dict) -> int | None:
 # บังคับทั้งสอง section เท่ากันหมด ทำให้ nocoop ที่เคยตรงอยู่แล้วพังไปแทน
 # (ตรวจกับ eval-gt จริงแล้วเห็นผลนี้ชัดเจน — นี่คือบทเรียนที่ต้องแก้ทันที)
 # ยังไม่ได้ตรวจ IT/DSBA ว่ามีวิชาโครงงานแบบเดียวกันหรือไม่
+# โปรแกรมที่เปิดใช้การกู้คืนจากตารางดิบ (ทางเลือก rowspan ที่หาย, หน่วยกิตที่เป็น null, ลำดับช่อง
+# ตามเอกสาร, category/type ตามรหัส) — ตรวจกับ DSBA แล้วเท่านั้น; IT/BIT/AIT/GENED ยังไม่ได้ตรวจกับ
+# markdown ดิบ จึงไม่เปิดจนกว่าจะตรวจ (เพิ่มชื่อโปรแกรมในเซ็ตนี้เมื่อตรวจแล้ว)
+RAW_TABLE_RECOVERY_PROGRAMS: set[str] = {"DSBA", "BIT"}
+
+# หมายเหตุที่ติดให้ elective_slot ที่ถูกบังคับเป็นวิชาเลือก แต่หน่วยกิตยังรวมอยู่ในยอดหลักสูตร
+# (CHK1 ต้องนับหน่วยกิตของแถวที่มีป้ายนี้ ไม่งั้นยอดแผนขาดไปเท่าหน่วยกิตของวิชานั้น)
+FORCED_ELECTIVE_COUNTED_MARK = "[นับในยอดหลักสูตร]"
+
+# (โปรแกรม, section) ที่วิชาซึ่งถูกบังคับเป็นวิชาเลือก "ยังอยู่ในยอดหลักสูตรที่ประกาศ" จริง จึงให้ CHK1 บวกหน่วยกิตเพิ่ม
+# ตอนนี้ว่างเปล่าโดยตั้งใจ: BIT coop เคยอยู่ในเซ็ตนี้ (06036145/06036146 = โครงงาน 1/2 รวม 6 หน่วยกิต)
+# แต่ตรวจกับเล่มแล้วว่ายอดต่อเทอมของแผนสหกิจที่เล่มพิมพ์ (18+18+18+18+18+15+15+6) รวมได้ 126 พอดี "โดยไม่มี" โครงงาน
+# และเล่มประกาศ 126 -- การบวกโครงงานอีก 6 จึงนับซ้ำ (CHK1 ได้ 132 ไม่ตรง 126)
+# ค่าเดิมเคยชดเชยยอดที่ขาด 6 หน่วยกิตตอนที่ช่อง "เลือก 1 จาก 3" ของ 3/2 ถูกนับเป็นช่องเดียว
+# (ดู split_cross_category_alt_groups) พอแก้ต้นเหตุนั้นแล้วตัวชดเชยจึงกลายเป็นตัวนับซ้ำ
+FORCED_ELECTIVE_COUNTED_IN_TOTAL: set[tuple[str, str]] = set()
+
 FORCE_ELECTIVE_TYPE_OVERRIDE: dict[str, dict[str, set[str]]] = {
     "BIT": {"coop": {"06036145", "06036146"}},
 }
 
+
+
+_CREDIT_LIKE_RE = re.compile(r"\d{1,2}\s*\(\s*[0-9xX]+\s*-\s*[0-9xX]+\s*-\s*[0-9xX]+\s*\)")
 
 
 def _raw_table_credits_map(md_text: str) -> dict[str, list[str]]:
@@ -903,7 +1212,14 @@ def _raw_table_credits_map(md_text: str) -> dict[str, list[str]]:
             is_wildcard = bool(re.fullmatch(r"[0-9X]{4,8}", token) and "X" in token)
             if not (is_code or is_wildcard):
                 continue
-            credits_cell = cells[-1].strip()
+            # หน่วยกิต = เซลล์ \"ขวาสุดที่หน้าตาเป็นหน่วยกิต\" ไม่ใช่เซลล์สุดท้ายตามตำแหน่งดื้อ ๆ
+            # (เจอจริง DSBA: ตาราง 4 คอลัมน์ที่ช่องท้ายว่าง -> cells[-1] ว่างแล้วทิ้งรหัส เช่น 06026217;
+            # ตาราง colspan=3 ที่ช่องท้ายคือ \"ชื่อวิชา\" -> ชื่อถูกเขียนลงช่องหน่วยกิต เช่น 06026258)
+            credits_cell = next((c.strip() for c in reversed(cells[1:])
+                                 if _CREDIT_LIKE_RE.search(c)), "")
+            if not credits_cell and len(cells) > 1 and re.fullmatch(
+                    r"\d{1,2}(?:\s*หน่วยกิต)?", cells[-1].strip()):
+                credits_cell = cells[-1].strip()        # เลขเดี่ยวล้วน (พฤติกรรมเดิม)
             if not credits_cell:
                 continue
             out.setdefault(token, []).append(credits_cell)
@@ -932,6 +1248,51 @@ def _credits_needs_repair(raw_credits: Any) -> bool:
     return bool(re.fullmatch(r"\d{1,2}(?:\s*หน่วยกิต)?", text))
 
 
+# โปรแกรมที่ยอมให้ "ช่องเลือก 1 จาก N ที่เล่มพิมพ์หน่วยกิตช่องเดียวคลุมทุกรหัส" ใช้เป็นหน่วยกิตของทุกรหัสในช่อง
+SHARED_CELL_CREDIT_PROGRAMS: set[str] = {"DSBA"}
+
+
+def _raw_table_shared_credit_map(md_text: str) -> dict[str, list[str]]:
+    """รหัสที่อยู่ในเซลล์ 'A หรือ B' เซลล์เดียว โดยเล่มพิมพ์หน่วยกิตเซลล์เดียว (rowspan >= 2) คลุมทั้งช่อง
+
+    พบจริงกับ DSBA: หน้า 36 มี <td rowspan="3">06026259<br/>หรือ 06026260</td> คู่กับ
+    <td rowspan="3">6 (0-35-0)</td> -- หน่วยกิตพิมพ์ครั้งเดียวคลุมทั้งสหกิจศึกษาและสหกิจศึกษาต่างประเทศ
+    _raw_table_credits_map() มองไม่เห็นเพราะ cell แรก 'ไม่ใช่รหัสเดี่ยว' จึงไม่มีทั้งสองรหัส
+    (ตารางแผนหน้า 22 ก็พังคนละแบบ: รหัส 06026259 ติดคำว่า 'รหัสวิชา' และ 06026260 ไม่มีช่องหน่วยกิต)
+
+    เข้มงวดโดยตั้งใจ: ต้องมีคำว่า 'หรือ' คั่นรหัสในเซลล์ และเซลล์หน่วยกิตต้อง rowspan >= 2 เท่านั้น
+    ไม่ใช้กับเซลล์รหัสซ้อนหลายบรรทัดที่ไม่มีคำว่า 'หรือ' (เช่นกลุ่ม 06016416/417/418 ของ IT ที่แต่ละ
+    ชื่อวิชามีหน่วยกิตจริงต่างกัน การแจกหน่วยกิตช่องเดียวให้ทุกรหัสจะผิด)
+    """
+    out: dict[str, list[str]] = {}
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        for row in re.findall(r"<tr>.*?</tr>", table, flags=re.S):
+            cells = [(attrs, re.sub(r"<[^>]+>", " ", inner).strip())
+                     for attrs, inner in re.findall(r"<t[dh]([^>]*)>(.*?)</t[dh]>", row, flags=re.S)]
+            if len(cells) < 2:
+                continue
+            codes = re.findall(r"(?<!\d)\d{8}(?!\d)", cells[0][1])
+            if len(set(codes)) < 2 or "หรือ" not in cells[0][1]:
+                continue
+            credit = next((txt for attrs, txt in reversed(cells[1:])
+                           if _CREDIT_LIKE_RE.search(txt)
+                           and int((re.search(r'rowspan="?(\d+)', attrs) or [0, 1])[1]) >= 2), "")
+            if not credit:
+                continue
+            for code in dict.fromkeys(codes):
+                out.setdefault(code, []).append(credit)
+    return out
+
+
+def merge_shared_cell_credits(raw_map: dict[str, list[str]] | None, md_text: str
+                              ) -> dict[str, list[str]]:
+    """เติมเฉพาะรหัสที่ _raw_table_credits_map() ไม่มีเลย -- ไม่แตะรหัสที่มีค่าอยู่แล้ว"""
+    merged = {k: list(v) for k, v in (raw_map or {}).items()}
+    for code, vals in _raw_table_shared_credit_map(md_text).items():
+        merged.setdefault(code, vals)
+    return merged
+
+
 def repair_credits_from_raw_tables(
         courses: list[dict], raw_map: dict[str, list[str]]) -> tuple[list[dict], list[str]]:
     """
@@ -951,6 +1312,11 @@ def repair_credits_from_raw_tables(
         current = row.get("credits")
         if raw_code and _credits_needs_repair(current):
             candidates = raw_map.get(raw_code)
+            if not candidates:
+                # แถวที่ Lab 7B รวมรหัสไว้ในช่องเดียว เช่น "06026259 หรือ 06026260"
+                parts = _lab7b_codes(raw_code)
+                if len(parts) > 1:
+                    candidates = [c for pc in parts for c in raw_map.get(pc, [])]
             if candidates:
                 best = _pick_best_raw_credits(candidates)
                 if best and best != current:
@@ -988,6 +1354,8 @@ _CREDITS_INFERRED_NOTE_RE = re.compile(r"หน่วยกิตอนุมา
 _ALT_GROUP_CREDIT_RE = re.compile(
     r"\d+\s*\(\s*(?:\d+|[xX]+)\s*-\s*(?:\d+|[xX]+)\s*-\s*(?:\d+|[xX]+)\s*\)")
 _LATIN_NAME_RE = re.compile(r"[A-Z]{3,}[A-Z0-9 /\-]*")
+# คำนำหน้า 'กลุ่มวิชาที่กำหนดโดยคณะ*' ที่ติดมาในเซลล์เดียวกับรหัส (เช่น 90644042) ไม่ใช่ส่วนของชื่อวิชา
+_FACULTY_GROUP_PREFIX_RE = re.compile(r"^\s*กลุ่มวิชาที่กำหนดโดยคณะ\*?\s*")
 
 
 def _looks_like_course_name_text(text: str) -> bool:
@@ -1051,8 +1419,7 @@ def _leading_code_and_rest(text: str) -> tuple[str, str] | None:
     return m.group(1), text[m.end():].strip()
 
 
-_PDF_PAGE_MARKER_RE = re.compile(r"<!--\s*PDF_PAGE\s+(\d+)\s*-->")
-
+# _PDF_PAGE_MARKER_RE ย้ายไปนิยามรวมกับ _iter_pages()/detect_sections() ด้านบนแล้ว
 
 def _table_page_positions(md_text: str) -> list[tuple[int, int | None]]:
     """คืน [(ตำแหน่ง char ที่ <table> แต่ละใบเริ่มต้น, เลขหน้า PDF ของ marker ล่าสุดก่อนหน้า)]
@@ -1125,6 +1492,17 @@ def recover_alt_group_siblings_from_raw_tables(
         table_page = table_pages.get(tm.start())
         cur_code: str | None = None
         group_cells: list[str] = []
+        # (ปี, เทอม) ของตารางนี้ = ค่าที่พบบ่อยสุดของแถวที่มีอยู่แล้วบนหน้าเดียวกันและรหัสอยู่ในตารางนี้
+        _tcodes = set()
+        for _r in _table_rows_cells(table):
+            _l = _leading_code_and_rest(_r[0]) if _r else None
+            if _l:
+                _tcodes.add(_l[0].strip().replace(' ', '').upper())
+        _ys = [(c.get('year'), c.get('semester')) for c in courses
+               if table_page in _row_pages(c)
+               and str(c.get('code') or '').strip().replace(' ', '').upper() in _tcodes
+               and c.get('year') and c.get('semester')]
+        table_ys = max(set(_ys), key=_ys.count) if _ys else None
 
         def flush_group() -> None:
             nonlocal group_counter
@@ -1171,7 +1549,7 @@ def recover_alt_group_siblings_from_raw_tables(
                 # ทางเลือกนี้ Lab 7B เก็บมาแล้วจริงในสำเนาหน้านี้เอง (หรือใกล้ที่สุด) หรือยัง
                 already = closest_candidate(
                     candidates_by_code_name.get((code_norm, norm), []), table_page)
-                if already is not None and _lab7b_page(already) == table_page:
+                if already is not None and table_page in _row_pages(already):
                     continue  # มีอยู่แล้วตรงหน้านี้เป๊ะ — ไม่ต้องเติมซ้ำ
                 elsewhere = [c for c in candidates_by_name_any_code.get(norm, [])
                              if str(c.get("code") or "").strip().replace(" ", "").upper()
@@ -1200,8 +1578,10 @@ def recover_alt_group_siblings_from_raw_tables(
                     "name_th": name_th_part,
                     "name_en": name_en_part,
                     "credits": combined_credit,
-                    "year": template.get("year"),
-                    "semester": template.get("semester"),
+                    "year": (table_ys[0] if table_ys and table_page not in _row_pages(template)
+                             else template.get("year")),
+                    "semester": (table_ys[1] if table_ys and table_page not in _row_pages(template)
+                                 else template.get("semester")),
                     "category": template.get("category"),
                     "type": template.get("type"),
                     "alt_group": alt_group_id,
@@ -1224,6 +1604,7 @@ def recover_alt_group_siblings_from_raw_tables(
             if lead:
                 flush_group()
                 cur_code, rest0 = lead
+                rest0 = _FACULTY_GROUP_PREFIX_RE.sub("", rest0)
                 group_cells = ([rest0] if rest0 else []) + list(row[1:])
             elif cur_code is not None:
                 group_cells.extend(row)
@@ -1257,7 +1638,7 @@ def flag_inferred_credits_for_review(courses: list[dict]) -> list[str]:
     return flagged
 
 
-def null_inferred_credits(courses: list[dict]) -> tuple[list[dict], list[str]]:
+def null_inferred_credits(courses: list[dict], keep: set[int] | None = None) -> tuple[list[dict], list[str]]:
     """
     ตั้งหน่วยกิตเป็น null ทุกแถวที่ Lab 7B ประกาศเองใน note ว่าหน่วยกิต "อนุมาน" มา ไม่ได้อ่าน
     จากเล่มตรง ๆ (แทนที่ flag_inferred_credits_for_review() ด้านบนซึ่งแค่รายงานแล้วปล่อยค่า
@@ -1280,9 +1661,12 @@ def null_inferred_credits(courses: list[dict]) -> tuple[list[dict], list[str]]:
     """
     notes: list[str] = []
     out: list[dict] = []
-    for src in courses:
+    for idx, src in enumerate(courses):
         row = dict(src)
         note = str(row.get("note") or "")
+        if keep and idx in keep:
+            out.append(row)       # เล่มพิมพ์ยอดรวมยืนยันค่านี้แล้ว (corroborated_inferred_credit_indexes)
+            continue
         if _CREDITS_INFERRED_NOTE_RE.search(note):
             old = row.get("credits")
             if old not in (None, ""):
@@ -1293,6 +1677,134 @@ def null_inferred_credits(courses: list[dict]) -> tuple[list[dict], list[str]]:
                 row["credits"] = None
         out.append(row)
     return out, notes
+
+
+# ── จัดกลุ่มทางเลือกของแผนหลังแปลง (ต้นเหตุ CHK1 เกินใน DSBA) ─────────────────────
+# พบจริงกับ DSBA: CHK1 ได้ 156 (nocoop) / 159 (coop) แต่ประกาศ 132 เพราะ 2 เรื่อง
+#   1) ช่องวิชาเลือกกลุ่ม "วิชาเลือกกลุ่ม<ก> n / <ข> n / <ค> n" ในเทอมเดียวกันคือ
+#      "เลือก 1 จาก 3" แต่ไม่มี alt_group เลย (coop 3/2 ช่อง 4 มีครึ่งเดียว: recover_alt_group_
+#      siblings_from_raw_tables ใส่กลุ่มให้เฉพาะพี่น้องที่กู้คืน ไม่ใส่ให้ "ต้นแบบ" ที่ Lab 7B
+#      เก็บมาแล้วเอง) -> v_semester_credits นับทุกช่องแยกกัน
+#   2) coop 4/2: 06026259 โผล่สองแถวในเทอมเดียวกัน (กลุ่มเดิม alt_y4s2_1 + แถวที่กู้คืนซ้ำ
+#      ใต้กลุ่ม raw_alt_recovered_*) -> สหกิจ 6 หน่วยกิตถูกนับสองครั้ง
+# ฟังก์ชันนี้แก้ที่ข้อมูลแผน (alt_group) ไม่แตะ CHK1 — CHK1 ต้องเป็นด่านตรวจอิสระต่อไป
+_RECOVERED_ALT_PREFIX = "raw_alt_recovered_"
+_MAJOR_ELECTIVE_SLOT_RE = re.compile(r"^วิชาเลือกกลุ่ม\s*(.+?)\s+(\d+)\s*$")
+
+
+def split_cross_category_alt_groups(plan: list[dict]) -> list[str]:
+    """แก้ plan (in-place): alt_group ที่สมาชิกมี category ต่างกัน -> แยกเป็นช่องวิชาเดี่ยว
+
+    ทางเลือกจริง (เช่น สหกิจศึกษา / สหกิจศึกษาต่างประเทศ) อยู่ category เดียวกันเสมอ
+    ส่วนกลุ่มที่ข้ามหมวด (ทั่วไป / เฉพาะ / เลือกเสรี) เกิดจาก Lab 7B อ่านเซลล์รหัสที่ merge
+    ซ้อนกันหลายบรรทัด (เช่น BIT coop 3/2: 96643021 / 06036xxx / xxxxxx) เป็น "เลือกอย่างใดอย่างหนึ่ง"
+    ทั้งที่เล่มพิมพ์เป็นสามช่องแยกกัน (รวมเทอม 15) ผลคือ CHK1 นับขาด 6 หน่วยกิต
+    ปิดได้ด้วย LAB8_SPLIT_CROSS_CATEGORY_ALT=0
+    """
+    if os.environ.get("LAB8_SPLIT_CROSS_CATEGORY_ALT", "1").strip().lower() in ("0", "false", "no", "off"):
+        return []
+    members: dict[tuple, list[int]] = {}
+    for i, row in enumerate(plan):
+        ag = row.get("alt_group")
+        if ag:
+            members.setdefault((row["year"], row["semester"], str(ag)), []).append(i)
+    notes: list[str] = []
+    for (y, s, ag), idxs in sorted(members.items()):
+        if len(idxs) < 2:
+            continue
+        cats = {str(plan[i].get("category") or "") for i in idxs}
+        if len(cats) < 2:
+            continue
+        for i in idxs:
+            plan[i]["alt_group"] = None
+            if _ALT_NOTE_RE.search(str(plan[i].get("note") or "")):
+                plan[i]["note"] = None
+        notes.append(f"{y}/{s}: alt_group {ag!r} ข้าม {len(cats)} หมวด "
+                     f"({', '.join(sorted(cats))}) -> แยกเป็น {len(idxs)} ช่องเดี่ยว")
+    return notes
+
+
+
+def normalize_plan_alternatives(plan: list[dict], course_by_code: dict[str, dict],
+                                *, group_slots: bool | None = None) -> list[str]:
+    """แก้ plan (in-place) ให้ทางเลือกที่เป็นตัวเลือกเดียวกันอยู่ใน alt_group เดียวกัน
+
+    1) แถวเดียวกัน (ปี/เทอม/รหัส) ที่โผล่ซ้ำ โดยแถวหนึ่งเป็น alt_group ที่ถูกกู้คืน
+       (raw_alt_recovered_*) -> ตัดแถวกู้คืนทิ้ง และย้ายพี่น้องของกลุ่มนั้นไปกลุ่มของแถวที่เหลือ
+    2) ช่อง PLACEHOLDER ชื่อ "วิชาเลือกกลุ่ม<ชื่อกลุ่ม> <n>" ที่เทอมเดียวกัน เลข n เดียวกัน
+       และมี "ชื่อกลุ่ม" ต่างกันตั้งแต่ 2 ชื่อขึ้นไป -> alt_group เดียวกัน
+       (ไม่ทับ alt_group ที่ Lab 7B ให้มาเอง ยกเว้นกลุ่มที่ถูกกู้คืน)
+       ปิดได้ด้วย LAB8_GROUP_ELECTIVE_SLOTS=0 (ข้อ 1 ทำงานเสมอ)
+
+    คืนรายการโน้ตสำหรับใส่ warnings
+    """
+    notes: list[str] = []
+    if group_slots is None:
+        group_slots = os.environ.get("LAB8_GROUP_ELECTIVE_SLOTS", "1").strip().lower() \
+            not in ("0", "false", "no", "off")
+
+    # ── 1) แถวซ้ำที่เกิดจากการกู้คืน ────────────────────────────────
+    by_key: dict[tuple, list[int]] = {}
+    for i, row in enumerate(plan):
+        by_key.setdefault((row["year"], row["semester"], row["code"]), []).append(i)
+    drop: set[int] = set()
+    regroup: dict[str, str] = {}
+    for (y, s, code), idxs in by_key.items():
+        if len(idxs) < 2:
+            continue
+        keep = [i for i in idxs
+                if not str(plan[i].get("alt_group") or "").startswith(_RECOVERED_ALT_PREFIX)]
+        extra = [i for i in idxs if i not in keep]
+        if not keep or not extra:
+            continue          # ซ้ำแบบอื่น (ไม่ใช่แถวกู้คืน) — ไม่แตะ ให้ CHK6 รายงานเอง
+        survivor = plan[keep[0]]
+        for i in extra:
+            old = plan[i].get("alt_group")
+            drop.add(i)
+            if survivor.get("alt_group"):
+                regroup[old] = survivor["alt_group"]
+            else:
+                survivor["alt_group"] = old      # ไม่ให้พี่น้องที่กู้คืนมากลายเป็นกลุ่มกำพร้า
+            notes.append(
+                f"{code} ({y}/{s}): ตัดแถวซ้ำที่กู้คืน (alt_group={old!r}) เพราะมีแถวเดียวกันอยู่แล้ว "
+                f"(alt_group={survivor.get('alt_group')!r}) — ไม่งั้นนับหน่วยกิตสองครั้ง")
+    if regroup:
+        for row in plan:
+            if row.get("alt_group") in regroup:
+                row["alt_group"] = regroup[row["alt_group"]]
+    if drop:
+        plan[:] = [row for i, row in enumerate(plan) if i not in drop]
+
+    # ── 2) ช่องวิชาเลือกกลุ่มเดียวกันข้ามกลุ่มวิชา ───────────────────
+    if group_slots:
+        buckets: dict[tuple, list[tuple[int, str]]] = {}
+        for i, row in enumerate(plan):
+            if not is_placeholder(row["code"]):
+                continue
+            ag = row.get("alt_group")
+            if ag and not str(ag).startswith(_RECOVERED_ALT_PREFIX):
+                continue      # Lab 7B จัดกลุ่มมาเองแล้ว — เชื่อค่าเดิม
+            name = str((course_by_code.get(row["code"]) or {}).get("name_th") or "").strip()
+            m = _MAJOR_ELECTIVE_SLOT_RE.match(name)
+            if m:
+                buckets.setdefault((row["year"], row["semester"], m.group(2)),
+                                   []).append((i, m.group(1).strip()))
+        for (y, s, n), members in sorted(buckets.items()):
+            labels = sorted({lab for _, lab in members})
+            if len(labels) < 2:
+                continue      # มีชื่อกลุ่มเดียว ไม่ใช่ตัวเลือกข้ามกลุ่ม
+            gid = f"major_elective_y{y}s{s}_slot{n}"
+            old_ids = {plan[i]["alt_group"] for i, _ in members if plan[i].get("alt_group")}
+            for i, _ in members:
+                plan[i]["alt_group"] = gid
+            for row in plan:
+                if row.get("alt_group") in old_ids:
+                    row["alt_group"] = gid
+            notes.append(
+                f"{y}/{s}: จัดช่องวิชาเลือกกลุ่มลำดับที่ {n} ({len(members)} ช่อง: "
+                f"{', '.join(labels)}) เป็น alt_group เดียว {gid!r} — "
+                f"สมมติฐาน 'เลือก 1 จาก {len(labels)} กลุ่ม' ตรวจกับตารางในเล่มก่อนใช้จริง")
+    return notes
 
 
 def convert_lab7b(data: dict, *, program: str | None = None,
@@ -1335,10 +1847,21 @@ def convert_lab7b(data: dict, *, program: str | None = None,
         alt_group_names.setdefault(str(ag0), set()).add(
             _normalize_name_th(str(src0.get("name_th") or "").strip()))
 
+    # รหัสที่มีตำแหน่งปี/เทอมจริงในแผน (ใช้ตัดสินว่าวิชา year 0 เป็นวิชาเลือกล้วนหรือไม่)
+    _scheduled_codes: set[str] = set()
+    for _s in data.get("courses") or []:
+        try:
+            _y, _t = int(_s.get("year")), int(_s.get("semester"))
+        except (TypeError, ValueError):
+            continue
+        if 1 <= _y <= 8 and 1 <= _t <= 3:
+            _scheduled_codes.update(_lab7b_codes(str(_s.get("code") or "")))
+
     for index, src in enumerate(data.get("courses") or []):
         raw_code = str(src.get("code") or "").strip()
         codes = _lab7b_codes(raw_code)
         page = _lab7b_page(src)
+        pages = _lab7b_pages(src)
         category = _normalize_category(
             str(src.get("category")).strip() if src.get("category") else None)
         ctype = str(src.get("type")).strip() if src.get("type") else None
@@ -1417,14 +1940,27 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                 # เก็บไว้โดยไม่มีหน่วยกิต เพื่อให้ตอบ "วิชานี้คืออะไร/บังคับก่อนอะไร" ได้ (ห้ามทำข้อมูลหายเงียบ)
                 credit = lecture = lab = self_h = None
                 warnings.append(f"{raw_code}: {exc}; เก็บวิชาไว้โดยไม่มีหน่วยกิต")
+        credits_text = None
         if "หรือ" in str(src.get("credits") or ""):
-            warnings.append(f"{raw_code}: หน่วยกิตมีหลายแบบ; ใช้แบบแรก")
+            warnings.append(f"{raw_code}: หน่วยกิตมีหลายแบบ; ตัวเลขใช้แบบแรก เก็บข้อความเต็มใน credits_text")
+            credits_text = re.sub(r"\s+", " ", str(src.get("credits")).strip())
 
         try:
             year = int(src.get("year"))
             semester = int(src.get("semester"))
         except (TypeError, ValueError):
             year = semester = 0
+
+        if program in RAW_TABLE_RECOVERY_PROGRAMS:
+            code_u = raw_code.replace(" ", "").upper()
+            # ตาราง DSBA ไม่มีหัวข้อหมวด — รหัส 06… คือหมวดวิชาเฉพาะ (เฉลยยืนยัน)
+            if category is None and code_u.startswith("06"):
+                category = "หมวดวิชาเฉพาะ"
+            # วิชา 06026… ที่ไม่มีตำแหน่งปี/เทอมในแผนเลย = อยู่ใต้ 'กลุ่มวิชาชีพเฉพาะด้าน - กลุ่ม…'
+            # ซึ่งเป็นวิชาเลือกทั้งหมด (หัวกลุ่มวิศวกรรมข้อมูลไม่มีคำว่า 'เลือก' ทำให้ default เป็นบังคับ)
+            if (not (1 <= year <= 8 and 1 <= semester <= 3) and code_u.startswith("06026")
+                    and not any(c in _scheduled_codes for c in codes) and ctype != "เลือก"):
+                ctype = "เลือก"
 
         force_elective_codes = FORCE_ELECTIVE_TYPE_OVERRIDE.get(
             program or "", {}).get(section or "", set())
@@ -1438,6 +1974,8 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                 f"(เล่มพิมพ์ปี {year}/{semester} type={ctype!r} แต่เฉลยทั้งสองแผนไม่ตรงกับตำแหน่งนี้)")
             year = semester = 0
             ctype = "เลือก"
+            if (program or "", section or "") in FORCED_ELECTIVE_COUNTED_IN_TOTAL:
+                note = (f"{note} " if note else "") + FORCED_ELECTIVE_COUNTED_MARK
 
         flexible = str(src.get("flexible_year_semester") or "").strip() or None
 
@@ -1454,11 +1992,12 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                 "name_en": (str(src["name_en"]).replace("\n", " ").strip()
                             if src.get("name_en") else None),
                 "credits": credit,
+                "credits_text": credits_text,
                 "lecture_h": lecture,
                 "lab_h": lab,
                 "self_h": self_h,
                 "description_th": src.get("description_th"),
-                "source_page": page,
+                "pages": pages,
             }
             fp = (candidate["name_th"], str(year), str(semester))
             resolved_codes.append(
@@ -1477,10 +2016,11 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                     "name_th": _normalize_name_th(
                         str(src.get("name_th") or "").strip() or None),
                     "credits": credit,
+                    "credits_text": credits_text,
                     "category": category,
                     "type": ctype,
                     "note": note,
-                    "source_page": page,
+                    "pages": pages,
                 }
                 fp = (slot["name_th"] or "", str(flexible or ""))
                 _dedup_insert(slot_by_code, slot_fingerprints, code, fp, slot)
@@ -1505,7 +2045,7 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                                  "code": code, "credits": plan_credit,
                                  "alt_group": alt_group,
                                  "category": category, "type": ctype,
-                                 "note": note, "source_page": page})
+                                 "note": note, "pages": pages})
                     seen_plan.add(key)
                 elif is_slot:
                     # ช่องวิชาเดียวกันปรากฏซ้ำในภาคเดียวกัน (เช่น วิชาภาษา 2 ช่อง)
@@ -1530,7 +2070,7 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                                  "code": dup_code, "credits": plan_credit,
                                  "alt_group": alt_group,
                                  "category": category, "type": ctype,
-                                 "note": note, "source_page": page})
+                                 "note": note, "pages": pages})
                     seen_plan.add((year, semester, dup_code, alt_group))
 
         pre_codes = _lab7b_codes(src.get("prerequisite"))
@@ -1546,6 +2086,10 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                     prerequisites.append({"code": code, "requires": required,
                                           "kind": "pre"})
                     seen_pre.add(key)
+
+    warnings.extend(normalize_plan_alternatives(plan, course_by_code))
+    warnings.extend(split_cross_category_alt_groups(plan))
+    warnings.extend(apply_term_alt_merge_override(plan, program))
 
     max_year = max((p["year"] for p in plan), default=4)
     effective_years = years or max_year
@@ -1594,7 +2138,7 @@ def convert_lab7b(data: dict, *, program: str | None = None,
     }
     Curriculum = build_models()
     result = Curriculum.model_validate(result).model_dump()
-    with_page = sum(1 for c in result["courses"] if c.get("source_page"))
+    with_page = sum(1 for c in result["courses"] if c.get("pages"))
     report = {
         "source_courses": len(data.get("courses") or []),
         "converted_courses": len(result["courses"]),
@@ -1616,9 +2160,22 @@ def convert_lab7b(data: dict, *, program: str | None = None,
     return result, report
 
 
-def plan_sections(program: str | None) -> dict[str, tuple[int, int]]:
-    """section แผนการศึกษา (nocoop/coop) ของโปรแกรมนี้ — ว่างถ้าโปรแกรมมีแผนเดียว"""
-    ranges = PROGRAM_PAGE_RANGES.get(program or "", {})
+def plan_sections(program: str | None, text: str | None = None
+                  ) -> dict[str, tuple[int, int]]:
+    """section แผนการศึกษา (nocoop/coop) — ว่างถ้าโปรแกรมมีแผนเดียว (หรือไม่มีแผนเลย)
+
+    ถ้ามี text (Markdown ต้นทางของโปรแกรมนี้) จะจับ nocoop/coop จากป้ายหัวข้อในเนื้อหาเอง
+    ด้วย detect_sections() — ไม่ใช้ตาราง PROGRAM_PAGE_RANGES เลย
+    ถ้าไม่มี text (เช่นตอนมีแค่ pred JSON จาก Lab 7B ไม่มี markdown ดิบให้สแกน) จะถอยไปใช้
+    ตาราง PROGRAM_PAGE_RANGES เป็น fallback แบบเดิม
+    """
+    if text is not None:
+        try:
+            ranges = detect_sections(text)
+        except ValueError:
+            ranges = {}
+    else:
+        ranges = PROGRAM_PAGE_RANGES.get(program or "", {})
     return {k: v for k, v in ranges.items() if k in ("nocoop", "coop")}
 
 
@@ -1803,7 +2360,347 @@ def _enrich_duplicate_row_fields(courses: list[dict]) -> tuple[list[dict], list[
     return enriched, notes
 
 
-def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | None = None
+def _sort_placeholder_rows_doc_order(rows: list[dict], text: str) -> None:
+    """เรียงแถวรหัส wildcard รหัสเดียวกันตามลำดับในเอกสาร (หน้า, ตำแหน่งชื่อในหน้า) แบบ in-place
+
+    ตัวเลขต่อท้าย (_2, _3, …) ของช่อง wildcard ถูกกำหนดจากลำดับแถว และเฉลยนับตามลำดับในเอกสาร
+    แถวที่กู้คืนมาถูกต่อท้ายลิสต์ จึงต้องเรียงใหม่ ไม่งั้นชื่อ/ปี/เทอมของแต่ละช่องคลาดกันหมด
+    ตำแหน่งที่หาไม่พบอยู่ท้ายสุดและคงลำดับเดิม (stable sort)"""
+    page_text = {p: re.sub(r"\s+", "", t) for p, t in _iter_pages(text)}
+
+    def pos(c: dict) -> tuple[int, int]:
+        p = _lab7b_page(c)
+        name = re.sub(r"\s+", "", str(c.get("name_th") or ""))
+        i = page_text.get(p, "").find(name) if name and p is not None else -1
+        return (p if p is not None else 10 ** 6, i if i >= 0 else 10 ** 6)
+
+    by_code: dict[str, list[int]] = {}
+    for i, c in enumerate(rows):
+        code = str(c.get("code") or "").strip().replace(" ", "").upper()
+        if is_placeholder(code) or re.search(r"[X]", code):
+            by_code.setdefault(code, []).append(i)
+    for idxs in by_code.values():
+        ordered = sorted((rows[i] for i in idxs), key=pos)
+        for i, r in zip(idxs, ordered):
+            rows[i] = r
+
+
+# ── IT: กลุ่ม "เลือก 1" ที่เล่มพิมพ์เป็นเซลล์รหัสหลายบรรทัด + หน่วยกิตที่อนุมานแล้วตรงกับยอดรวมที่เล่มพิมพ์ ──
+# พบจริงกับ IT (ตรวจกับ pred_vlm.json + intermediate_vlm.md):
+#   1) ตาราง 3/1 พิมพ์กลุ่มสื่อประสมเป็นเซลล์เดียว "06016426<br/>06016427<br/>06016418" (เลือก 1) แต่ Lab 7B
+#      ไม่ใส่ alt_group ให้ 426/427 และทิ้ง 06016418 เป็นแถวเดี่ยวอีกแถว -> นับเกิน 6 (nocoop) / 3 (coop)
+#   2) nocoop 3/2 ช่อง "วิชาเลือกทางเทคโนโลยีสารสนเทศ 1" OCR อ่านไม่ได้ Lab 7B อนุมานหน่วยกิตเอง แล้วนโยบาย
+#      "ห้ามเดา" ตั้งเป็น null -> เทอมนับได้ 12 แทน 15 ที่เล่มพิมพ์
+# สองข้อนี้แก้เฉพาะ IT (โปรแกรมอื่นยังไม่ได้ตรวจ จึงไม่เปิด) และอ้างอิงเฉพาะสิ่งที่เล่มพิมพ์จริง ไม่เดา
+MULTICODE_CELL_GROUP_PROGRAMS: set[str] = {"IT"}
+CORROBORATED_INFERRED_CREDIT_PROGRAMS: set[str] = {"IT"}
+
+# บังคับรวมแถวของเทอมหนึ่งเป็น alt_group เดียว เมื่อเล่มพิมพ์ยอดรวมเทอมไม่ตรงกับโครงสร้างตารางที่อ่านได้
+# และยังไม่ทราบกติกาจริง (ดู warning ที่ฟังก์ชันใช้งาน) — ใช้เพื่อให้ยอดหน่วยกิตตรงกับที่เล่มพิมพ์
+# IT 2/2: บังคับ 12 (วิชาบังคับ 4 ตัว) + 3 (414|415) + 3 = 18 ตามที่เล่มพิมพ์ "รวม 18" ทั้งสองแผน
+# แต่ตารางมี 3 กลุ่มวิชา (พัฒนาซอฟต์แวร์ / โครงสร้างพื้นฐาน / สื่อประสม) ซึ่งตามกติกา "เลือก 1 ต่อกลุ่ม" จะได้ 21
+TERM_ALT_MERGE_OVERRIDE: dict[str, list[dict]] = {
+    "IT": [{
+        "year": 2, "semester": 2,
+        "codes": {"06016419", "06016420", "06016424", "06016425"},
+        "alt_group": "alt_y2s2_override",
+        "reason": ("เล่มพิมพ์ยอดรวม 2/2 = 18 แต่ตารางมี 3 กลุ่มวิชาเลือก (กติกา 'เลือก 1 ต่อกลุ่ม' ได้ 21) — "
+                   "รวมกลุ่มโครงสร้างพื้นฐานกับสื่อประสมเป็น 'เลือก 1' เดียวเพื่อให้ยอดตรงที่เล่มพิมพ์ "
+                   "กติกาจริงยังไม่ได้ยืนยัน ต้องให้คนตรวจกับหลักสูตร"),
+    }],
+}
+
+_MULTICODE_CELL_RE = re.compile(r"<td[^>]*>\s*((?:\d{8}\s*<br\s*/?>\s*)+\d{8})\s*</td>")
+_PRINTED_TOTAL_RE = re.compile(r"รวม(?:\*\*)?\s*</td>\s*<td[^>]*>\s*(\d+)\s*</td>")
+
+
+def group_multicode_cells_from_raw_tables(courses: list[dict], md_text: str,
+                                          sections: dict[str, tuple[int, int]]
+                                          ) -> tuple[list[dict], list[str]]:
+    """เซลล์รหัสหลายบรรทัดในตารางแผน (เช่น 426<br/>427<br/>418) = 'เลือกอย่างใดอย่างหนึ่ง'
+    ถ้า Lab 7B ยังไม่มี alt_group ครอบรหัสชุดนั้นเลย -> ใส่ให้ (ไม่เพิ่ม/ลบแถว ไม่เดาข้อมูลใหม่)
+    ข้ามถ้ามีกลุ่มเดิมที่สมาชิกตรงกับรหัสในเซลล์พอดี และข้ามถ้าได้สมาชิกไม่ถึง 2 แถว
+    """
+    notes: list[str] = []
+    out = [dict(c) for c in courses]
+    plan_pages = {pg for a, b in sections.values() for pg in range(a, b + 1)}
+    tables = list(re.finditer(r"<table>.*?</table>", md_text, flags=re.S))
+    positions = _table_page_positions(md_text)
+    counter: dict[tuple, int] = {}
+    for tm, (_, pg) in zip(tables, positions):
+        if pg is None or pg not in plan_pages:
+            continue
+        for cm in _MULTICODE_CELL_RE.finditer(tm.group(0)):
+            codes = re.findall(r"\d{8}", cm.group(1))
+            code_set = set(codes)
+            if len(code_set) < 2:
+                continue
+            picked: list[int] = []
+            terms: set[tuple] = set()
+            for i, row in enumerate(out):
+                if (str(row.get("code")) in code_set and pg in _row_pages(row)
+                        and not row.get("alt_group")):
+                    picked.append(i)
+                    terms.add((row.get("year"), row.get("semester")))
+            if len(picked) < 2 or len(terms) != 1:
+                continue
+            term = next(iter(terms))
+            existing: dict[str, set[str]] = {}
+            for row in out:
+                if row.get("alt_group") and (row.get("year"), row.get("semester")) == term:
+                    existing.setdefault(str(row["alt_group"]), set()).add(str(row.get("code")))
+            if any(members == code_set for members in existing.values()):
+                continue
+            counter[term] = counter.get(term, 0) + 1
+            gid = f"alt_y{term[0]}s{term[1]}_cell{counter[term]}"
+            for i in picked:
+                out[i]["alt_group"] = gid
+            notes.append(
+                f"{term[0]}/{term[1]} (หน้า {pg}): เซลล์รหัส {'/'.join(codes)} พิมพ์เป็นช่อง 'เลือก 1' "
+                f"แต่ไม่มี alt_group -> ใส่ {gid!r} ให้ {len(picked)} แถว")
+    return out, notes
+
+
+def corroborated_inferred_credit_indexes(courses: list[dict], md_text: str) -> tuple[set[int], list[str]]:
+    """ดัชนีแถวที่หน่วยกิตถูก Lab 7B อนุมาน แต่ 'ยอดรวมที่เล่มพิมพ์ของหน้านั้น - หน่วยกิตของแถวอื่น
+    ในเทอมเดียวกัน' ได้ค่าเท่ากับค่าที่อนุมานพอดี -> เล่มยืนยันค่านี้ ไม่ต้อง null
+    เงื่อนไขเข้ม: หน้านั้นต้องมียอด 'รวม' เพียงค่าเดียว และแถวอื่นทุกแถวต้องมีหน่วยกิตที่อ่านได้
+    """
+    markers = [(m.start(), int(m.group(1))) for m in _PDF_PAGE_MARKER_RE.finditer(md_text)]
+    page_totals: dict[int, list[int]] = {}
+    for k, (start, pg) in enumerate(markers):
+        end = markers[k + 1][0] if k + 1 < len(markers) else len(md_text)
+        page_totals[pg] = [int(x) for x in _PRINTED_TOTAL_RE.findall(md_text[start:end])]
+
+    def lead(v: Any) -> int | None:
+        m = re.match(r"\s*(\d+)\s*\(", str(v or ""))
+        return int(m.group(1)) if m else None
+
+    keep: set[int] = set()
+    notes: list[str] = []
+    for i, row in enumerate(courses):
+        if not _CREDITS_INFERRED_NOTE_RE.search(str(row.get("note") or "")):
+            continue
+        val = lead(row.get("credits"))
+        if val is None:
+            continue
+        term = (row.get("year"), row.get("semester"))
+        for pg in _row_pages(row):
+            totals = page_totals.get(pg) or []
+            if len(totals) != 1:
+                continue
+            seen_groups: set[str] = set()
+            others_sum, ok = 0, True
+            for j, o in enumerate(courses):
+                if j == i or pg not in _row_pages(o) or (o.get("year"), o.get("semester")) != term:
+                    continue
+                ag = o.get("alt_group")
+                if ag:
+                    if ag in seen_groups:
+                        continue
+                    seen_groups.add(ag)
+                c = lead(o.get("credits"))
+                if c is None:
+                    ok = False
+                    break
+                others_sum += c
+            if ok and totals[0] - others_sum == val:
+                keep.add(i)
+                notes.append(
+                    f"{row.get('code')} ({term[0]}/{term[1]}): หน่วยกิตที่ Lab 7B อนุมาน ({val}) ตรงกับยอดรวมที่เล่มพิมพ์ "
+                    f"(หน้า {pg}: {totals[0]} - แถวอื่น {others_sum}) -> คงค่าไว้ ไม่ตั้งเป็น null")
+                break
+    return keep, notes
+
+
+# โปรแกรมที่ใช้ "ค่าที่เล่มพิมพ์ใน <table> ดิบ" แทนค่าที่ Lab 7B อนุมาน (ดู repair_inferred_credits_...)
+# ใส่เฉพาะโปรแกรมที่ตรวจแล้ว เพื่อไม่ให้โปรแกรมที่อนุมัติแล้ว (DSBA/AIT/GENED) เปลี่ยนผลโดยไม่ตั้งใจ
+RAW_PRINTED_CREDIT_REPAIR_PROGRAMS: set[str] = {"IT", "BIT", "DSBA", "AIT", "GENED",
+                                                 "IT_2560", "BIT_2560", "DSBA_2560",
+                                                 "GENED_2559", "GENED_2564"}
+
+
+def repair_inferred_credits_from_raw_tables(
+        courses: list[dict], raw_map: dict[str, list[str]]
+) -> tuple[list[dict], set[int], list[str]]:
+    """แถวที่ Lab 7B ประกาศใน note ว่า 'อนุมาน' หน่วยกิต แต่เล่มดิบพิมพ์ไว้ตรง ๆ ใน <table>
+    -> ใช้ค่าที่เล่มพิมพ์ (ไม่ใช่ค่าอนุมาน) แล้วกันไม่ให้ null_inferred_credits() ตัดทิ้ง
+
+    ไม่ขัดนโยบาย 'ไม่รู้แน่ชัดห้ามเดา' เพราะค่านี้อ่านจากเล่มตรง ๆ เงื่อนไข: ทุกครั้งที่รหัสนี้
+    โผล่ใน <table> ต้องได้หน่วยกิตค่าเดียวกันเท่านั้น (ถ้าขัดกันเอง/ไม่พบ -> ปล่อยให้ถูก null ต่อ)
+
+    พบจริง: IT 06016453/54 (ค่าอนุมานถูก) และ BIT 06036128/129/133/134/135/136/140/141/131
+    -- อยู่ในตารางรายวิชาเลือก หน้า 23-25 พิมพ์ครบ แต่ถูก null ทั้งหมด และ 131/134/135 ค่าอนุมาน
+    (3(3-0-6)) ผิดจากที่เล่มพิมพ์ (3(2-2-5)) -- คอมเมนต์เดิมที่ว่า 3 รายการนี้ 'ไม่มี <table>'
+    ไม่จริง: _raw_table_credits_map() อ่านทุก <table> ไม่ได้จำกัดเฉพาะตารางแผน
+
+    คืน (courses ที่แก้แล้ว, ดัชนีที่ต้องคงค่าไว้, โน้ต)
+    """
+    triple = re.compile(r"\d+\(\d+-\d+-\d+\)")
+    out: list[dict] = []
+    keep: set[int] = set()
+    notes: list[str] = []
+    for i, src in enumerate(courses):
+        row = dict(src)
+        out.append(row)
+        if not _CREDITS_INFERRED_NOTE_RE.search(str(row.get("note") or "")):
+            continue
+        code = str(row.get("code") or "").strip().upper()
+        printed = {t.replace(" ", "") for cand in raw_map.get(code, [])
+                   for t in triple.findall(str(cand).replace(" ", ""))}
+        if len(printed) != 1:
+            continue
+        val = next(iter(printed))
+        old = row.get("credits")
+        row["credits"] = val
+        keep.add(i)
+        notes.append(
+            f"{code}: หน่วยกิตที่ Lab 7B อนุมาน ({old!r}) "
+            + (f"แก้เป็น {val!r} ตามที่เล่มพิมพ์ใน <table> ดิบ" if str(old).replace(' ', '') != val
+               else "ตรงกับที่เล่มพิมพ์ใน <table> ดิบ -> คงค่าไว้")
+            + " ไม่ตั้งเป็น null")
+    return out, keep, notes
+
+
+# ── ชื่อวิชาที่มีหมายเหตุ/หัวข้อถัดไปติดมา (AIT/GENED: 90641008) ─────────────────────────────
+# พบจริง: เล่มพิมพ์ชื่อวิชาใน <table> เป็น "พื้นฐานทักษะการสื่อสารภาษาอังกฤษ" แต่ใต้ตารางมีเชิงอรรถ
+# "** 90641008 พื้นฐานทักษะ... เป็นรายวิชาบังคับก่อน ที่ไม่นับหน่วยกิต ..." แล้วตามด้วยหัวข้อ
+# "ข. หมวดวิชาเฉพาะ" -- Lab 7B อ่านเชิงอรรถทั้งก้อนเป็นชื่อวิชา (ตัดช่องว่างทิ้ง) ทำให้ name_th ยาวผิดปกติ
+# trim_names_to_canonical() เดิมแก้ไม่ได้ เพราะ "ชื่อมาตรฐาน" ของมันสร้างจากบรรทัดข้อความ `CODE ชื่อ`
+# ซึ่งในกรณีนี้คือเชิงอรรถเอง (ไม่ใช่ชื่อวิชา) และ AIT/GENED ไม่ผ่าน split_lab7b_by_plan() อยู่แล้ว
+# ฟังก์ชันนี้อ่านชื่อจากเซลล์ชื่อวิชาใน <table> โดยตรง (ส่วนก่อน <br/>) -- เป็นค่าที่เล่มพิมพ์ ไม่ใช่การเดา
+UNSPLIT_NAME_TRIM_PROGRAMS: set[str] = {"AIT"}   # GENED มีอาการเดียวกันใน pred แต่ยังไม่ได้ตรวจคำเตือนของ GENED -> ยังไม่ใส่
+_MIN_GLUED_TAIL = 8          # ส่วนที่เกินต้องยาวอย่างน้อยเท่านี้ (ไม่นับช่องว่าง) กันไปตัดเลขลำดับท้ายชื่อ เช่น "1", "2"
+
+
+def _table_name_th_map(md_text: str) -> dict[str, set[str]]:
+    """รหัส -> ชื่อไทยที่พิมพ์ในเซลล์ชื่อวิชาของ <table> (ทุกครั้งที่รหัสนั้นโผล่)"""
+    out: dict[str, set[str]] = {}
+    for tbl in re.findall(r"<table>.*?</table>", md_text or "", flags=re.S):
+        for row in re.findall(r"<tr>.*?</tr>", tbl, flags=re.S):
+            cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+            if len(cells) < 2:
+                continue
+            code = re.sub(r"[\s*]", "", re.sub(r"<[^>]+>", "", cells[0]))
+            if not re.fullmatch(r"\d{8}", code):
+                continue
+            cell = re.sub(r"<br\s*/?>", "\n", cells[1])
+            cell = re.sub(r"<[^>]+>", " ", cell)
+            if "\n" in cell.strip():
+                th = cell.strip().split("\n")[0]
+            else:
+                th, _ = _split_thai_english_name(cell)
+            th = re.sub(r"\s+", " ", th).strip()
+            if th and re.search(r"[\u0E00-\u0E7F]", th):
+                out.setdefault(code, set()).add(th)
+    return out
+
+
+def trim_glued_names_from_tables(courses: list[dict], program: str | None, text: str | None
+                                 ) -> tuple[list[dict], list[str]]:
+    """name_th ที่ขึ้นต้นด้วยชื่อในตารางเป๊ะ (เทียบโดยไม่นับช่องว่าง) แต่ยาวเกินมาก -> ใช้ชื่อในตาราง
+
+    เงื่อนไขกันตัดผิด: (1) รหัสนี้ต้องมีชื่อในตารางเพียงชื่อเดียว (ถ้าตารางขัดกันเอง -> ไม่แตะ)
+    (2) ส่วนที่เกินต้องยาว >= _MIN_GLUED_TAIL ตัวอักษร (ไม่นับช่องว่าง) (3) ไม่แตะชื่อที่สั้นกว่า/สะกดต่าง
+    """
+    if not text or program not in UNSPLIT_NAME_TRIM_PROGRAMS:
+        return courses, []
+    table = _table_name_th_map(text)
+    notes: list[str] = []
+    out: list[dict] = []
+    ns = lambda t: re.sub(r"\s+", "", t)
+    for src in courses:
+        row = dict(src)
+        code = str(row.get("code") or "").strip()
+        name = str(row.get("name_th") or "")
+        names = table.get(code) or set()
+        if len(names) == 1:
+            good = next(iter(names))
+            if (len(ns(name)) - len(ns(good)) >= _MIN_GLUED_TAIL
+                    and ns(name).startswith(ns(good))):
+                notes.append(f"{code}: name_th มีข้อความอื่นติดท้ายชื่อวิชา ({name!r}) -- "
+                             f"ใช้ชื่อที่เล่มพิมพ์ในตาราง {good!r}")
+                row["name_th"] = good
+        out.append(row)
+    return out, notes
+
+
+
+# โปรแกรมที่ "ไม่มีแผน nocoop/coop" (plan_sections() ว่าง -> ไม่เรียก split_lab7b_by_plan()) และต้องซ่อมหน่วยกิต
+# จาก <table> ดิบด้วย repair_credits_unsplit() ใส่เฉพาะโปรแกรมที่ตรวจแล้ว: AIT ผ่านการอนุมัติแล้วโดยไม่ผ่านขั้นนี้
+# จึงห้ามใส่เองโดยไม่อ่านคำเตือนของ AIT ก่อน
+UNSPLIT_CREDIT_REPAIR_PROGRAMS: set[str] = {"GENED", "GENED_2559", "GENED_2564"}
+
+_PRINTED_TRIPLE_RE = re.compile(r"\d+\s*\(\s*\d+\s*-\s*\d+\s*-\s*\d+\s*\)")
+
+
+def _unanimous_printed_credit_map(raw_map: dict[str, list[str]]) -> tuple[dict[str, list[str]], list[str]]:
+    """แปลง _raw_table_credits_map() ให้เหลือเฉพาะรูป n(a-b-c) ล้วน ๆ ต่อรหัส
+
+    ตารางแบบ colspan ใส่ชื่อวิชาติดมากับเซลล์หน่วยกิต (เช่น 'ศัลยกรรมชีวิต 3 (3-0-6)') -- ตัดชื่อออก เก็บแค่
+    ตัวเลข และเก็บเฉพาะรหัสที่ทุกครั้งที่โผล่ใน <table> ได้ค่าเดียวกัน (ถ้าเล่มพิมพ์ขัดกันเอง -> ไม่ซ่อม ปล่อยเป็น null)
+    """
+    out: dict[str, list[str]] = {}
+    notes: list[str] = []
+    for code, cands in raw_map.items():
+        vals = {re.sub(r"\s+", "", t) for c in cands for t in _PRINTED_TRIPLE_RE.findall(str(c))}
+        if len(vals) == 1:
+            out[code] = [next(iter(vals))]
+        elif len(vals) > 1:
+            notes.append(f"{code}: เล่มพิมพ์หน่วยกิตขัดกันเองใน <table> ({sorted(vals)}) -- ไม่ซ่อม ปล่อยตามค่าเดิม/null")
+    return out, notes
+
+
+def repair_credits_unsplit(courses: list[dict], program: str | None, text: str | None,
+                           raw_map: dict[str, list[str]] | None = None
+                           ) -> tuple[list[dict], list[str]]:
+    """ซ่อมหน่วยกิตสำหรับโปรแกรมที่ไม่ผ่าน split_lab7b_by_plan() (ตอนนี้ = GENED เท่านั้น)
+
+    ปัญหาที่พบจริงกับ GENED: plan_sections('GENED') ว่าง -> _import_split() ไม่เรียก split_lab7b_by_plan()
+    ทำให้ขั้นซ่อมหน่วยกิตทั้งหมดไม่ทำงาน แถวที่ Lab 7B ปล่อยว่าง (หรืออนุมานแล้วผิด เช่น 90642084) จึงค้างทั้งที่เล่ม
+    พิมพ์ค่าไว้ใน <table> (ตรวจแล้ว: 37/37 แถวที่น่าสงสัยมีค่าพิมพ์ใน <table>)
+
+    ลำดับเดียวกับ split_lab7b_by_plan(): เติมแถวว่าง -> ใช้ค่าที่เล่มพิมพ์แทนค่าอนุมาน -> null ส่วนที่ยังอนุมานค้าง
+    ไม่แตะแถวที่มีหน่วยกิตครบและไม่ได้ถูกประกาศว่าอนุมาน และอ่านเฉพาะค่าที่เล่มพิมพ์ตรง ๆ (ไม่เดา)
+    """
+    if not text or program not in UNSPLIT_CREDIT_REPAIR_PROGRAMS:
+        return courses, []
+    # เลขเดี่ยวเกิน 12 ในช่องหน่วยกิต = เลขในชื่อวิชาหลุดเข้ามา (เช่น "ศตวรรษที่ 21") -> ตั้งว่างก่อน
+    # แล้วให้ขั้นเติมจาก <table> ดิบอ่านค่าที่เล่มพิมพ์จริง (อ่านไม่ได้ก็ค้างเป็น null ไม่เดา)
+    courses = [dict(c) for c in courses]
+    bad_notes: list[str] = []
+    for c in courses:
+        v = str(c.get("credits") or "").strip()
+        if re.fullmatch(r"\d{1,2}", v) and int(v) > 12:
+            bad_notes.append(f"{c.get('code')}: หน่วยกิต {v!r} เกิน 12 (เลขจากชื่อวิชาหลุดมา) -> ตั้งว่างเพื่อเติมจาก <table> ดิบ")
+            c["credits"] = None
+    printed, notes = _unanimous_printed_credit_map(raw_map if raw_map is not None
+                                                   else _raw_table_credits_map(text))
+    notes = bad_notes + notes
+    rows, fill_notes = repair_credits_from_raw_tables(courses, printed)
+    notes.extend(fill_notes)
+    rows, keep, inferred_notes = repair_inferred_credits_from_raw_tables(rows, printed)
+    notes.extend(inferred_notes)
+    rows, null_notes = null_inferred_credits(rows, keep)
+    notes.extend(null_notes)
+    return rows, notes
+
+
+def apply_term_alt_merge_override(plan: list[dict], program: str | None) -> list[str]:
+    notes: list[str] = []
+    for rule in TERM_ALT_MERGE_OVERRIDE.get(program or "", []):
+        hit = [r for r in plan if (r["year"], r["semester"]) == (rule["year"], rule["semester"])
+               and r["code"] in rule["codes"]]
+        if len(hit) < 2:
+            continue
+        for r in hit:
+            r["alt_group"] = rule["alt_group"]
+        notes.append(f"{rule['year']}/{rule['semester']}: {rule['reason']} (รวม {len(hit)} แถว)")
+    return notes
+
+
+def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | None = None,
+                        text: str | None = None
                         ) -> tuple[dict[str, dict], dict[str, int], list[str]]:
     """
     แยกผล Lab 7B ที่รวมสองแผนไว้ในรอบเดียว ออกเป็นทีละ section จากเลขหน้า PDF
@@ -1815,8 +2712,11 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
       - แถวที่เจอทั้งสองช่วง (วิชาเดียวกัน ปี/ภาคเดียวกัน ทั้งสองแผน) -> อยู่ทั้งสองฝั่ง
       - แถวที่จำแนกไม่ได้ (ไม่มีเลขหน้า หรืออยู่นอกช่วงแผน เช่นหน้าคำอธิบายรายวิชา)
         -> เก็บไว้ทั้งสองฝั่ง
+
+    text: Markdown ต้นทางของโปรแกรมนี้ (ถ้ามี) — ส่งให้ plan_sections() จับ nocoop/coop
+    จากป้ายหัวข้อในเนื้อหาเองแทนตาราง PROGRAM_PAGE_RANGES ที่ hardcode ไว้
     """
-    sections = plan_sections(program)
+    sections = plan_sections(program, text=text)
     warnings: list[str] = []
     stats = {"rows": 0, "only_one_plan": 0, "in_both_plans": 0,
              "unclassified_kept_in_both": 0, "no_page_info": 0, "forced_shared": 0}
@@ -1832,13 +2732,48 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
             f"เลขหน้าทุกหน้าของก้อน ก้อนที่คร่อมรอยต่อ nocoop/coop จะทำให้วิชาไปอยู่สองฝั่งเกินจริง "
             f"(ตั้ง LAB7_CHUNK=1 เพื่อให้แยกได้แม่น)")
 
+    if text and program in RAW_TABLE_RECOVERY_PROGRAMS:
+        # กู้ทางเลือก rowspan ที่ Lab 7B ทิ้ง + ซ่อมหน่วยกิต null จากตารางดิบ (ดูคอมเมนต์ที่ฟังก์ชันกู้คืน)
+        recovered, rec_notes = recover_alt_group_siblings_from_raw_tables(
+            data.get("courses") or [], text)
+        data = {**data, "courses": recovered}
+        warnings.extend(rec_notes)
+        if raw_table_credits is None:
+            raw_table_credits = _raw_table_credits_map(text)
+        if program in SHARED_CELL_CREDIT_PROGRAMS:
+            raw_table_credits = merge_shared_cell_credits(raw_table_credits, text)
+
+    if text and program in MULTICODE_CELL_GROUP_PROGRAMS:
+        grouped, grp_notes = group_multicode_cells_from_raw_tables(
+            data.get("courses") or [], text, sections)
+        data = {**data, "courses": grouped}
+        warnings.extend(grp_notes)
+
+    if text:
+        name_fixed, name_notes = trim_names_to_canonical(data.get("courses") or [], text)
+        data = {**data, "courses": name_fixed}
+        warnings.extend(name_notes)
+        name_fixed, space_notes = restore_name_spacing_from_tables(
+            data.get("courses") or [], program, text)
+        data = {**data, "courses": name_fixed}
+        warnings.extend(space_notes)
+
     dup_filled_courses, dup_notes = _enrich_duplicate_row_fields(data.get("courses") or [])
     warnings.extend(dup_notes)
     if raw_table_credits:
         dup_filled_courses, table_notes = repair_credits_from_raw_tables(
             dup_filled_courses, raw_table_credits)
         warnings.extend(table_notes)
-    dup_filled_courses, inferred_null_notes = null_inferred_credits(dup_filled_courses)
+    keep_inferred: set[int] = set()
+    if text and program in CORROBORATED_INFERRED_CREDIT_PROGRAMS:
+        keep_inferred, keep_notes = corroborated_inferred_credit_indexes(dup_filled_courses, text)
+        warnings.extend(keep_notes)
+    if text and program in RAW_PRINTED_CREDIT_REPAIR_PROGRAMS:
+        dup_filled_courses, raw_keep, raw_notes = repair_inferred_credits_from_raw_tables(
+            dup_filled_courses, raw_table_credits or _raw_table_credits_map(text))
+        keep_inferred = keep_inferred | raw_keep
+        warnings.extend(raw_notes)
+    dup_filled_courses, inferred_null_notes = null_inferred_credits(dup_filled_courses, keep_inferred)
     warnings.extend(inferred_null_notes)
     enriched_courses, enrich_notes = _enrich_alt_group_fillers(dup_filled_courses)
     warnings.extend(enrich_notes)
@@ -1866,10 +2801,18 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
         for name in (hit or set(sections)):
             a, b = sections[name]
             own = [pg for pg in pages if a <= pg <= b]
+            # หน้าที่อยู่นอกช่วงแผนทุกแผน (เช่น หน้าคำอธิบายรายวิชา) เป็นหลักฐานของวิชานี้ในทั้งสองแผน -> เก็บไว้
+            # ส่วนหน้าของแผนอีกฝั่งตัดทิ้ง เพื่อไม่ให้วิชา coop อ้างหน้าของ nocoop (และกลับกัน)
+            outside = [pg for pg in pages
+                       if not any(x <= pg <= y for x, y in sections.values()) and pg not in own]
             row = dict(src)
-            row["pages"] = own or pages
+            row["pages"] = (own + outside) or pages
             row["source_page"] = (own or pages or [None])[0]
             parts[name]["courses"].append(row)
+
+    if text and program in RAW_TABLE_RECOVERY_PROGRAMS:
+        for part in parts.values():
+            _sort_placeholder_rows_doc_order(part["courses"], text)
 
     failed = (data.get("_meta") or {}).get("ocr_failed_pages") or []
     if failed:
@@ -1916,15 +2859,21 @@ def _import_split(args, data: dict) -> None:
     root.mkdir(parents=True, exist_ok=True)
     meta_all = (json.loads(Path(args.program_meta).read_text(encoding="utf-8"))
                 if args.program_meta else {})
-    sections = plan_sections(args.program)
+    source_text = (Path(args.source_md).read_text(encoding="utf-8")
+                  if getattr(args, "source_md", None) else None)
+    if source_text is None:
+        print(f"  ! ไม่ได้ระบุ --source-md — จำแนก nocoop/coop ด้วยตาราง legacy "
+              f"PROGRAM_PAGE_RANGES[{args.program!r}] แทนการจับป้ายหัวข้อ")
+    sections = plan_sections(args.program, text=source_text)
 
     manifest: dict[str, Any] = {
         "program": args.program, "source": str(args.input),
+        "source_md": str(args.source_md) if getattr(args, "source_md", None) else None,
         "split_by_plan": bool(sections), "split_stats": None,
         "warnings": [], "programs": [],
     }
     if sections:
-        parts, stats, warns = split_lab7b_by_plan(data, args.program)
+        parts, stats, warns = split_lab7b_by_plan(data, args.program, text=source_text)
         manifest["split_stats"], manifest["warnings"] = stats, warns
         jobs = [(f"{args.program}_{name}", name, parts[name], Path(name))
                 for name in sections]
@@ -1938,6 +2887,15 @@ def _import_split(args, data: dict) -> None:
         for w in warns:
             print(f"    ⚠ {w}")
     else:
+        fixed, repair_notes = repair_credits_unsplit(
+            data.get("courses") or [], args.program, source_text)
+        fixed, name_notes = trim_glued_names_from_tables(fixed, args.program, source_text)
+        repair_notes = repair_notes + name_notes
+        if repair_notes:
+            data = {**data, "courses": fixed}
+            manifest["warnings"] = repair_notes
+            for w in repair_notes:
+                print(f"    ⚠ {w}")
         jobs = [(args.program, None, data, Path("."))]
         fallback = {"program_name": args.program_name,
                     "total_credits": args.total_credits, "years": args.years}
@@ -1980,6 +2938,17 @@ def cmd_import_lab7b(args) -> None:
         return
     if not args.output:
         raise SystemExit("ต้องระบุ -o (แปลงเป็นไฟล์เดียว) หรือ --split-dir --program (แยกแผนอัตโนมัติ)")
+
+    if getattr(args, "source_md", None) and (args.program in UNSPLIT_CREDIT_REPAIR_PROGRAMS
+                                              or args.program in UNSPLIT_NAME_TRIM_PROGRAMS):
+        _txt = Path(args.source_md).read_text(encoding="utf-8")
+        _fixed, _notes = repair_credits_unsplit(data.get("courses") or [], args.program, _txt)
+        _fixed, _name_notes = trim_glued_names_from_tables(_fixed, args.program, _txt)
+        _notes = _notes + _name_notes
+        if _notes:
+            data = {**data, "courses": _fixed}
+            for w in _notes:
+                print(f"    ⚠ {w}")
 
     converted, report = convert_lab7b(
         data,
@@ -2035,6 +3004,12 @@ def open_db(path: str | Path, readonly: bool = False) -> sqlite3.Connection:
 TABLES = ("program", "course", "plan_item", "prerequisite", "elective_slot")
 
 
+def _pages_for_db(row: dict) -> str | None:
+    """pages (list) -> JSON text สำหรับคอลัมน์ pages; รับ curriculum.json เก่าที่มีแต่ source_page ด้วย"""
+    pages = _lab7b_pages({"pages": row.get("pages"), "source_page": row.get("source_page")})
+    return json.dumps(pages) if pages else None
+
+
 def load_curriculum(conn: sqlite3.Connection, data: dict) -> None:
     """
     โหลด dict ของ Lab 8B เข้าฐานข้อมูลที่เปิดอยู่แล้ว
@@ -2054,21 +3029,21 @@ def load_curriculum(conn: sqlite3.Connection, data: dict) -> None:
     for c in data.get("courses", []):
         conn.execute(
             "INSERT OR REPLACE INTO course (code, name_th, name_en, credits,"
-            " lecture_h, lab_h, self_h, description_th, source_page)"
+            " lecture_h, lab_h, self_h, description_th, pages)"
             " VALUES (?,?,?,?,?,?,?,?,?)",
             (c["code"], c["name_th"], c.get("name_en"), c["credits"],
              c.get("lecture_h"), c.get("lab_h"), c.get("self_h"),
-             c.get("description_th"), c.get("source_page")))
+             c.get("description_th"), _pages_for_db(c)))
 
     conn.execute("DELETE FROM plan_item WHERE program_id = ?", (pid,))
     for p in data.get("plan", []):
         conn.execute(
             "INSERT INTO plan_item (program_id, year, semester, code, credits,"
-            " alt_group, category, type, note, source_page)"
+            " alt_group, category, type, note, pages)"
             " VALUES (?,?,?,?,?,?,?,?,?,?)",
             (pid, p["year"], p["semester"], p["code"], p["credits"],
              p.get("alt_group"), p.get("category"), p.get("type"),
-             p.get("note"), p.get("source_page")))
+             p.get("note"), _pages_for_db(p)))
 
     for r in data.get("prerequisites", []):
         conn.execute(
@@ -2081,10 +3056,10 @@ def load_curriculum(conn: sqlite3.Connection, data: dict) -> None:
         conn.execute(
             "INSERT OR REPLACE INTO elective_slot (program_id, code,"
             " allowed_terms, name_th, credits, category, type, note,"
-            " source_page) VALUES (?,?,?,?,?,?,?,?,?)",
+            " pages) VALUES (?,?,?,?,?,?,?,?,?)",
             (pid, s["code"], s.get("allowed_terms"), s.get("name_th"),
              s.get("credits"), s.get("category"), s.get("type"),
-             s.get("note"), s.get("source_page")))
+             s.get("note"), _pages_for_db(s)))
     conn.commit()
 
 
@@ -2117,7 +3092,7 @@ def cmd_load(args) -> None:
     n = {t: conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
          for t in TABLES}
     pages = conn.execute(
-        "SELECT COUNT(*) FROM course WHERE source_page IS NOT NULL").fetchone()[0]
+        "SELECT COUNT(*) FROM course WHERE pages IS NOT NULL").fetchone()[0]
     conn.close()
     print(f"  โหลดเข้า {db} แล้ว")
     for t, c in n.items():
@@ -2125,7 +3100,7 @@ def cmd_load(args) -> None:
     print(f"    course ที่มีเลขหน้าอ้างอิง {pages}/{n['course']}")
     if n["course"] and pages == 0:
         print("    ! ไม่มีเลขหน้าเลย — คำตอบจะอ้างอิงหน้าไม่ได้ "
-              "ตรวจว่า Lab 7B แนบ source_page มาหรือยัง")
+              "ตรวจว่า Lab 7B แนบ pages/source_page มาหรือยัง")
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -2170,6 +3145,11 @@ def verify_db(conn: sqlite3.Connection) -> list[dict]:
     # ── CHK1 หน่วยกิตรวมของแผน ต้องเท่ากับที่หลักสูตรประกาศ ────────
     rows = _sem_credits(conn)
     total = sum(r["credits"] for r in rows)
+    # วิชาที่ถูกบังคับเป็นวิชาเลือก (ไม่ผูกเทอม) แต่ยังรวมอยู่ในยอดหลักสูตร
+    forced = conn.execute(
+        "SELECT COALESCE(SUM(credits), 0) FROM elective_slot WHERE note LIKE ?",
+        (f"%{FORCED_ELECTIVE_COUNTED_MARK}%",)).fetchone()[0]
+    total += forced
     declared = prog["total_credits"]
     # ยอมให้ต่างได้ ถ้าหลักสูตรมีหมวดวิชาเลือกเสรีที่ไม่ระบุในแผนรายเทอม
     # ใช้คอลัมน์ category จริง ไม่ใช่ note LIKE '%เลือกเสรี%' แบบเดิม
@@ -2186,6 +3166,7 @@ def verify_db(conn: sqlite3.Connection) -> list[dict]:
     else:
         add("CHK1", "หน่วยกิตรวมของแผน = หน่วยกิตที่หลักสูตรประกาศ", total == declared,
             f"แผนรวม {total} · ประกาศไว้ {declared}"
+            + (f" (รวมวิชาเลือกที่นับในยอด {forced} หน่วยกิต)" if forced else "")
             + (f" · มีวิชาเลือกเสรี {free} รายการ" if free else "")
             + (f" · วิชาเลือกที่ไม่ระบุเทอม {slots} รายการ (ไม่นับในแผน)" if slots else ""))
 
@@ -2392,8 +3373,9 @@ SQL: SELECT SUM(credits) FROM plan_item WHERE type='เลือก'
   ซึ่ง v_course_terms รวมมาให้แล้วทั้งสองทาง
 - ถามเรื่องวิชาบังคับ/วิชาเลือก ให้ใช้คอลัมน์ type ('บังคับ' หรือ 'เลือก')
   ถามเรื่องหมวดวิชา ให้ใช้คอลัมน์ category — ห้ามค้นจาก note
-- ให้เลือกคอลัมน์ source_page ติดมาด้วยเสมอถ้าตารางหรือวิวนั้นมีคอลัมน์นี้
-  เพราะคำตอบต้องอ้างอิงเลขหน้าในเล่มหลักสูตรได้
+- ให้เลือกคอลัมน์ pages ติดมาด้วยเสมอถ้าตารางหรือวิวนั้นมีคอลัมน์นี้ (ฐานเก่าใช้ชื่อ source_page)
+  เพราะคำตอบต้องอ้างอิงเลขหน้าในเล่มหลักสูตรได้ — pages เก็บเป็นข้อความ JSON เช่น [23, 287]
+  ห้ามเอาไปกรองหรือเทียบตัวเลขโดยตรง ให้เลือกมาเฉย ๆ
 - ตอบเป็น SQL ล้วน ไม่ต้องมีคำอธิบายและไม่ต้องมี markdown fence
 
 คำถาม: {question}
@@ -2410,7 +3392,7 @@ ANSWER_PROMPT = """ตอบคำถามต่อไปนี้เป็น�
 - ตอบสั้น ตรงประเด็น ไม่ต้องอธิบายวิธีการ
 - ใช้เฉพาะตัวเลขและข้อความที่ปรากฏในผลลัพธ์ ห้ามเพิ่มข้อมูลจากความรู้ของคุณเอง
 - ถ้าผลลัพธ์ว่างเปล่า ให้ตอบว่า "ไม่พบข้อมูลนี้ในเล่มหลักสูตร"
-- ถ้าผลลัพธ์มีคอลัมน์ source_page ให้ใส่เลขหน้าเหล่านั้นลงใน source_pages
+- ถ้าผลลัพธ์มีคอลัมน์ pages (หรือ source_page) ให้ใส่เลขหน้าเหล่านั้นลงใน source_pages
   ใช้เฉพาะเลขที่ปรากฏในผลลัพธ์ ห้ามเดาเลขหน้าเอง ถ้าไม่มีให้ใส่ []
 - ตอบเป็น JSON รูปแบบนี้เท่านั้น
   {{"answer": "...", "source_pages": [12, 13]}}
@@ -2435,19 +3417,25 @@ def pages_of(rows: list[dict]) -> list[int]:
     """
     รวมเลขหน้าจากแถวผลลัพธ์
 
-    รับทุกคอลัมน์ที่ลงท้ายด้วย source_page เพราะ JOIN มักเปลี่ยนชื่อคอลัมน์
-    เป็น c.source_page หรือ p.source_page ตามที่ LLM เขียน SQL มา
+    รับทุกคอลัมน์ที่ลงท้ายด้วย pages หรือ source_page เพราะ JOIN มักเปลี่ยนชื่อคอลัมน์
+    เป็น c.pages หรือ p.pages ตามที่ LLM เขียน SQL มา; ค่าอาจเป็นข้อความ JSON "[23, 287]",
+    list หรือเลขเดี่ยว (ฐานเก่า) — เก็บเลขทุกตัว ไม่ใช่แค่ตัวแรก
     """
     pages: set[int] = set()
     for r in rows:
         for key, value in r.items():
-            if not str(key).lower().endswith("source_page"):
+            k = str(key).lower()
+            if not (k.endswith("pages") or k.endswith("source_page")):
                 continue
             if value is None:
                 continue
-            m = re.search(r"\d+", str(value))
-            if m:
-                pages.add(int(m.group()))
+            if isinstance(value, (list, tuple)):
+                items = list(value)
+            else:
+                items = re.findall(r"\d+", str(value))
+            for item in items:
+                if str(item).isdigit() and int(item) > 0:
+                    pages.add(int(item))
     return sorted(pages)
 
 
@@ -2923,7 +3911,10 @@ def _dedup_insert(out: dict, fingerprints: dict, base_key: str,
     if key in out:
         # วิชาเดียวกันปรากฏหลายหน้า — เติมช่องที่ยังว่างแทนการทับ
         for f, v in record.items():
-            if out[key].get(f) in (None, "") and v not in (None, ""):
+            if f == "pages" and isinstance(v, list) and v:
+                merged = list(out[key].get(f) or [])
+                out[key][f] = merged + [pg for pg in v if pg not in merged]
+            elif out[key].get(f) in (None, "") and v not in (None, ""):
                 out[key][f] = v
     else:
         out[key] = dict(record, code=key)
@@ -3077,6 +4068,9 @@ def _flatten_pred(pred: Any) -> list[dict]:
                 rec["credits"] = f"{credits_val}({hours[0]}-{hours[1]}-{hours[2]})"
             else:
                 rec["credits"] = str(credits_val)
+    for rec in by_code.values():
+        if rec.get("credits_text"):     # เล่มให้หลายแบบ — เทียบทั้งก้อนตามที่ _norm_credits ตั้งใจ
+            rec["credits"] = rec["credits_text"]
 
     for p in pred.get("plan") or []:
         code = str(p.get("code") or "").strip()
@@ -3487,9 +4481,9 @@ def cmd_selftest(args=None) -> bool:
         ck("นับวิชา flexible ที่กู้ไว้ได้", report["flexible_courses_kept"], 1)
 
         # ── citation และ category/type ─────────────────────────────────
-        ck("เก็บเลขหน้าจาก source_page", by_code["06026240"]["source_page"], 12)
+        ck("เก็บเลขหน้าจาก source_page", by_code["06026240"]["pages"], [12])
         ck("เก็บเลขหน้าจากชื่อฟิลด์อื่น (page)",
-           by_code["06026241"]["source_page"], 13)
+           by_code["06026241"]["pages"], [13])
         ck("category แยกเป็นคอลัมน์จริง",
            plan_by_code["06026240"]["category"], "หมวดวิชาเฉพาะ")
         ck("type แยกเป็นคอลัมน์จริง",
@@ -3569,6 +4563,27 @@ def cmd_selftest(args=None) -> bool:
     ck("นับวิชาเลือกอย่างใดอย่างหนึ่งครั้งเดียว", rows[(2, 1)], 9)
     ck("ภาคสหกิจนับได้ 6 หน่วยกิต", rows[(2, 2)], 6)
 
+    # ── 4b. normalize_plan_alternatives (ต้นเหตุ CHK1 เกินของ DSBA) ─────
+    _nm = {f"PLACEHOLDER_06026XXX_{k}": {"name_th": f"วิชาเลือกกลุ่ม{g} {n}"}
+           for k, (g, n) in zip(range(7, 13), [("วิทยาการข้อมูล", 3), ("การวิเคราะห์เชิงสถิติ", 3),
+                                               ("วิศวกรรมข้อมูล", 3), ("วิทยาการข้อมูล", 4),
+                                               ("การวิเคราะห์เชิงสถิติ", 4), ("วิศวกรรมข้อมูล", 4)])}
+    _pl = [{"year": 3, "semester": 2, "code": c, "credits": 3, "alt_group": None}
+           for c in list(_nm)[:4]]
+    _pl += [{"year": 3, "semester": 2, "code": c, "credits": 3,
+             "alt_group": "raw_alt_recovered_06026XXX_10"} for c in list(_nm)[4:]]
+    _pl += [{"year": 4, "semester": 2, "code": "06026259", "credits": 6, "alt_group": "alt_y4s2_1"},
+            {"year": 4, "semester": 2, "code": "06026260", "credits": 6, "alt_group": "alt_y4s2_1"},
+            {"year": 4, "semester": 2, "code": "06026259", "credits": 6,
+             "alt_group": "raw_alt_recovered_06026259_12"}]
+    normalize_plan_alternatives(_pl, _nm, group_slots=True)
+    _units: dict[tuple, int] = {}
+    for _i, _r in enumerate(_pl):
+        _k = (_r["year"], _r["semester"], _r["alt_group"] or f"x{_i}")
+        _units[_k] = min(_units.get(_k, 10 ** 6), _r["credits"])
+    ck("ช่องวิชาเลือกกลุ่ม 2 ช่อง + สหกิจ นับเป็น 3+3+6", sum(_units.values()), 12)
+    ck("ตัดแถวสหกิจซ้ำที่กู้คืนทิ้ง", sum(1 for r in _pl if r["code"] == "06026259"), 1)
+
     # ── 5. กฎต้องจับความผิดจริงได้ด้วย ──────────────────────────────
     conn.execute("UPDATE plan_item SET credits = 5 WHERE code = '06026240'")
     res2 = {r["id"]: r["ok"] for r in verify_db(conn)}
@@ -3636,8 +4651,8 @@ def cmd_selftest(args=None) -> bool:
 
     # ── 6. citation, category/type และวิชาเลือกยืดหยุ่นในฐานข้อมูลจริง ──
     ck("v_plan มีเลขหน้าให้อ้างอิง",
-       conn.execute("SELECT source_page FROM v_plan WHERE code='06026240'"
-                    ).fetchone()[0], 62)
+       conn.execute("SELECT pages FROM v_plan WHERE code='06026240'"
+                    ).fetchone()[0], "[62]")
     ck("นับวิชาบังคับด้วยคอลัมน์ type ได้ตรง ๆ",
        conn.execute("SELECT COUNT(*) FROM plan_item WHERE year=1 AND semester=1"
                     " AND type='บังคับ'").fetchone()[0], 4)
@@ -3656,6 +4671,10 @@ def cmd_selftest(args=None) -> bool:
        pages_of([{"code": "06026240", "source_page": 62},
                  {"code": "06026241", "c.source_page": 62},
                  {"code": "06026390", "source_page": None}]), [62])
+    ck("ดึงเลขหน้าหลายหน้าจากคอลัมน์ pages (JSON)",
+       pages_of([{"code": "06046400", "pages": "[23, 287]"},
+                 {"code": "06046402", "p.pages": [23, 288]},
+                 {"code": "06066000", "pages": None}]), [23, 287, 288])
     ck("ต่อเลขหน้าท้ายคำตอบ",
        with_citation("9 หน่วยกิต", [12]), "9 หน่วยกิต (อ้างอิงหน้า 12)")
     ck("ไม่มีเลขหน้าก็ไม่แต่งขึ้นมา",
@@ -3665,6 +4684,73 @@ def cmd_selftest(args=None) -> bool:
        "9 หน่วยกิต (อ้างอิงหน้า 12)")
     ck("ANSWER_PROMPT format ได้โดยไม่ KeyError",
        "source_pages" in ANSWER_PROMPT.format(question="ถาม", rows="[]"), True)
+
+    # ── 8. detect_sections() — จับป้ายหัวข้อภาษาไทย แทนตาราง PROGRAM_PAGE_RANGES ──
+    # เอกสารจำลองด้วยตัวคั่น <!-- PDF_PAGE N --> (แบบ intermediate_vlm.md จริง) ครบทุก
+    # เคสขอบที่เจอจริงตอนตรวจกับ BIT/IT/DSBA/AIT/GENED ทั้ง 5 โปรแกรม
+    def _pg(n, body):
+        return f"<!-- PDF_PAGE {n} -->\n{body}\n"
+
+    two_plan_doc = "".join([
+        _pg(10, "### 3.1.3 รายวิชา\nเนื้อหารายวิชา..."),
+        _pg(11, "รายวิชาต่อ ๆ ไป"),
+        # ประโยคแทรกแบบ DSBA — มีคำว่า "ร่วม" ต้องไม่ถูกจับเป็นหัวข้อแผนจริง
+        _pg(12, "สำหรับแผนการศึกษาที่ไม่เข้าร่วมโครงการสหกิจศึกษา\nสำหรับแผนการศึกษาที่เข้าร่วมโครงการสหกิจศึกษา"),
+        _pg(13, "3.1.4 แผนการศึกษา\n3.1.4.1 แผนการศึกษาที่ไม่เข้าโครงการสหกิจศึกษา\nปีที่ 1 ภาคการศึกษาที่ 1"),
+        _pg(14, "ปีที่ 4 ภาคการศึกษาที่ 2\nรวมตลอดหลักสูตร 126 หน่วยกิต"),
+        _pg(15, "3.1.4.2 แผนการศึกษาที่เข้าโครงการสหกิจศึกษา\nปีที่ 1 ภาคการศึกษาที่ 1"),
+        _pg(16, "เนื้อหาสหกิจศึกษาต่อ"),
+        _pg(17, "รวมตลอดหลักสูตร 126 หน่วยกิต"),
+        _pg(18, "ความหมายของรหัสประจำรายวิชา — เนื้อหาอื่นที่ไม่ใช่ section ไหนเลย"),
+        _pg(19, "เนื้อหาแทรกอื่น ๆ ก่อนถึงภาคผนวกคำอธิบายรายวิชา"),
+        _pg(20, "# คำอธิบายรายวิชา\n06026200 แคลคูลัส 1\nวิชาบังคับก่อน : ไม่มี"),
+    ])
+    got = detect_sections(two_plan_doc)
+    ck("detect_sections: course_list เริ่มที่หน้าแรกของ 'รายวิชา'", got.get("course_list"), (10, 12))
+    ck("detect_sections: nocoop ไม่ติดกับดัก 'ไม่เข้าร่วม' (มีคำว่าร่วม)", got.get("nocoop"), (13, 14))
+    ck("detect_sections: coop ไม่ติดกับดัก 'เข้าร่วม' (มีคำว่าร่วม)", got.get("coop"), (15, 17))
+    ck("detect_sections: coop จบที่ 'รวมตลอดหลักสูตร' ไม่ใช่กินยาวไปจนถึง courses",
+       got.get("coop"), (15, 17))
+    ck("detect_sections: courses (คำอธิบายรายวิชา) เริ่มถูกหน้า ไม่ใช่หน้า 18/19 ที่เป็นแค่เนื้อหาคั่น",
+       got.get("courses"), (20, 20))
+
+    single_plan_doc = "".join([
+        _pg(1, "3.2 รายวิชา\nเนื้อหารายวิชา"),
+        _pg(2, "3.3 แผนการศึกษา\nปีที่ 1 ภาคการศึกษาที่ 1"),
+        _pg(3, "รวมตลอดหลักสูตร 120 หน่วยกิต"),
+        _pg(4, "องค์ประกอบภาคสนาม — เนื้อหาคั่นก่อนภาคผนวก"),
+        _pg(5, "# คำอธิบายรายวิชา\n06046400 แคลคูลัส 1"),
+    ])
+    got2 = detect_sections(single_plan_doc)
+    ck("detect_sections: เล่มแผนเดียว (ไม่แยกสหกิจ) ได้ key 'plan' ไม่ใช่ nocoop/coop",
+       ("plan" in got2, "nocoop" in got2, "coop" in got2), (True, False, False))
+    ck("detect_sections: 'plan' แผนเดียวก็ตัดจบที่ 'รวมตลอดหลักสูตร' เหมือนกัน",
+       got2.get("plan"), (2, 3))
+
+    no_plan_doc = "".join([
+        _pg(1, "3.4 รายวิชาในหมวดวิชาศึกษาทั่วไป\nตารางวิชา..."),
+        _pg(2, "ภาคผนวก ก คำอธิบายรายวิชา\n90641004 โครงงานกลุ่ม 1"),
+    ])
+    got3 = detect_sections(no_plan_doc)
+    ck("detect_sections: เอกสารไม่มีแผนการศึกษาเลย (แบบ GENED) ไม่มี key แผนใด ๆ",
+       any(k in got3 for k in ("nocoop", "coop", "plan")), False)
+    ck("detect_sections: ยังจับ courses จากภาคผนวกที่ขึ้นต้น 'ภาคผนวก ก' ได้",
+       got3.get("courses"), (2, 2))
+
+    def _detect_raises_valueerror(text):
+        try:
+            detect_sections(text)
+            return False
+        except ValueError:
+            return True
+    ck("detect_sections: เอกสารไม่มีตัวคั่นหน้าเลย -> ValueError ชัดเจน (ไม่ใช่พังเงียบ)",
+       _detect_raises_valueerror("ไม่มีตัวคั่นหน้าอยู่เลยในข้อความนี้"), True)
+
+    sliced13 = slice_pages(two_plan_doc, 13, 13)
+    ck("slice_pages: ใช้ได้กับตัวคั่นแบบ <!-- PDF_PAGE N --> ด้วย ไม่ใช่แค่ --- Page N ---",
+       ("PDF_PAGE 13" in sliced13, "PDF_PAGE 14" in sliced13,
+        "แผนการศึกษาที่ไม่เข้าโครงการสหกิจศึกษา" in sliced13),
+       (True, False, True))
 
     conn.close()
     db.unlink(missing_ok=True)
@@ -3701,11 +4787,17 @@ def main() -> None:
     p.add_argument("--rounds", type=int, default=MAX_REPAIR_ROUNDS)
     p.add_argument("--max-chars", type=int, default=40000)
     p.add_argument("--program", choices=sorted(PROGRAM_PAGE_RANGES),
-                   help="ใช้ช่วงหน้า default ของโปรแกรมนี้ (IT/DSBA/BIT/AIT/GENED)")
+                   help="ป้ายกำกับ (IT/DSBA/BIT/AIT/GENED) ใช้เป็น fallback ตาราง legacy "
+                        "เฉพาะตอนที่จับป้ายหัวข้อในไฟล์ไม่ได้เลย ปกติไม่ต้องระบุ — ค่าเริ่มต้น "
+                        "คือจับ section จากป้ายหัวข้อ 'รายวิชา'/'แผนการศึกษา'/'คำอธิบายรายวิชา' "
+                        "ในไฟล์เอง (ดู detect_sections())")
     p.add_argument("--section",
-                   help="section ในโปรแกรมนั้น เช่น nocoop, coop, plan, courses "
-                        "(ไม่ระบุจะใช้ section แรกของโปรแกรมนั้น)")
-    p.add_argument("--start-page", type=int, help="override ช่วงหน้าเอง (ใช้แทน --program)")
+                   help="section ที่ต้องการ เช่น course_list, nocoop, coop, plan, courses "
+                        "(ไม่ระบุจะใช้ section แรกตามลำดับหน้าที่จับได้)")
+    p.add_argument("--no-detect", action="store_true",
+                   help="ปิดการจับ section อัตโนมัติ — ป้อนทั้งไฟล์เข้า LLM รวดเดียว "
+                        "(เหมือนไม่ระบุ --program/--section/--start-page/--end-page เลยแบบเดิม)")
+    p.add_argument("--start-page", type=int, help="override ช่วงหน้าเอง (ใช้แทนการจับอัตโนมัติ)")
     p.add_argument("--end-page", type=int)
 
     p = sub.add_parser("import-lab7b",
@@ -3717,8 +4809,13 @@ def main() -> None:
     p.add_argument("--program", choices=sorted(PROGRAM_PAGE_RANGES), default=None,
                    help="โปรแกรมของ pred JSON นี้ — ใช้กับ --split-dir")
     p.add_argument("--split-dir", default=None,
-                   help="แยกโปรแกรมที่มี nocoop+coop ตามเลขหน้าอัตโนมัติ (IT/DSBA/BIT -> 2 โปรแกรม, "
-                        "AIT/GENED -> 1) เขียน <dir>/<section>/curriculum.json + <dir>/manifest.json")
+                   help="แยกโปรแกรมที่มี nocoop+coop ออกเป็นสองโปรแกรม (AIT/GENED ที่มีแผนเดียว/"
+                        "ไม่มีแผน -> 1) เขียน <dir>/<section>/curriculum.json + <dir>/manifest.json")
+    p.add_argument("--source-md", default=None,
+                   help="Markdown ต้นทางของโปรแกรมนี้ (intermediate_vlm.md หรือ curriculum.md) — "
+                        "ใช้กับ --split-dir เพื่อจับช่วงหน้า nocoop/coop จากป้ายหัวข้อ "
+                        "'แผนการศึกษา...' ในเนื้อหาเองแทนตาราง PROGRAM_PAGE_RANGES ที่ hardcode "
+                        "ไว้ล่วงหน้า ไม่ระบุจะถอยไปใช้ตาราง legacy ตาม --program")
     p.add_argument("--program-meta", default=None,
                    help="JSON {program_id: {name, total_credits, years}} เช่น IT_nocoop — ใช้กับ --split-dir")
     p.add_argument("--program-id", default=None, help="ทับ program id จาก Lab 7B")
