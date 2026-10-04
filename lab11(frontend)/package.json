@@ -1,0 +1,12 @@
+{
+  "name": "curriculum-clearwave-ui",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./styles/tailwind.css -o ./static/style.css --minify",
+    "watch:css": "tailwindcss -i ./styles/tailwind.css -o ./static/style.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
