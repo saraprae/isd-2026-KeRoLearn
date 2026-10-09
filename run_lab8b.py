@@ -156,8 +156,8 @@ def read_manifest(lab8_out: Path, program: str, dry_run: bool) -> list[dict] | N
         # dry-run ไม่ได้รัน import จริงจึงไม่มี manifest — ประมาณจากตารางช่วงหน้าเพื่อโชว์คำสั่ง
         sections = [k for k in PROGRAM_PAGE_RANGES.get(program, {}) if k in ("nocoop", "coop")]
         if sections:
-            return [{"program_id": f"{program}_{sec}", "section": sec, "dir": sec,
-                     "curriculum": f"{sec}/curriculum.json", "status": "ok"} for sec in sections]
+            return [{"program_id": f"{program}_{sec}", "section": sec,
+                     "dir": sec, "curriculum": f"{sec}/curriculum.json", "status": "ok"} for sec in sections]
         return [{"program_id": program, "section": None, "dir": ".",
                  "curriculum": "curriculum.json", "status": "ok"}]
     return None
@@ -249,7 +249,6 @@ def process_lab8_stage(run_id: str, program_meta: str | None, gt_dir: str | None
         import_cmd += ["--program-meta", program_meta]
     # ไม่มี --track ที่นี่เช่นกัน (ดูเหตุผลใน run_single) — nocoop/coop อยู่ใน program_id แล้ว
     # (IT_nocoop / IT_coop) และ import-lab7b เป็นคนตั้งให้เองจากการแยกตามเลขหน้า
-
     try:
         run(LAB8, "schema", "-o", lab8_out / "schema", dry_run=dry_run)
         run(*import_cmd, dry_run=dry_run)
@@ -311,11 +310,12 @@ def main() -> None:
 
     legacy = parser.add_argument_group(
         "single-file mode", "ไม่ระบุ --run/--program/--all-runs = โหมดนี้ (พฤติกรรมเดิม)")
-    legacy.add_argument("-i", "--input", default="data/input_C/dsba.pdf",
+    legacy.add_argument("-i", "--input", default="data/input/dsba.pdf",
                         help="Path to input PDF file or directory")
     legacy.add_argument("--pages", type=str, default=None,
                         help="Specific pages to process (e.g. '1', '1-2', '1,3')")
-    legacy.add_argument("-g", "--gt", default="data/ground_truth_C/DSBA_academic_plan_coop.json")
+    legacy.add_argument("-g", "--gt", default="data/ground_truth/DSBA_academic_plan_coop.json",
+                        help="Path to ground truth JSON file")
     legacy.add_argument("--program-id", default="DSBA-coop")
     legacy.add_argument("--program-name", default=None)
     legacy.add_argument("--total-credits", type=int, default=None)
