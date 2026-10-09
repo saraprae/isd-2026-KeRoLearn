@@ -4,11 +4,11 @@ Lab นี้มีสอง application แยก `main.py` และ `index.ht
 
 ```text
 Curriculum App                 Transcript App
-คำถาม → SQL → SQLite          Upload PDF/Image
+คำถาม → กฎ/แผน → SQL → SQLite Upload PDF/Image
        → rows → คำตอบ          → preprocess → OCR → postprocess → JSON
 ```
 
-> ระบบนี้ยังไม่ใช่ vector RAG: ไม่มี embedding หรือ vector database โมเดลทำหน้าที่แปลงคำถามเป็น SQL และสรุปผลจาก SQLite
+> Curriculum ใช้ SQLite และ SQL templates; กฎและ cache ทำงานก่อน Qwen โมเดลช่วยเลือก intent/คำค้นเมื่อจำเป็น ส่วนโค้ดตรวจแผน สร้าง SQL และคำตอบพร้อม citations ไม่มี embedding หรือ vector database ดูคู่มือปัจจุบันใน [HANDOFF](curriculum_app/HANDOFF.md)
 
 ## 1. ไฟล์สำคัญ
 
@@ -40,7 +40,7 @@ lab10_fastapi/
 - Ollama
 - โมเดล `qwen3:4b`
 - ฝั่ง Transcript ต้องมีโมเดล `scb10x/typhoon-ocr1.5-3b` ด้วย
-- ฐานข้อมูล `work/lab8b_run/curriculum.db` จาก Lab 8B
+- ฐานข้อมูลจาก Lab 8B ตาม `Settings.db_paths`; ฐานเริ่มต้นคือ `work/lab8b_run/DSBA/nocoop/curriculum.db`
 
 ถ้ายังไม่มีฐานข้อมูล ให้กลับไปรันจากรากโปรเจกต์:
 

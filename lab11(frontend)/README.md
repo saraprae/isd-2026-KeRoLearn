@@ -1,7 +1,9 @@
 # Clearwave frontend
 
 FastAPI serves `static/index.html`, `static/app.js`, and the compiled `static/style.css`.
-The existing HTML structure, IDs, classes, and JavaScript remain unchanged.
+The answer panel presents numeric summaries, readable course cards, and highlighted notes.
+Database rows appear in a table inside a disclosure; raw JSON and SQL remain available in nested disclosures.
+Two-program comparisons show the actual programs and tracks from returned rows, with per-program credit/duration cards and Thai table headings.
 
 ## Edit styles
 
@@ -21,8 +23,12 @@ Commit the compiled `static/style.css` so Python can serve it without Node.js at
 
 Run the existing FastAPI command from the repository root, then open http://127.0.0.1:8000/.
 
-The layout switches to two columns at 640px, retains all four UI states,
+The form uses two columns at 640px and the form/answer workspace uses two columns at 768px. It retains all four UI states,
 and respects reduced-motion preferences.
+
+The answer is rendered with text nodes rather than HTML from the API. Numeric highlights use the returned rows without adding totals, and missing credits retain the backend's notes. Loading, errors, and edits clear previous results, citations and timing. The request and four core response fields are preserved; optional `citations` and `processing_ms` are now displayed.
+
+See the [combined Lab 10 / Lab 11 handoff](../lab10_fastapi/curriculum_app/HANDOFF.md) for the implementation, function comparison, workflow, data limitations, metrics, verification results and cleanup manifest. The header shows browser wait time and API processing time separately. The source section shows recorded book pages without inventing PDF links; responses without page metadata show an explicit missing-reference message.
 
 Tailwind reference: https://tailwindcss.com/docs/functions-and-directives
 
@@ -74,19 +80,21 @@ UI แสดง `error` และข้อความให้รีเฟร�
 
 ### 2. POST /api/ask
 
-**หน้าที่:** รับคำถาม เลือกฐานข้อมูลตามหลักสูตรและแผน ให้โมเดลสร้าง SQL
-อ่านฐานข้อมูล แล้วส่งคำตอบพร้อม SQL และผลข้อมูลกลับมา
+**หน้าที่:** รับคำถาม เลือกฐานข้อมูลตามหลักสูตรและแผน ตรวจ rules/cache และให้โมเดลเลือก intent/คำค้นเมื่อจำเป็น
+โค้ด compile SQL อ่านฐานข้อมูล แล้วส่งคำตอบพร้อมผลข้อมูล เลขหน้าอ้างอิง และเวลาประมวลผลกลับมา
+
+คำถามเปรียบเทียบ เช่น `เปรียบเทียบหน่วยกิตรวมและจำนวนปี IT กับ DSBA` ใช้ชื่อ 2 หลักสูตรในข้อความเป็นหลัก ผ่านกฎที่ไม่เรียก Qwen รองรับเฉพาะหน่วยกิตรวมทางการและจำนวนปี; `rows` มี `program`, `track` และหัวข้อที่ขอ เพื่อให้ UI แสดงบริบทจริง แม้หลักสูตรในฟอร์มต่างจากข้อความ แผนชัดเจนในคำถามมีผลก่อนฟอร์ม; แผนเดียวเลือกอัตโนมัติ และกรณีกำกวมตอบให้ระบุเพิ่มโดยไม่ query
 
 **Request header:** `Content-Type: application/json`
 
 | Field | Type | Required | เงื่อนไข |
 |---|---|---|---|
 | `question` | string | ใช่ | 2–500 ตัวอักษร; Frontend ตัดช่องว่างหัวท้ายก่อนส่ง |
-| `program` | string | ใช่ | อย่างน้อย 2 ตัวอักษร และต้องอยู่ในรายการหลักสูตรของระบบ |
-| `track` | string หรือ null | ตามหลักสูตร | หลักสูตรที่มีหลายแผนต้องส่งค่าที่รองรับ; หลักสูตรที่มีแผนเดียวละได้หรือส่ง null |
+| `program` | string | ใช่ | อย่างน้อย 2 ตัวอักษร; คำถามทั่วไปต้องอยู่ในรายการระบบ ส่วนการเปรียบเทียบใช้ targets ที่ตรวจจากข้อความ |
+| `track` | string หรือ null | ตามหลักสูตร | คำถามทั่วไปเลือกแผนของ program; การเปรียบเทียบใช้เป็นค่าแผนสำรองของแต่ละ target |
 
 Backend ตัดช่องว่างหัวท้ายและแปลง `program` เป็นตัวพิมพ์ใหญ่ และ `track` เป็นตัวพิมพ์เล็ก
-หากมีแผนเดียว ระบบเลือกแผนนั้นให้เมื่อไม่ส่ง `track` หรือส่ง null
+สำหรับคำถามทั่วไป หากมีแผนเดียว ระบบเลือกแผนนั้นให้เมื่อไม่ส่ง `track` หรือส่ง null
 แต่ข้อความว่าง `""` ไม่ถือเป็นการละค่าและจะถูกปฏิเสธ
 Frontend ปัจจุบันส่งทั้ง `program` และ `track` จากตัวเลือกเสมอ
 
@@ -115,8 +123,13 @@ Frontend ปัจจุบันส่งทั้ง `program` และ `trac
 |---|---|---|
 | `question` | string | คำถามที่ Backend ได้รับ |
 | `sql` | string | SQL ที่ใช้หรือพยายามใช้; แสดงใน `#sql` |
-| `rows` | array of objects | ผลจากฐานข้อมูล; แสดงเป็น JSON ใน `#rows` |
+| `rows` | array of objects | ผลจากฐานข้อมูล; แสดงตารางใน `#rows-table` และ JSON ใน `#rows` ภายในส่วนพับข้อมูลประกอบ |
 | `answer` | string | คำตอบหรือคำอธิบายผล; แสดงใน `#answer` |
+| `citations` | array of objects; ค่าเริ่มต้น `[]` | `source`, `pages` และขอบเขตหลักสูตร/แผน/วิชา/ปี/เทอม; แสดงใน `#answer-citations` |
+| `processing_ms` | number หรือ null; ค่าเริ่มต้น null | เวลาฝั่ง API ตั้งแต่เข้า route ถึงหลัง `model.ask()` จบ; แสดงใน `#processing-time` |
+| `performance` | object หรือ null; ค่าเริ่มต้น null | เวลาแยกขั้น เส้นทาง cache/rules/Qwen และ counters สำหรับผู้ดูแล ตรวจได้ผ่าน API/Network; ดู [handoff](../lab10_fastapi/curriculum_app/HANDOFF.md) |
+
+Frontend วัดเวลาผู้ใช้รอด้วย `performance.now()` ตั้งแต่ก่อน fetch ถึงหลัง render ใน `#response-time` และไม่คำนวณผลต่างเป็นเวลาเครือข่าย รองรับ API เก่าสี่ฟิลด์โดยซ่อนเวลาฝั่ง API และแจ้งว่าไม่มีเลขหน้าเมื่อมีผลค้น
 
 - คอลัมน์ในแต่ละ object ของ `rows` เปลี่ยนตาม SQL และค่าในคอลัมน์อาจเป็น null
 - จำนวนแถวที่คืนถูกจำกัดด้วย `CURRICULUM_MAX_ROWS` (ค่าเริ่มต้น 100) ไม่ใช่จำนวนแถวทั้งหมดในฐานข้อมูล
@@ -131,7 +144,10 @@ Frontend ปัจจุบันส่งทั้ง `program` และ `trac
 | `422 Unprocessable Entity` | ข้อมูลไม่ผ่าน Pydantic validation เช่นไม่มี question หรือ question สั้นเกินไป | array of objects |
 | `422 Unprocessable Entity` | หลักสูตร/แผนไม่ถูกต้อง หรือไม่ส่งแผนสำหรับหลักสูตรที่มีหลายแผน | string |
 | `422 Unprocessable Entity` | ValueError, JSON parsing error หรือ SQLite error ที่ route จับไว้ระหว่างประมวลผล | string |
-| `503 Service Unavailable` | ไม่พบไฟล์ฐานข้อมูล หรือติดต่อ Ollama ไม่สำเร็จ รวมถึง request timeout ที่ถูกจับไว้ | string |
+| `503 Service Unavailable` | ไม่พบไฟล์ฐานข้อมูล หรือติดต่อ Ollama ไม่สำเร็จ | string |
+| `504 Gateway Timeout` | เวลารวมของคำถามหรือ query เกินกำหนด | string |
+| `502 Bad Gateway` | ผลโมเดลผิดรูปแบบและซ่อมไม่ได้ | string |
+| `500 Internal Server Error` | SQL ที่ compile แล้วทำงานไม่สำเร็จ หรือข้อมูลเปรียบเทียบเปลี่ยนระหว่างอ่านทั้งสองรอบ | string |
 
 ตัวอย่างข้อผิดพลาดจากการเลือกหลักสูตร (`422`):
 
@@ -189,5 +205,6 @@ Frontend ปัจจุบันส่งทั้ง `program` และ `trac
 สถานะควบคุมด้วย `setState(state, message)` ใน `app.js` และแสดงผ่าน
 `#ui-status` / `data-state`; `aria-busy` บนฟอร์มบอกว่ากำลังประมวลผล
 Frontend ยังไม่มีการกำหนด timeout หรือยกเลิก fetch ด้วย AbortController
-จึงรอจน request สำเร็จหรือเกิดข้อผิดพลาด ไม่ควรถือว่า 180 วินาทีเป็นเวลาสูงสุดของทั้ง API
-เพราะ Backend อาจเรียกโมเดลมากกว่าหนึ่งครั้งต่อคำถาม
+จึงรอจน request สำเร็จหรือเกิดข้อผิดพลาด Backend ใช้ deadline ร่วมใน `model.ask()`
+(ค่าเริ่มต้น 180 วินาที รวมการเรียกโมเดลซ้ำ) แต่เวลาฝั่ง browser รวม network/render
+จึงไม่ถือ deadline ของ service เป็นเวลาสูงสุดของการรอหน้าเว็บ
