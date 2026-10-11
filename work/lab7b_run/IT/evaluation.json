@@ -1,0 +1,302 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 115,
+        "cer": 0.008696,
+        "wer": null,
+        "exact_match_acc": 0.991304,
+        "n_sub": 0,
+        "n_del": 8,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 920,
+        "error_samples": [
+          {
+            "key": "90644042 [ตกแถว]",
+            "gt": "90644042",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 115,
+        "cer": 0.056506,
+        "wer": 0.066798,
+        "exact_match_acc": 0.947826,
+        "n_sub": 1,
+        "n_del": 35,
+        "n_ins": 149,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3274,
+        "error_samples": [
+          {
+            "key": "060164xx",
+            "gt": "วิชาเลือกทางเทคโนโลยีสารสนเทศ 1",
+            "pred": "วิชาเลือกทางเทคโนโลยีสารสนเทศ 1 ผู้ประกอบการสมัยใหม่"
+          },
+          {
+            "key": "06016430",
+            "gt": "การพัฒนาคลาวด์แอปพลิเคชัน",
+            "pred": "การพัฒนาคลาวด์แอปพลิเคชันM2: โมดูล / ประกอบด้วยรายวิชาดังต่อไปนี้"
+          },
+          {
+            "key": "06016441",
+            "gt": "ประสิทธิภาพเครือข่ายและระบบ",
+            "pred": "ประสิทธิภาพเครือข่ายและระบบM3: โมดูลประกอบด้วยรายวิชาดังต่อไปนี้"
+          },
+          {
+            "key": "06016448",
+            "gt": "การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้น",
+            "pred": "การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้นวิชาเลือกทางเทคโนโลยีสารสนเทศจากกลุ่มวิชาบังคับเฉพาะสาขา"
+          },
+          {
+            "key": "06016472",
+            "gt": "กระบวนการอัตโนมัติด้วยโรบอต",
+            "pred": "กระบวนการอัตโนมัติด้วยโรบอท"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 115,
+        "cer": 0.020647,
+        "wer": 0.022371,
+        "exact_match_acc": 0.947826,
+        "n_sub": 0,
+        "n_del": 40,
+        "n_ins": 27,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3245,
+        "error_samples": [
+          {
+            "key": "06016425",
+            "gt": "VISUAL DESIGN FUNDAMENTALS FOR INTERACTIVE MEDIA",
+            "pred": "-5 VISUAL DESIGN FUNDAMENTALS FOR INTERACTIVE MEDIA"
+          },
+          {
+            "key": "06016416",
+            "gt": "REQUIREMENT ENGINEERING",
+            "pred": "## REQUIREMENT ENGINEERING"
+          },
+          {
+            "key": "06016417",
+            "gt": "SOFTWARE DEVELOPMENT TOOLS AND ENVIRONMENTS",
+            "pred": "## SOFTWARE DEVELOPMENT TOOLS AND ENVIRONMENTS"
+          },
+          {
+            "key": "06016423",
+            "gt": "INFRASTRUCTURE PROGRAMMABILITY AND AUTOMATION",
+            "pred": "-5 INFRASTRUCTURE PROGRAMMABILITY AND AUTOMATION"
+          },
+          {
+            "key": "060164xx",
+            "gt": "ELECTIVE COURSE IN INFORMATION TECHNOLOGY 1",
+            "pred": "ELECTIVE COURSE IN INFORMATION TECHNOLOGY 1 MODERN ENTREPRENEURS"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 115,
+        "cer": 0.053922,
+        "wer": null,
+        "exact_match_acc": 0.947826,
+        "n_sub": 7,
+        "n_del": 48,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1020,
+        "error_samples": [
+          {
+            "key": "06016425",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "06016434",
+            "gt": "3(2-2-5)",
+            "pred": "None"
+          },
+          {
+            "key": "06016435",
+            "gt": "3(2-2-5)",
+            "pred": "None"
+          },
+          {
+            "key": "06016458",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "060164xx",
+            "gt": "3(3-0-6) หรือ 3(2-2-5) หรือ 3(0-6-3)",
+            "pred": "3(0-9-0)"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 115,
+        "cer": 0.012766,
+        "wer": null,
+        "exact_match_acc": 0.991304,
+        "n_sub": 0,
+        "n_del": 3,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 235,
+        "error_samples": [
+          {
+            "key": "90644042 [ตกแถว]",
+            "gt": "4/2",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 115,
+        "cer": 0.011987,
+        "wer": null,
+        "exact_match_acc": 0.991304,
+        "n_sub": 0,
+        "n_del": 19,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1585,
+        "error_samples": [
+          {
+            "key": "90644042 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 115,
+        "cer": 0.0096,
+        "wer": null,
+        "exact_match_acc": 0.991304,
+        "n_sub": 0,
+        "n_del": 6,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 625,
+        "error_samples": [
+          {
+            "key": "90644042 [ตกแถว]",
+            "gt": "บังคับ",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 114,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 621,
+        "error_samples": []
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 114,
+        "cer": 1.333333,
+        "wer": null,
+        "exact_match_acc": 0.535088,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 212,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 159,
+        "error_samples": [
+          {
+            "key": "06016428",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016429",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016431",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016432",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016433",
+            "gt": "4/1",
+            "pred": "3/2, 4/1"
+          }
+        ]
+      }
+    },
+    "overall_micro_cer": 0.047501,
+    "alignment": {
+      "matched": 114,
+      "missed": 1,
+      "spurious": 4,
+      "precision": 0.9661,
+      "recall": 0.9913,
+      "f1": 0.9785,
+      "gt_total": 115,
+      "pred_total": 118,
+      "missed_codes": [
+        "90644042"
+      ],
+      "spurious_codes": [
+        "06016425",
+        "06016418",
+        "90643021",
+        "9064xxxx"
+      ]
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 118,
+      "n_duplicate_keys": 2,
+      "credits_by_term": {
+        "1/1": 18,
+        "1/2": 18,
+        "2/1": 18,
+        "2/2": 33,
+        "3/1": 24,
+        "3/2": 21,
+        "4/1": 24,
+        "4/2": 18
+      },
+      "total_credits_fixed_terms": 174,
+      "issues": [
+        "06016481: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016482: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "ภาค 2/2 มีถึง 33 หน่วยกิต — น่าจะมีวิชาซ้ำ"
+      ]
+    }
+  }
+}

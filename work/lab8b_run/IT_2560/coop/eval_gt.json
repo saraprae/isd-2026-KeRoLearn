@@ -1,0 +1,320 @@
+{
+  "n_gt_courses": 106,
+  "n_pred_courses": 105,
+  "per_field": {
+    "code": {
+      "tp": 104,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.9905,
+      "recall": 0.9811,
+      "f1": 0.9858
+    },
+    "name_th": {
+      "tp": 99,
+      "fp": 6,
+      "fn": 7,
+      "precision": 0.9429,
+      "recall": 0.934,
+      "f1": 0.9384
+    },
+    "name_en": {
+      "tp": 97,
+      "fp": 8,
+      "fn": 9,
+      "precision": 0.9238,
+      "recall": 0.9151,
+      "f1": 0.9194
+    },
+    "credits": {
+      "tp": 95,
+      "fp": 6,
+      "fn": 11,
+      "precision": 0.9406,
+      "recall": 0.8962,
+      "f1": 0.9179
+    },
+    "year": {
+      "tp": 63,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.9692,
+      "recall": 0.9844,
+      "f1": 0.9767
+    },
+    "semester": {
+      "tp": 64,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.9846,
+      "recall": 1.0,
+      "f1": 0.9922
+    },
+    "category": {
+      "tp": 104,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.9905,
+      "recall": 0.9811,
+      "f1": 0.9858
+    },
+    "type": {
+      "tp": 103,
+      "fp": 2,
+      "fn": 3,
+      "precision": 0.981,
+      "recall": 0.9717,
+      "f1": 0.9763
+    },
+    "prerequisite": {
+      "tp": 32,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9697,
+      "f1": 0.9846
+    }
+  },
+  "micro": {
+    "tp": 761,
+    "fp": 27,
+    "fn": 36,
+    "precision": 0.9657,
+    "recall": 0.9548,
+    "f1": 0.9603
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "06016382",
+        "gt": "06016382",
+        "pred": null
+      },
+      {
+        "code": "06016351",
+        "gt": "06016351",
+        "pred": null
+      },
+      {
+        "code": "06036382",
+        "gt": null,
+        "pred": "06036382"
+      }
+    ],
+    "name_th": [
+      {
+        "code": "06016343",
+        "gt": "การออกแบบและพัฒนาเกม",
+        "pred": "แขนงวิชาการพัฒนาสื่อประสมและเกมการออกแบบและพัฒนาเกม"
+      },
+      {
+        "code": "90201012",
+        "gt": "การพัฒนาทักษะการอ่านและการเขียนภาษาอังกฤษ",
+        "pred": "การพัฒนาทักษะการอ่านและเขียนภาษาอังกฤษ"
+      },
+      {
+        "code": "06016382",
+        "gt": "การโปรแกรมอินเทอร์เน็ต",
+        "pred": null
+      },
+      {
+        "code": "06036382",
+        "gt": null,
+        "pred": "การโปรแกรมอินเทอร์เน็ต"
+      },
+      {
+        "code": "06016351",
+        "gt": "เทคโนโลยีเชิงวัตถุ",
+        "pred": null
+      },
+      {
+        "code": "06016321",
+        "gt": "วิศวกรรมซอฟต์แวร์",
+        "pred": "แขนงวิชาวิศวกรรมซอฟต์แวร์วิศวกรรมซอฟต์แวร์"
+      },
+      {
+        "code": "06016341",
+        "gt": "การโปรแกรมสื่อประสม",
+        "pred": "แขนงวิชาการพัฒนาสื่อประสมและเกมการโปรแกรมสื่อประสม"
+      },
+      {
+        "code": "06016333",
+        "gt": "เทคโนโลยีการให้บริการอินเตอร์เน็ต",
+        "pred": "เทคโนโลยีการให้บริการอินเทอร์เน็ต"
+      }
+    ],
+    "name_en": [
+      {
+        "code": "06016393",
+        "gt": "COOPERATIV EDUCATION IN SOFTWARE ENGINEERING",
+        "pred": "COOPERATIVE EDUCATION IN SOFTWARE ENGINEERING"
+      },
+      {
+        "code": "06016335",
+        "gt": "INTRODUCTION TO CLOUD COMPUTIN",
+        "pred": "INTRODUCTION TO CLOUD COMPUTING"
+      },
+      {
+        "code": "90201012",
+        "gt": "DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH",
+        "pred": "DEVELOPMENT OF READING AND WRITING SKILL IN ENGLISH"
+      },
+      {
+        "code": "06016382",
+        "gt": "INTERNET PROGRAMMING",
+        "pred": null
+      },
+      {
+        "code": "06036382",
+        "gt": null,
+        "pred": "INTERNET PROGRAMMING"
+      },
+      {
+        "code": "06016351",
+        "gt": "OBJECT-ORIENTED TECHNOLOGY",
+        "pred": null
+      },
+      {
+        "code": "06016352",
+        "gt": "ADVANCE DATABASE SYSTEMS",
+        "pred": "ADVANCED DATABASE SYSTEMS"
+      },
+      {
+        "code": "06016356",
+        "gt": "DISTRIBUTED COMPUTING SYSTEMS",
+        "pred": "DISTRIBUTED COMPUTING SYSTEM"
+      },
+      {
+        "code": "06016358",
+        "gt": "COMPUTER SIMULATION AND MODELLING",
+        "pred": "COMPUTER SIMULATION AND MODELING"
+      },
+      {
+        "code": "06016345",
+        "gt": "3D COMPUTER ANIMATION",
+        "pred": "COMPUTER ANIMATION"
+      }
+    ],
+    "credits": [
+      {
+        "code": "06016382",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06016351",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06016321",
+        "gt": "3(3-0-6)",
+        "pred": "3(3-0-6) หรือ 3(2-2-5)"
+      },
+      {
+        "code": "06016352",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "06016364",
+        "gt": "3(2-2-5)",
+        "pred": "3(3-0-6)"
+      },
+      {
+        "code": "06016332",
+        "gt": "3(3-0-6)",
+        "pred": "3(3-0-6) หรือ 3(2-2-5)"
+      },
+      {
+        "code": "06016322",
+        "gt": "3(2-2-5)",
+        "pred": "3(3-0-6) หรือ 3(2-2-5)"
+      },
+      {
+        "code": "06016353",
+        "gt": "3(2-2-5)",
+        "pred": null
+      },
+      {
+        "code": "06016333",
+        "gt": "3(2-2-5)",
+        "pred": null
+      },
+      {
+        "code": "06016359",
+        "gt": "3(2-2-5)",
+        "pred": "3(3-0-6)"
+      }
+    ],
+    "year": [
+      {
+        "code": "06016321",
+        "gt": 2,
+        "pred": 3
+      },
+      {
+        "code": "06016381",
+        "gt": null,
+        "pred": 4
+      }
+    ],
+    "semester": [
+      {
+        "code": "06016381",
+        "gt": null,
+        "pred": 1
+      }
+    ],
+    "category": [
+      {
+        "code": "06016382",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "06036382",
+        "gt": null,
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06016351",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      }
+    ],
+    "type": [
+      {
+        "code": "06016382",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "06036382",
+        "gt": null,
+        "pred": "เลือก"
+      },
+      {
+        "code": "06016351",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "06016381",
+        "gt": "เลือก",
+        "pred": "บังคับ"
+      }
+    ],
+    "prerequisite": [
+      {
+        "code": "06016351",
+        "gt": "06016306",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "IT_2560_academic_plan_coop.json"
+  ]
+}

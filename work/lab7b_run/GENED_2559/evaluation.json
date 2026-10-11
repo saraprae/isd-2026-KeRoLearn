@@ -1,0 +1,357 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 161,
+        "cer": 0.180124,
+        "wer": null,
+        "exact_match_acc": 0.819876,
+        "n_sub": 0,
+        "n_del": 232,
+        "n_ins": 0,
+        "n_missing": 29,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1288,
+        "error_samples": [
+          {
+            "key": "90591004 [ตกแถว]",
+            "gt": "90591004",
+            "pred": ""
+          },
+          {
+            "key": "90591005 [ตกแถว]",
+            "gt": "90591005",
+            "pred": ""
+          },
+          {
+            "key": "90591006 [ตกแถว]",
+            "gt": "90591006",
+            "pred": ""
+          },
+          {
+            "key": "90591007 [ตกแถว]",
+            "gt": "90591007",
+            "pred": ""
+          },
+          {
+            "key": "90591008 [ตกแถว]",
+            "gt": "90591008",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 161,
+        "cer": 0.26013,
+        "wer": 0.25777,
+        "exact_match_acc": 0.782609,
+        "n_sub": 2,
+        "n_del": 706,
+        "n_ins": 133,
+        "n_missing": 29,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3233,
+        "error_samples": [
+          {
+            "key": "90591916",
+            "gt": "กอล์ฟ",
+            "pred": "กอล์ฟศึกษากฎกติกามารยาทของการเล่นกอล์ฟฝึกฝนทักษะเพื่อประยุกต์ไปสู่การออกกำลังกายเพื่อส่งเสริมสุขภาพในชีวิตประจำวัน"
+          },
+          {
+            "key": "90593012",
+            "gt": "ไร้ซ์-สาระ",
+            "pred": "ไร้ช์-สาระ"
+          },
+          {
+            "key": "90593018",
+            "gt": "สาระน่ารู้อนูพันธุศาสตร์",
+            "pred": "สาระน่ารู้อนุพันธุศาสตร์"
+          },
+          {
+            "key": "90595031",
+            "gt": "การสื่อสารข้ามวัฒนธรรม",
+            "pred": "การสื่อสารข้ามวัฒนธรรม 3 (3-0-6)"
+          },
+          {
+            "key": "90595032",
+            "gt": "ภาษาเกาหลีเพื่อการท่องเที่ยว",
+            "pred": "ภาษาเกาหลีเพื่อการท่องเที่ยว 3 (3-0-6)"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 161,
+        "cer": 0.230378,
+        "wer": 0.206967,
+        "exact_match_acc": 0.782609,
+        "n_sub": 14,
+        "n_del": 701,
+        "n_ins": 10,
+        "n_missing": 31,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3147,
+        "error_samples": [
+          {
+            "key": "90591020",
+            "gt": "THAI’S CHARM",
+            "pred": "THAI'S CHARM"
+          },
+          {
+            "key": "90592008",
+            "gt": "TODAY’S THAI SOCIETY",
+            "pred": "TODAY'S THAI SOCIETY"
+          },
+          {
+            "key": "90591916",
+            "gt": "GOLF",
+            "pred": "None"
+          },
+          {
+            "key": "90595031",
+            "gt": "CROSS CULTURAL COMMUNICATION",
+            "pred": "None"
+          },
+          {
+            "key": "90595032",
+            "gt": "KOREAN FOR TRAVEL",
+            "pred": "FOR TRAVEL90595033"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 161,
+        "cer": 0.189441,
+        "wer": null,
+        "exact_match_acc": 0.807453,
+        "n_sub": 4,
+        "n_del": 240,
+        "n_ins": 0,
+        "n_missing": 30,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1288,
+        "error_samples": [
+          {
+            "key": "90591002",
+            "gt": "1(0-3-2)",
+            "pred": "None"
+          },
+          {
+            "key": "90591916",
+            "gt": "2(1-2-3)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "90591004 [ตกแถว]",
+            "gt": "3(3-0-6)",
+            "pred": ""
+          },
+          {
+            "key": "90591005 [ตกแถว]",
+            "gt": "3(3-0-6)",
+            "pred": ""
+          },
+          {
+            "key": "90591006 [ตกแถว]",
+            "gt": "3(3-0-6)",
+            "pred": ""
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 161,
+        "cer": 0.180124,
+        "wer": null,
+        "exact_match_acc": 0.819876,
+        "n_sub": 0,
+        "n_del": 29,
+        "n_ins": 0,
+        "n_missing": 29,
+        "n_hallucinated": 0,
+        "n_ref_chars": 161,
+        "error_samples": [
+          {
+            "key": "90591004 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90591005 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90591006 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90591007 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90591008 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 161,
+        "cer": 0.180124,
+        "wer": null,
+        "exact_match_acc": 0.819876,
+        "n_sub": 0,
+        "n_del": 551,
+        "n_ins": 0,
+        "n_missing": 29,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3059,
+        "error_samples": [
+          {
+            "key": "90591004 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90591005 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90591006 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90591007 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90591008 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 161,
+        "cer": 0.180124,
+        "wer": null,
+        "exact_match_acc": 0.819876,
+        "n_sub": 0,
+        "n_del": 145,
+        "n_ins": 0,
+        "n_missing": 29,
+        "n_hallucinated": 0,
+        "n_ref_chars": 805,
+        "error_samples": [
+          {
+            "key": "90591004 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90591005 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90591006 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90591007 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90591008 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 132,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 0,
+        "error_samples": []
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 132,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 0,
+        "error_samples": []
+      }
+    },
+    "overall_micro_cer": 0.213158,
+    "alignment": {
+      "matched": 132,
+      "missed": 29,
+      "spurious": 0,
+      "precision": 1.0,
+      "recall": 0.8199,
+      "f1": 0.901,
+      "gt_total": 161,
+      "pred_total": 132,
+      "missed_codes": [
+        "90591004",
+        "90591005",
+        "90591006",
+        "90591007",
+        "90591008",
+        "90591009",
+        "90591010",
+        "90591011",
+        "90594009",
+        "90594010",
+        "90594011",
+        "90594012",
+        "90594013",
+        "90594014",
+        "90594015",
+        "90594041",
+        "90594042",
+        "90595001",
+        "90595002",
+        "90595003"
+      ],
+      "spurious_codes": []
+    },
+    "internal_check": {
+      "ok": true,
+      "n_courses": 132,
+      "n_duplicate_keys": 0,
+      "credits_by_term": {},
+      "total_credits_fixed_terms": 0,
+      "issues": []
+    }
+  }
+}

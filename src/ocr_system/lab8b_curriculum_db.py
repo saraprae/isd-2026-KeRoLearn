@@ -172,7 +172,7 @@ _PLACEHOLDER_RE = re.compile(r"^PLACEHOLDER_[0-9A-Za-z_]+$")
 # รูปแบบรหัส wildcard ที่พบในเล่ม เช่น 90644xxx, 0602 6xxx
 # รวมรหัสที่เป็น x ล้วน (xxxxxxxx = วิชาเลือกเสรี) ด้วย — เดิมต้องมีเลขนำหน้า 2 หลักขึ้นไป
 # ทำให้ช่องวิชาเลือกเสรีถูกข้ามและหน่วยกิตหายจากแผน
-_WILDCARD_RE = re.compile(r"^(?=.{4,12}$)\d{0,7}[xX]{1,8}$")
+_WILDCARD_RE = re.compile(r"^(?=.{4,12}$)\d{0,7}[xX]{1,11}$")
 
 
 def normalize_code(value: Any, what: str = "รหัสวิชา") -> str:
@@ -575,6 +575,9 @@ TOTAL_CREDITS_RE = re.compile(r"รวมตลอดหลักสูตร")
 _PLAN_KEYS = ("nocoop", "coop", "plan")
 
 
+_YEAR1_SEM1_RE = re.compile(r"ปีที่\s*[1๑]\s*ภาค(?:การศึกษา|เรียน)?(?:ที่)?\s*[1๑](?!\d)")
+
+
 def detect_sections(text: str) -> dict[str, tuple[int, int]]:
     """หาช่วงหน้าของแต่ละ section จากป้ายหัวข้อภาษาไทยในเนื้อหาเอง
 
@@ -614,6 +617,16 @@ def detect_sections(text: str) -> dict[str, tuple[int, int]]:
 
     # "plan" (แผนเดียว) ใช้เฉพาะตอนไม่มี nocoop/coop แยกเลยในทั้งเอกสาร — ถ้ามีอย่างใด
     # อย่างหนึ่งแล้ว แปลว่าหัวข้อ "แผนการศึกษา" เปล่า ๆ ที่เจอเป็นแค่หัวข้อแม่ ไม่ใช่ section ใหม่
+    # VLM บางรอบทำหัวข้อ "3.1.4.1 แผนการศึกษาที่ไม่เข้าโครงการสหกิจศึกษา" หาย (เจอจริง: DSBA หน้า 23)
+    # ทั้งที่หัวข้อ coop ยังอยู่ -> nocoop ไม่ถูกจับ ทุกแถวของแผน nocoop เลยตกไปรวมใน coop (CHK1/CHK7 เกิน)
+    # ถ้าเจอ coop แต่ไม่เจอ nocoop: ใช้หน้าแรกก่อนหัวข้อ coop ที่มีตาราง "ปีที่ 1 ภาคการศึกษาที่ 1" เป็นจุดเริ่ม nocoop
+    if "coop" in first_hit and "nocoop" not in first_hit:
+        for page_no, chunk in pages:
+            if page_no >= first_hit["coop"]:
+                break
+            if _YEAR1_SEM1_RE.search(chunk) and "<table" in chunk:
+                first_hit["nocoop"] = page_no
+                break
     if "nocoop" not in first_hit and "coop" not in first_hit and generic_plan_pages:
         first_hit["plan"] = generic_plan_pages[0]
 
@@ -949,6 +962,17 @@ def restore_name_spacing_from_tables(courses: list[dict], program: str | None, t
 
 
 
+_NAME_EN_JUNK_RE = re.compile(r"^(?:[\s#*\-•>]+|\d{1,2}\s+(?=[A-Z]))+")
+
+
+def _clean_name_en(value: str) -> str | None:
+    """ตัดเศษที่ OCR ติดหน้าชื่อภาษาอังกฤษ: หัวข้อ markdown ('## '), bullet, และเศษหน่วยกิตที่แตก
+    ข้ามบรรทัด ('-5 ', จาก '(3-2-2-5)') — ตัดเฉพาะอักขระนำหน้าก่อนตัวอักษรละติน ไม่แก้ตัวสะกด"""
+    s = re.sub(r"\s+", " ", str(value or "").replace("\n", " ")).strip()
+    s = _NAME_EN_JUNK_RE.sub("", s).strip()
+    return s or None
+
+
 def _normalize_category(category: str | None) -> str | None:
     """แม็ปชื่อย่อหมวดวิชาที่ไม่ตรงเฉลยให้เป็นชื่อเต็มมาตรฐาน"""
     if not category:
@@ -1052,6 +1076,14 @@ def _is_synth_alt_filler(raw_code: str, note: Any, alt_group: Any,
     return len(alt_group_names.get(str(alt_group), ())) == 1
 
 
+def _is_total_row(src: dict) -> bool:
+    """True ถ้าเป็นแถวยอดรวมของตาราง: ชื่อไทยคือ \"รวม\" เฉย ๆ ไม่มีชื่ออังกฤษ และหน่วยกิตไม่ใช่รูป n(a-b-c)
+    (เป็นเลขยอดภาคล้วน เช่น \"12\") -- ชื่อวิชาจริงไม่มีทางเป็น \"รวม\" ล้วน ๆ"""
+    if str(src.get("name_th") or "").strip() != "รวม" or str(src.get("name_en") or "").strip():
+        return False
+    return not re.search(r"\d+\s*\(\s*\d+\s*-\s*\d+\s*-\s*\d+\s*\)", str(src.get("credits") or ""))
+
+
 def _is_junk_ocr_placeholder_row(raw_code: str, name_th: Any) -> bool:
     """
     True ถ้า name_th คือ "รหัส wildcard + หน่วยกิต" ที่หลุดมาจากตารางตรงๆ ไม่ใช่ชื่อวิชาจริง
@@ -1080,6 +1112,9 @@ def _is_junk_ocr_placeholder_row(raw_code: str, name_th: Any) -> bool:
 # มือแล้วเท่านั้น ไม่ใช่ทิ้งทุกแถวที่มีคำว่า "อนุมาน" ในเล่ม เพราะโปรแกรม/เทอมอื่นอาจมีแถวอนุมาน
 # ที่ถูกต้องจริงอยู่ก็ได้ (การอนุมานจากยอดหน่วยกิตไม่ได้ผิดเสมอไป — ที่นี่ผิดเฉพาะกรณีนี้)
 FABRICATED_ROW_OVERRIDE: dict[str, set[tuple[int, int, int]]] = {
+    # BIT nocoop 4/1 หน้า 29: Lab 7B เติมแถว PLACEHOLDER_06036XXX เองเพราะยอดภาคไม่ลงตัว (เซลล์ 0603615 ถูกยัดรวมกับ
+    # 06036146 จึงอ่าน 06036115 ไม่ได้) พอ recover_codes_by_name + fill_term_from_same_cell_siblings คืน 06036115
+    # ปี 4/1 ยอดภาคก็ครบ 12 โดยไม่ต้องมีแถวนี้ (3+3+3+3) และชื่อ "…1-1" / เทอม 1 ไม่มีในเล่มเลย
     "BIT": {(4, 1, 29)},
 }
 
@@ -1101,8 +1136,64 @@ def _placeholder_code(raw_code: str) -> str | None:
     """
     token = str(raw_code or "").strip().replace(" ", "")
     if _WILDCARD_RE.match(token):
-        return PLACEHOLDER_PREFIX + token.upper()
+        token = token.upper()
+        if set(token) == {"X"}:
+            # เล่มพิมพ์ช่องวิชาเลือกเสรีเป็น x ล้วนยาวไม่เท่ากัน (xxxxxxxx / xxxxxxxxxxx)
+            # ทุกแบบคือช่องเดียวกัน — รวมเป็น 8 ตัวให้ตรงกับเฉลย
+            token = "X" * 8
+        return PLACEHOLDER_PREFIX + token
     return None
+
+
+def _is_subsequence(short: str, long: str) -> bool:
+    it = iter(long)
+    return all(ch in it for ch in short)
+
+
+def recover_codes_by_name(courses: list[dict]) -> tuple[list[dict], list[str]]:
+    """
+    กู้รหัสวิชาของแถวที่ OCR อ่านรหัสพัง/หาย โดยอิงชื่อวิชาจากแถวอื่นที่รหัสถูกต้อง
+
+    พบจริง: BIT nocoop 4/1 อ่านรหัส "0603615" (7 หลัก ที่ถูกคือ 06036115) และ IT coop 4/2
+    วิชา "การสื่อสารและการนำเสนออย่างมืออาชีพ" ไม่มีรหัสในตาราง — convert_lab7b เดิมข้ามทั้งแถว
+    ทำให้หน่วยกิตของเทอมนั้นขาดไป 3
+
+    ไม่เดา: กู้เมื่อชื่อตรงกับวิชาที่มีรหัส 8 หลักเพียงรหัสเดียวเท่านั้น และถ้ารหัสที่อ่านได้เป็น
+    ตัวเลข ต้องเป็นรหัสที่ตกหล่นตัวอักษรไปจากรหัสจริง (subsequence) ไม่งั้นข้าม
+    """
+    def ns(s: Any) -> str:
+        return re.sub(r"\s+", "", _normalize_name_th(str(s or "").strip()) or "")
+
+    known: dict[str, set[str]] = {}
+    for c in courses:
+        raw = str(c.get("code") or "").strip()
+        if _CODE_RE.match(raw) and len(ns(c.get("name_th"))) >= 10:
+            known.setdefault(ns(c.get("name_th")), set()).add(raw)
+
+    notes: list[str] = []
+    out: list[dict] = []
+    for src in courses:
+        row = dict(src)
+        raw = str(row.get("code") or "").strip()
+        compact = raw.replace(" ", "")
+        if (not _lab7b_codes(raw) and _placeholder_code(raw) is None
+                and (not compact or compact.isdigit())):
+            key = ns(row.get("name_th"))
+            cands = {code for name, codes in known.items()
+                     if len(name) >= 10 and (key == name or key.endswith(name))
+                     for code in codes}
+            if compact:
+                cands = {c for c in cands if _is_subsequence(compact, c)}
+            if len(cands) == 1:
+                fixed = next(iter(cands))
+                notes.append(f"{raw or '(ไม่มีรหัส)'}: กู้รหัสเป็น {fixed} จากชื่อวิชา "
+                             f"{row.get('name_th')!r} (OCR อ่านรหัสพัง/หาย)")
+                row["code"] = fixed
+            elif len(cands) > 1:
+                notes.append(f"{raw or '(ไม่มีรหัส)'}: ชื่อ {row.get('name_th')!r} ตรงกับหลายรหัส "
+                             f"{sorted(cands)} — ไม่กู้ ให้คนตรวจ")
+        out.append(row)
+    return out, notes
 
 
 def _lab7b_pages(src: dict) -> list[int] | None:
@@ -1222,6 +1313,11 @@ def _raw_table_credits_map(md_text: str) -> dict[str, list[str]]:
                 credits_cell = cells[-1].strip()        # เลขเดี่ยวล้วน (พฤติกรรมเดิม)
             if not credits_cell:
                 continue
+            # ตารางแบบ colspan: ช่องเดียวมี "ชื่อไทย ชื่ออังกฤษ 3(2-2-5)" (IT 06016434/435) -> เก็บเฉพาะค่าหน่วยกิตท้ายช่อง
+            # ใช้เมื่อมี triple เดียวและอยู่ท้ายช่องเท่านั้น (ช่อง "หรือ" ที่มีหลายค่าไม่แตะ)
+            _tr = list(re.finditer(r"\d+\s*\(\s*\d+\s*-\s*\d+\s*-\s*\d+\s*\)", credits_cell))
+            if len(_tr) == 1 and credits_cell[_tr[0].end():].strip() == "" and credits_cell[:_tr[0].start()].strip():
+                credits_cell = _tr[0].group(0)
             out.setdefault(token, []).append(credits_cell)
     return out
 
@@ -1613,6 +1709,88 @@ def recover_alt_group_siblings_from_raw_tables(
     return courses + new_rows, notes
 
 
+# โปรแกรมที่เปิดการกู้แถว "ไม่มีรหัสวิชา" จากตารางดิบ — ตรวจกับ IT แล้วเท่านั้น
+CODELESS_ROW_RECOVERY_PROGRAMS: set[str] = {"IT"}
+
+
+def recover_codeless_rows_from_raw_tables(courses: list[dict], md_text: str
+                                          ) -> tuple[list[dict], list[str]]:
+    """
+    กู้แถวในตารางแผนที่เล่มไม่พิมพ์รหัสวิชา (เซลล์รหัส rowspan=2 ครอบสองแถว แถวที่สองเหลือแต่ชื่อ+หน่วยกิต)
+    Lab 7B ทำแถวแบบนี้หายเงียบ ๆ
+
+    พบจริง: IT coop 4/2 (หน้า 44) "การสื่อสารและการนำเสนออย่างมืออาชีพ" 3(3-0-6) อยู่ใต้รหัส 90642033
+    ของวิชากฎหมาย ทำให้เทอมนั้นขาด 3 หน่วยกิต (ได้ 12 จากที่เล่มพิมพ์ 15)
+
+    ไม่เดา: ต้องหารหัสจากชื่อวิชาที่เล่มพิมพ์คู่กับรหัส 8 หลักที่อื่นใน <table> ได้รหัสเดียวเท่านั้น
+    และปี/เทอม/หมวด/ประเภทคัดลอกจากแถวพี่น้องที่อยู่ใต้เซลล์รหัสเดียวกันที่ Lab 7B เก็บมาได้แล้ว
+    ถ้าหาไม่ได้จะข้ามและแจ้งเตือน
+    """
+    notes: list[str] = []
+    ns = lambda t: re.sub(r"\s+", "", t or "")
+    known: dict[str, set[str]] = {}
+    for code, names in _table_name_th_map(md_text).items():
+        for n in names:
+            if len(ns(n)) >= 10:
+                known.setdefault(ns(n), set()).add(code)
+
+    new_rows: list[dict] = []
+    tables = list(re.finditer(r"<table>.*?</table>", md_text, flags=re.S))
+    for tm, (_, pg) in zip(tables, _table_page_positions(md_text)):
+        prev_code: str | None = None
+        for row in re.findall(r"<tr>.*?</tr>", tm.group(0), flags=re.S):
+            raw_cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+            texts = [re.sub(r"<[^>]+>", " ", re.sub(r"<br\s*/?>", "\n", c)) for c in raw_cells]
+            if not texts:
+                continue
+            first = ns(texts[0]).upper()
+            if _is_wildcard_or_code_token(first):
+                prev_code = first
+                continue
+            if prev_code is None or len(texts) < 2:
+                continue
+            credit = next((t.strip() for t in reversed(texts[1:]) if _CREDIT_LIKE_RE.search(t)), "")
+            if not credit:
+                continue
+            # ข้ามบรรทัดหัวกลุ่ม (กลุ่มวิชาตามเกณฑ์ของคณะ…) ที่ใช้ร่วมกันหลายวิชา — ใช้เฉพาะบรรทัดชื่อ
+            # ที่ชี้ไปรหัสเดียวเท่านั้น
+            found = {next(iter(cs)) for line in texts[0].split("\n") if ns(line)
+                     and not ns(line).startswith("กลุ่มวิชา")
+                     for cs in [known.get(ns(line), set())] if len(cs) == 1}
+            if len(found) != 1:
+                continue
+            code = next(iter(found))
+            if any(str(c.get("code")) == code and pg in _row_pages(c) for c in courses + new_rows):
+                continue
+            sib = next((c for c in courses if str(c.get("code")).strip().upper() == prev_code
+                        and pg in _row_pages(c) and c.get("year") and c.get("semester")), None)
+            name_line = next(l for l in texts[0].split("\n") if ns(l)
+                             and not ns(l).startswith("กลุ่มวิชา")
+                             and known.get(ns(l)) == {code})
+            if sib is None:
+                notes.append(f"{code} (หน้า {pg}): พบแถวไม่มีรหัสใต้ {prev_code} แต่ไม่มีแถวพี่น้องที่ Lab 7B "
+                             f"เก็บไว้ให้คัดลอกปี/เทอม — ข้าม ให้คนตรวจ")
+                continue
+            m = _CREDIT_LIKE_RE.search(credit)
+            # ชื่ออังกฤษ = บรรทัดละตินที่เล่มพิมพ์ต่อจากชื่อไทยในเซลล์เดียวกัน (ไม่มี -> None ไม่เดา)
+            _lines = [l.strip() for l in texts[0].split("\n") if ns(l)]
+            _i = next((k for k, l in enumerate(_lines) if ns(l) == ns(name_line)), None)
+            _en = (_lines[_i + 1] if _i is not None and _i + 1 < len(_lines)
+                   and not re.search(r"[\u0E00-\u0E7F]", _lines[_i + 1]) else None)
+            new_rows.append({
+                "code": code, "name_th": name_line.strip(), "name_en": _en,
+                "credits": re.sub(r"\s+", "", m.group(0)),
+                "year": sib.get("year"), "semester": sib.get("semester"),
+                "category": sib.get("category"), "type": sib.get("type"),
+                "note": f"กู้จากตารางดิบ (หน้า {pg}): เล่มไม่พิมพ์รหัสในแถวนี้ (อยู่ใต้เซลล์รหัส {prev_code}) "
+                        f"รหัสมาจากชื่อวิชาที่เล่มพิมพ์คู่กับรหัสนี้ที่อื่น",
+                "source_page": pg,
+            })
+            notes.append(f"{code} (หน้า {pg}): กู้แถวที่ไม่มีรหัส {name_line.strip()!r} "
+                         f"ปี {sib.get('year')}/{sib.get('semester')} หน่วยกิต {new_rows[-1]['credits']}")
+    return courses + new_rows, notes
+
+
 def flag_inferred_credits_for_review(courses: list[dict]) -> list[str]:
     """
     [ไม่ได้ใช้งานแล้วใน split_lab7b_by_plan() — ดู null_inferred_credits() ด้านล่าง]
@@ -1824,6 +2002,10 @@ def convert_lab7b(data: dict, *, program: str | None = None,
         อ่านหน่วยกิตไม่ออกจริง  -> warnings ใน conversion report
     """
     warnings: list[str] = []
+    _fixed_courses, _code_notes = recover_codes_by_name(data.get("courses") or [])
+    if _code_notes:
+        data = {**data, "courses": _fixed_courses}
+        warnings.extend(_code_notes)
     course_by_code: dict[str, dict] = {}
     course_fingerprints: dict[str, tuple] = {}
     plan: list[dict] = []
@@ -1887,6 +2069,14 @@ def convert_lab7b(data: dict, *, program: str | None = None,
             warnings.append(
                 f"courses[{index}] {raw_code}: ข้ามแถว — name_th={src.get('name_th')!r} "
                 f"เป็นรูปแบบ 'รหัส+หน่วยกิต' ที่หลุดจากตาราง ไม่ใช่ชื่อวิชาจริง")
+            continue
+
+        if _is_total_row(src):
+            # ข้ามแถวนี้ทั้งแถว — แถว "รวม <ยอดภาค>" ของตารางที่ OCR ยัดรหัสจาก rowspan ข้างบนมาให้ (BIT 4/1 หน้า 29:
+            # 9664xxxx + "รวม" + 12) ถ้าไม่ข้ามจะกลายเป็นช่องวิชาเกินและยอดแผนบวกเพิ่ม 3 (126 -> 129)
+            warnings.append(
+                f"courses[{index}] {raw_code}: ข้ามแถว — name_th={src.get('name_th')!r} credits={src.get('credits')!r} "
+                f"เป็นแถวยอดรวมของตาราง ไม่ใช่รายวิชา")
             continue
 
         if _is_synth_alt_filler(raw_code, note, src.get("alt_group"), alt_group_names):
@@ -1989,7 +2179,7 @@ def convert_lab7b(data: dict, *, program: str | None = None,
                 "code": code,
                 "name_th": _normalize_name_th(
                     str(src.get("name_th") or raw_code or code).strip()),
-                "name_en": (str(src["name_en"]).replace("\n", " ").strip()
+                "name_en": (_clean_name_en(str(src["name_en"]))
                             if src.get("name_en") else None),
                 "credits": credit,
                 "credits_text": credits_text,
@@ -2461,6 +2651,73 @@ def group_multicode_cells_from_raw_tables(courses: list[dict], md_text: str,
     return out, notes
 
 
+# ── BIT: เซลล์รหัสคู่ "A B" + ชื่อ "A หรือ B" + ยอดรวมช่องเดียว (สหกิจศึกษา / สหกิจศึกษาต่างประเทศ) ──
+# พบจริงกับ BIT coop 4/2 (หน้า 35): เล่มพิมพ์ <td rowspan="3">06036147 06036148</td> ชื่อ "สหกิจศึกษา" /
+# "หรือ สหกิจศึกษาต่างประเทศ" และ "รวม 6" -- คือ "เลือก 1 จาก 2" ยอด 6 หน่วยกิต
+# แต่ recover_alt_group_siblings_from_raw_tables() อ่านได้แค่รหัสแรก จึงสร้างแถวชื่อ "หรือ สหกิจศึกษาต่างประเทศ"
+# ซ้อนใต้ 06036147 แล้ว normalize_plan_alternatives() ตัดแถวซ้ำทิ้งโดยย้าย alt_group ไปให้ 06036147 ตัวเดียว
+# ส่วน 06036148 ไม่มีกลุ่ม -> CHK1 นับ 6+6 = 12 (แผนรวม 132 ทั้งที่เล่มประกาศ 126)
+# ฟังก์ชันนี้ตัดแถวกู้คืนที่ผิดทิ้ง แล้วใส่ alt_group เดียวให้ทุกรหัสในเซลล์ (ไม่เพิ่มแถว ไม่เดาข้อมูลใหม่)
+MULTICODE_OR_CELL_PROGRAMS: set[str] = {"BIT"}
+_SPACED_CODES_CELL_RE = re.compile(
+    r"<td[^>]*rowspan=\"(\d+)\"[^>]*>\s*((?:\d{8}[\s]*(?:<br\s*/?>)?\s*){2,})</td>")
+
+
+def group_spaced_or_cells_from_raw_tables(courses: list[dict], md_text: str,
+                                          sections: dict[str, tuple[int, int]] | None = None
+                                          ) -> tuple[list[dict], list[str]]:
+    notes: list[str] = []
+    out = [dict(c) for c in courses]
+    tables = list(re.finditer(r"<table>.*?</table>", md_text, flags=re.S))
+    positions = _table_page_positions(md_text)
+    for tm, (_, pg) in zip(tables, positions):
+        if pg is None:
+            continue
+        table = tm.group(0)
+        if "หรือ" not in table:
+            continue
+        for cm in _SPACED_CODES_CELL_RE.finditer(table):
+            span = int(cm.group(1))
+            if span < 2:
+                continue
+            # เข้มงวด: แถวถัดไปภายใน rowspan ต้องมีเซลล์ชื่อที่ขึ้นต้นด้วย "หรือ" (A / หรือ B)
+            # ไม่งั้นเซลล์รหัสซ้อน (เช่น 06036106<br/>06036116 ที่เป็นสองวิชาบังคับแยกกัน) จะถูกรวมกลุ่มผิด
+            segs = table[cm.end():].split("</tr>")[1:span]
+            has_or_row = False
+            for seg in segs:
+                first = re.search(r"<td[^>]*>(.*?)</td>", seg, flags=re.S)
+                if first and re.sub(r"<[^>]+>|\s+", "", first.group(1)).startswith("หรือ"):
+                    has_or_row = True
+                    break
+            if not has_or_row:
+                continue
+            codes = list(dict.fromkeys(re.findall(r"\d{8}", cm.group(2))))
+            if len(codes) < 2:
+                continue
+            code_set = set(codes)
+            # แถวกู้คืนที่ชื่อขึ้นต้นด้วย "หรือ" ซ้อนใต้รหัสในเซลล์ = ตัวสร้างปัญหา -> ตัดทิ้ง
+            drop = {i for i, r in enumerate(out)
+                    if str(r.get("code")) in code_set
+                    and str(r.get("alt_group") or "").startswith(_RECOVERED_ALT_PREFIX)
+                    and str(r.get("name_th") or "").lstrip().startswith("หรือ")
+                    and pg in _row_pages(r)}
+            keep = [i for i, r in enumerate(out)
+                    if i not in drop and str(r.get("code")) in code_set
+                    and pg in _row_pages(r) and r.get("year") and r.get("semester")]
+            terms = {(out[i]["year"], out[i]["semester"]) for i in keep}
+            if len({str(out[i]["code"]) for i in keep}) < 2 or len(terms) != 1:
+                continue
+            term = next(iter(terms))
+            gid = f"alt_y{term[0]}s{term[1]}_or_{codes[0]}"
+            for i in keep:
+                out[i]["alt_group"] = gid
+            out = [r for i, r in enumerate(out) if i not in drop]
+            notes.append(
+                f"{term[0]}/{term[1]} (หน้า {pg}): เซลล์รหัส {' / '.join(codes)} พิมพ์เป็น 'เลือก 1 จาก {len(codes)}' "
+                f"ยอดช่องเดียว -> ใส่ alt_group {gid!r} ให้ทุกรหัส และตัดแถวกู้คืนซ้ำ {len(drop)} แถว")
+    return out, notes
+
+
 def corroborated_inferred_credit_indexes(courses: list[dict], md_text: str) -> tuple[set[int], list[str]]:
     """ดัชนีแถวที่หน่วยกิตถูก Lab 7B อนุมาน แต่ 'ยอดรวมที่เล่มพิมพ์ของหน้านั้น - หน่วยกิตของแถวอื่น
     ในเทอมเดียวกัน' ได้ค่าเท่ากับค่าที่อนุมานพอดี -> เล่มยืนยันค่านี้ ไม่ต้อง null
@@ -2625,11 +2882,151 @@ def trim_glued_names_from_tables(courses: list[dict], program: str | None, text:
     return out, notes
 
 
+# ── ชื่อวิชาของโปรแกรมที่ไม่มีแผน (GENED): เลขหน่วยกิตติดท้าย name_en + ช่องว่างใน name_th หาย ──────
+# พบจริงกับ GENED (pred_vlm.json vs intermediate_vlm.md):
+#  (ก) หน้ารายการ "CODE ชื่อไทย ENGLISH NAME N (a-b-c)" -- N คือจำนวนหน่วยกิต แต่ Lab 7B เก็บ N ติดท้าย name_en
+#      เช่น "DIGITAL CITIZEN 3", "TEAM-PROJECT 1 1" (ชื่อจริง "TEAM-PROJECT 1"), "...SKILLS 3 3" (ชื่อจริง "...SKILLS 3")
+#      และ 90641009/010 ได้ "...ENGLISH 3" ทั้งที่ <table> พิมพ์ "...ENGLISH 1" / "...ENGLISH 2"
+#  (ข) name_th ที่เล่มพิมพ์มีช่องว่างคั่นวลี ("พูดได้ พูดดี พูดเป็น") แต่ Lab 7B ให้ผลติดกัน
+# ทั้งสองกฎอ่านจากข้อความที่เล่มพิมพ์ตรง ๆ เท่านั้น ไม่เดาตัวสะกด และเปิดเฉพาะโปรแกรมที่ตรวจแล้ว
+UNSPLIT_NAME_REPAIR_PROGRAMS: set[str] = {"GENED"}
+_CREDIT_HEAD_RE = re.compile(r"^\s*(\d+)\s*\(\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*\)")
+_THAI_CHAR_RE = re.compile(r"[\u0E00-\u0E7F]")
+
+
+def _printed_standalone_lines(md_text: str) -> set[str]:
+    """ข้อความทุกบรรทัด/เซลล์/ส่วนหลัง <br/> ในเล่มดิบ (ตัด tag, '*' และช่องว่างซ้ำ) -- ใช้ตรวจว่าชื่อหนึ่ง ๆ
+    ถูกพิมพ์ 'เป็นชื่อเดี่ยว' อยู่จริงหรือไม่ (ไม่ใช่ชื่อที่ติดกับตัวเลขหน่วยกิต)"""
+    t = re.sub(r"<[^>]+>", "\n", md_text or "")
+    out: set[str] = set()
+    for ln in t.split("\n"):
+        s = re.sub(r"\s+", " ", ln.replace("*", " ")).strip()
+        if s:
+            out.add(s)
+    return out
+
+
+def _table_english_names_by_code(md_text: str) -> dict[str, set[str]]:
+    """รหัส -> ชื่ออังกฤษที่ <table> พิมพ์ให้รหัสนั้น รองรับ 2 รูปแบบที่พบ:
+    (1) เซลล์ชื่อ 'ไทย<br/>ENGLISH'  (2) แถวถัดไปเป็นเซลล์เดียวมีแต่ชื่ออังกฤษ ('**ENGLISH**' หรือ colspan)"""
+    clean = lambda s: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip(" *")
+    is_en = lambda s: bool(s) and not _THAI_CHAR_RE.search(s) and bool(re.search(r"[A-Za-z]", s))
+    out: dict[str, set[str]] = {}
+    for tbl in re.findall(r"<table>.*?</table>", md_text or "", flags=re.S):
+        rows = re.findall(r"<tr>.*?</tr>", tbl, flags=re.S)
+        for i, row in enumerate(rows):
+            cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+            if len(cells) < 2:
+                continue
+            code = re.sub(r"[\s*]", "", re.sub(r"<[^>]+>", "", cells[0]))
+            if not re.fullmatch(r"\d{8}", code):
+                continue
+            parts = [clean(p) for p in re.split(r"<br\s*/?>", cells[1])]
+            parts = [p for p in parts if p]
+            if len(parts) >= 2 and _THAI_CHAR_RE.search(parts[0]) and is_en(parts[-1]):
+                out.setdefault(code, set()).add(parts[-1])
+            elif len(parts) == 1 and _THAI_CHAR_RE.search(parts[0]) and i + 1 < len(rows):
+                nxt = [clean(c) for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", rows[i + 1], flags=re.S)]
+                nxt = [c for c in nxt if c]
+                if len(nxt) == 1 and is_en(nxt[0]):
+                    out.setdefault(code, set()).add(nxt[0])
+    return out
+
+
+def strip_credit_digit_from_name_en(courses: list[dict], text: str | None
+                                    ) -> tuple[list[dict], list[str]]:
+    """name_en ที่ลงท้ายด้วยเลขเดียวกับหน่วยกิตนำหน้า (3 ของ 3(3-0-6)) -> ตัดเลขนั้นทิ้ง
+
+    ต้องผ่านครบทุกข้อ: (1) token สุดท้ายของ name_en == จำนวนหน่วยกิตของแถว (2) เล่มพิมพ์ 'name_en (a-b-c)' ติดกัน
+    ตามหน่วยกิตของแถวนี้จริง = เลขท้ายคือหน่วยกิตที่หลุดมา (3) name_en เต็มนี้ไม่ถูกพิมพ์เป็นชื่อเดี่ยวที่ใดในเล่ม
+    (วิชา 'PRACTICE UNDER MANAGEMENT SKILLS 1' ชื่อลงท้าย 1 จริง จึงไม่ถูกแตะ)
+    หลังตัดแล้ว ถ้า <table> พิมพ์ชื่อของรหัสนี้เป็น 'ชื่อที่ตัดแล้ว + เลขลำดับ' เพียงแบบเดียว (90641009/010) ใช้ชื่อนั้น"""
+    if not text:
+        return courses, []
+    printed = _printed_standalone_lines(text)
+    table_en = _table_english_names_by_code(text)
+    flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text))
+    out: list[dict] = []
+    notes: list[str] = []
+    for src in courses:
+        row = dict(src)
+        out.append(row)
+        name = str(row.get("name_en") or "").strip()
+        m = _CREDIT_HEAD_RE.match(str(row.get("credits") or ""))
+        toks = name.split()
+        if not m or len(toks) < 2 or toks[-1] != m.group(1) or name in printed:
+            continue
+        triple = r"\s*\(\s*%s\s*-\s*%s\s*-\s*%s\s*\)" % (m.group(2), m.group(3), m.group(4))
+        pat = r"(?<![\w-])" + r"\s+".join(re.escape(t) for t in toks) + triple
+        if not re.search(pat, flat):
+            continue
+        new = " ".join(toks[:-1])
+        code = str(row.get("code") or "").strip()
+        series = {p for p in table_en.get(code, set()) if re.fullmatch(re.escape(new) + r" \d+", p)}
+        why = "เล่มพิมพ์เลขท้ายเป็นหน่วยกิต"
+        if len(series) == 1:
+            new = next(iter(series))
+            why += f" และ <table> พิมพ์ชื่อรหัสนี้เป็น {new!r}"
+        row["name_en"] = new
+        notes.append(f"{code}: name_en มีหน่วยกิต {m.group(1)!r} ติดท้าย ({name!r}) -> {new!r} ({why})")
+    return out, notes
+
+
+def restore_name_th_spacing_from_book(courses: list[dict], text: str | None
+                                      ) -> tuple[list[dict], list[str]]:
+    """name_th ที่ตัวอักษรเหมือนที่เล่มพิมพ์ติดรหัสนั้นทุกตัว ต่างแค่ช่องว่าง -> คืนช่องว่างตามเล่ม
+
+    อ่านเฉพาะข้อความหลังรหัสนั้นในเล่ม (ถึงรหัส 8 หลักตัวถัดไป) ใช้เมื่อเล่มพิมพ์ชื่อนี้ 'แบบเดียว' ทุกที่ที่เจอ
+    และมีช่องว่างมากกว่าค่าเดิม (ไม่เคยลบช่องว่าง ไม่แก้ตัวสะกด) ถ้าเล่มพิมพ์หลายแบบ -> ไม่แตะ แจ้งให้คนตรวจ"""
+    if not text:
+        return courses, []
+    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<br\s*/?>", " ", text)).replace("\u00a0", " ")
+    thai_b = "\u0E00-\u0E7F"
+    out: list[dict] = []
+    notes: list[str] = []
+    for src in courses:
+        row = dict(src)
+        out.append(row)
+        code = str(row.get("code") or "").strip()
+        name = str(row.get("name_th") or "")
+        core = re.sub(r"\s+", "", name)
+        if not re.fullmatch(r"\d{8}", code) or len(core) < 4 or not _THAI_CHAR_RE.search(core):
+            continue
+        pat = re.compile(rf"(?<![{thai_b}])" + r"[ ]*".join(re.escape(ch) for ch in core)
+                         + rf"(?![{thai_b}])")
+        forms: set[str] = set()
+        for cm in re.finditer(re.escape(code), plain):
+            win = plain[cm.end():cm.end() + 400]
+            nxt = re.search(r"\d{8}", win)
+            if nxt:
+                win = win[:nxt.start()]
+            for fm in pat.finditer(win):
+                forms.add(re.sub(r" +", " ", fm.group(0)))
+        if len(forms) == 1:
+            good = next(iter(forms))
+            if good != name and good.count(" ") > name.count(" "):
+                row["name_th"] = good
+                notes.append(f"{code}: name_th คืนช่องว่างตามที่เล่มพิมพ์ ({name!r} -> {good!r})")
+        elif len(forms) > 1 and name not in forms:
+            notes.append(f"{code}: เล่มพิมพ์ name_th {name!r} ไว้หลายแบบช่องว่าง {sorted(forms)} -- ไม่แก้ ให้คนตรวจ")
+    return out, notes
+
+
+def repair_names_unsplit(courses: list[dict], program: str | None, text: str | None
+                         ) -> tuple[list[dict], list[str]]:
+    """รวมกฎซ่อมชื่อของโปรแกรมที่ไม่ผ่าน split_lab7b_by_plan() (ตอนนี้ GENED) -- เรียกต่อจาก trim_glued_names_from_tables"""
+    if not text or program not in UNSPLIT_NAME_REPAIR_PROGRAMS:
+        return courses, []
+    rows, n1 = strip_credit_digit_from_name_en(courses, text)
+    rows, n2 = restore_name_th_spacing_from_book(rows, text)
+    return rows, n1 + n2
+
+
 
 # โปรแกรมที่ "ไม่มีแผน nocoop/coop" (plan_sections() ว่าง -> ไม่เรียก split_lab7b_by_plan()) และต้องซ่อมหน่วยกิต
 # จาก <table> ดิบด้วย repair_credits_unsplit() ใส่เฉพาะโปรแกรมที่ตรวจแล้ว: AIT ผ่านการอนุมัติแล้วโดยไม่ผ่านขั้นนี้
 # จึงห้ามใส่เองโดยไม่อ่านคำเตือนของ AIT ก่อน
-UNSPLIT_CREDIT_REPAIR_PROGRAMS: set[str] = {"GENED", "GENED_2559", "GENED_2564"}
+UNSPLIT_CREDIT_REPAIR_PROGRAMS: set[str] = {"GENED", "GENED_2559", "GENED_2564", "AIT"}
 
 _PRINTED_TRIPLE_RE = re.compile(r"\d+\s*\(\s*\d+\s*-\s*\d+\s*-\s*\d+\s*\)")
 
@@ -2681,6 +3078,12 @@ def repair_credits_unsplit(courses: list[dict], program: str | None, text: str |
     notes.extend(fill_notes)
     rows, keep, inferred_notes = repair_inferred_credits_from_raw_tables(rows, printed)
     notes.extend(inferred_notes)
+    if program in PRINTED_CREDIT_OVERRIDE_PROGRAMS:
+        # หน่วยกิตของรหัสเดียวกันต้องตรงกับที่เล่มพิมพ์ใน <table> ทุกครั้ง (AIT 06046404: หน้า 20/23 พิมพ์ 3(3-0-6))
+        rows, ov_keep, ov_notes = override_credits_with_unanimous_printed(
+            rows, raw_map if raw_map is not None else _raw_table_credits_map(text))
+        keep = keep | ov_keep
+        notes.extend(ov_notes)
     rows, null_notes = null_inferred_credits(rows, keep)
     notes.extend(null_notes)
     return rows, notes
@@ -2697,6 +3100,399 @@ def apply_term_alt_merge_override(plan: list[dict], program: str | None) -> list
             r["alt_group"] = rule["alt_group"]
         notes.append(f"{rule['year']}/{rule['semester']}: {rule['reason']} (รวม {len(hit)} แถว)")
     return notes
+
+
+# โปรแกรมที่ยอมให้ "ค่าที่เล่มพิมพ์ตรงกันทุกครั้งใน <table> ดิบ" แทนหน่วยกิตที่ Lab 7B/ขั้นรวมกลุ่มใส่มา
+# ใส่เฉพาะโปรแกรมที่ตรวจแล้ว (ตอนนี้ IT) เพราะกฎนี้แตะแถวที่ไม่ได้ถูกประกาศว่า "อนุมาน" ด้วย
+PRINTED_CREDIT_OVERRIDE_PROGRAMS: set[str] = {"IT", "BIT", "AIT"}
+
+
+def override_credits_with_unanimous_printed(
+        courses: list[dict], raw_map: dict[str, list[str]]
+) -> tuple[list[dict], set[int], list[str]]:
+    """หน่วยกิตของรหัสเดียวกันต้องเท่ากันทุกที่ -- ถ้า <table> ดิบพิมพ์รหัส 8 หลักนี้พร้อมหน่วยกิตในแถวเดียวกัน
+    และทุกครั้งที่โผล่ได้ค่าเดียวกัน แต่แถวที่สกัดได้ถือค่าอื่น (เช่น เซลล์กลุ่มที่รวมสองวิชาแล้วแจกหน่วยกิตผิดตัว)
+    -> ใช้ค่าที่เล่มพิมพ์ พบจริง: IT 06016425 หน้า 34/41 รวมกับ 06016424 ได้ 3(3-0-6) แต่หน้า 26 พิมพ์ 3(2-2-5)
+
+    ขอบเขตแคบโดยตั้งใจ: เฉพาะรหัสเลข 8 หลัก (ไม่แตะ PLACEHOLDER/wildcard), เฉพาะแถวที่หน่วยกิตเป็นค่าเดียว
+    (ไม่แตะ "3(3-0-6) หรือ 3(2-2-5)" ที่เป็นช่องเลือก) และข้ามถ้าเล่มพิมพ์ขัดกันเอง -- ทุกแถวที่เปลี่ยนมี note
+    """
+    printed, notes = _unanimous_printed_credit_map(raw_map)
+    out: list[dict] = []
+    keep: set[int] = set()
+    for i, src in enumerate(courses):
+        row = dict(src)
+        out.append(row)
+        code = str(row.get("code") or "").strip()
+        if not re.fullmatch(r"\d{8}", code) or code not in printed:
+            continue
+        cur = str(row.get("credits") or "")
+        cur_triples = {re.sub(r"\s+", "", t) for t in _PRINTED_TRIPLE_RE.findall(cur)}
+        if len(cur_triples) != 1 or re.search(r"หรือ", cur):
+            continue
+        want = printed[code][0]
+        if next(iter(cur_triples)) == want:
+            continue
+        row["credits"] = want
+        keep.add(i)
+        notes.append(f"{code}: หน่วยกิตที่สกัดได้ ({cur!r}) ไม่ตรงกับที่เล่มพิมพ์ใน <table> ดิบทุกครั้ง "
+                     f"-> แก้เป็น {want!r}")
+    return out, keep, [n for n in notes if "แก้เป็น" in n]
+
+
+# โปรแกรมที่ยอมให้อ่านหน่วยกิตจาก "เซลล์หัวตาราง" เมื่อ OCR ทำช่องหน่วยกิตของแถวหายแล้วไปกองรวมไว้ที่หัวตาราง
+# ใส่เฉพาะโปรแกรมที่ตรวจเล่มดิบแล้ว (ตอนนี้ DSBA: กลุ่มการวิเคราะห์เชิงสถิติ หน้า 20 ของ PDF)
+HEADER_CELL_CREDIT_PROGRAMS: set[str] = {"DSBA"}
+
+# โปรแกรมที่เติมหน่วยกิตที่ว่าง (null) จาก <table> ดิบได้ แม้ไม่อยู่ใน RAW_TABLE_RECOVERY_PROGRAMS
+NULL_CREDIT_FILL_FROM_RAW_PROGRAMS: set[str] = {"IT"}
+
+
+def fill_credits_from_header_cell(courses: list[dict], md_text: str) -> tuple[list[dict], set[int], list[str]]:
+    """OCR บางตารางทำช่องหน่วยกิตของแถววิชาหาย แล้วเอาค่าไปกองในเซลล์หัวตาราง เช่น
+    <td>มคอ. 2<br/>3 (3-0-6)<br/>3 (2-2-5)<br/>3 (2-2-5)</td> ตามด้วยแถว 06026227/228/229 ที่ไม่มีช่องหน่วยกิต
+    -> จับคู่ตามลำดับ ใช้เฉพาะเมื่อ (1) ตารางนั้นมีเซลล์หัวตารางที่มีหน่วยกิต >=2 ค่า
+    (2) จำนวนแถวรหัส 8 หลักที่ "ไม่มีหน่วยกิตเลยทั้งแถว" เท่ากับจำนวนค่าในหัวตารางพอดี
+    (3) แถวในตารางยังเป็น null และ (4) รหัสนั้นไม่โผล่เป็นแถวที่มีหน่วยกิตของตัวเองที่อื่น
+    ไม่ตรงเงื่อนไขใดเงื่อนไขหนึ่ง = ไม่แตะ (ไม่เดา) ทุกแถวที่เติมมี note"""
+    triple = re.compile(r"\d+\s*\(\s*\d+\s*-\s*\d+\s*-\s*\d+\s*\)")
+    pairs: dict[str, str] = {}
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        rows = re.findall(r"<tr>.*?</tr>", table, flags=re.S)
+        header_vals: list[str] = []
+        bare: list[str] = []
+        for ri, row in enumerate(rows):
+            cells = [c for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)]
+            texts = [re.sub(r"<[^>]+>", " ", c).strip() for c in cells]
+            if not texts:
+                continue
+            if ri == 0:
+                for c in cells:
+                    vals = [re.sub(r"\s+", "", t) for t in triple.findall(re.sub(r"<[^>]+>", " ", c))]
+                    if len(vals) >= 2:
+                        header_vals = vals
+                continue
+            if re.fullmatch(r"\d{8}", texts[0].replace(" ", "")) and not any(triple.search(t) for t in texts[1:]):
+                bare.append(texts[0].replace(" ", ""))
+        if header_vals and bare and len(bare) == len(header_vals):
+            for code, val in zip(bare, header_vals):
+                pairs.setdefault(code, val)
+    printed = _unanimous_printed_credit_map(_raw_table_credits_map(md_text))[0]
+    out: list[dict] = []
+    keep: set[int] = set()
+    notes: list[str] = []
+    for i, src in enumerate(courses):
+        row = dict(src)
+        out.append(row)
+        code = str(row.get("code") or "").strip()
+        if code not in pairs or code in printed or str(row.get("credits") or "").strip():
+            continue
+        row["credits"] = pairs[code]
+        keep.add(i)
+        notes.append(f"{code}: ช่องหน่วยกิตของแถวหายจาก OCR แต่หัวตารางพิมพ์ค่าเรียงตามแถว -> ใช้ {pairs[code]!r} "
+                     f"(จับคู่ตามลำดับแถวในตารางเดียวกัน)")
+    return out, keep, notes
+
+
+_ANY_TRIPLE_RE = re.compile(r"\d+\s*\(\s*(?:\d+|[xX])\s*-\s*(?:\d+|[xX])\s*-\s*(?:\d+|[xX])\s*\)")
+
+
+def override_garbled_credits_by_printed_name(
+        courses: list[dict], md_text: str) -> tuple[list[dict], set[int], list[str]]:
+    """แถวที่หน่วยกิตมีหลายค่า (ปนจาก <br/> หรือ 'หรือ') เพราะ OCR ตารางเลื่อนคอลัมน์ ทั้งที่ชื่อวิชาเดียวกัน
+    เล่มพิมพ์หน่วยกิตค่าเดียวชัดเจนในแถวอื่นและทุกแถวตรงกัน -> ใช้ค่านั้น
+
+    พบจริง: IT coop หน้า 43 เซลล์ 'วิชาเลือกหมวดศึกษาทั่วไป 1' = 3(3-0-6)<br/>3(x-x-x) (ค่าของแถวข้างเคียงปน)
+    และ 'วิชาเลือกเสรี 2' = 3(0-9-0)<br/>3(3-0-6) หรือ 3(2-2-5) (ค่าของแถวโครงงาน) แต่ที่อื่นพิมพ์ 3(3-0-6)/3(x-x-x) ตรงกันหมด
+
+    ไม่แตะช่องเลือกจริงที่เล่มพิมพ์หลายแบบ (เช่น วิชาเลือกทางเทคโนโลยีสารสนเทศ: ไม่มีแถวค่าเดียวที่ไหนเลย)
+    ใช้เฉพาะโปรแกรมใน PRINTED_CREDIT_OVERRIDE_PROGRAMS ทุกแถวที่เปลี่ยนมี note
+    """
+    ns = lambda t: re.sub(r"\s+", "", t or "")
+    single: dict[str, set[str]] = {}
+    choice_names: set[str] = set()
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        for row in re.findall(r"<tr>.*?</tr>", table, flags=re.S):
+            cells = [re.sub(r"<[^>]+>", " ", re.sub(r"<br\s*/?>", "\n", c))
+                     for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)]
+            if len(cells) < 2:
+                continue
+            cr = cells[-1]
+            trip = [ns(x) for x in _ANY_TRIPLE_RE.findall(cr)]
+            if len(trip) >= 2:
+                # ช่องเลือกจริง: ทุกช่วงระหว่าง triple มีคำว่า "หรือ" คั่น (ต่างจากเซลล์ที่ OCR ยัดค่าของหลายแถวมาติดกัน
+                # ซึ่งไม่มี "หรือ" คั่นทุกช่วง) จำชื่อไว้เพื่อไม่ไปทับด้วยค่าเดี่ยวที่หลุดมาจากแถวอื่น
+                gaps = [cr[m1.end():m2.start()] for m1, m2 in zip(
+                    list(_ANY_TRIPLE_RE.finditer(cr)), list(_ANY_TRIPLE_RE.finditer(cr))[1:])]
+                if all("หรือ" in g for g in gaps):
+                    for c in cells[:-1]:
+                        for l in c.split("\n"):
+                            thai = ns(re.split(r"[A-Za-z]", l)[0])
+                            if re.search(r"[\u0E00-\u0E7F]", thai) and len(thai) > 3:
+                                choice_names.add(thai)
+            if len(trip) != 1 or "หรือ" in cr:
+                continue
+            name = next((ns(l) for c in cells[:-1] for l in c.split("\n")
+                         if re.search(r"[\u0E00-\u0E7F]", l) and len(ns(l)) > 3
+                         and not ns(l).startswith("กลุ่มวิชา")), "")
+            if name:
+                single.setdefault(name, set()).add(trip[0])
+    out: list[dict] = []
+    keep: set[int] = set()
+    notes: list[str] = []
+    for i, src in enumerate(courses):
+        row = dict(src)
+        out.append(row)
+        cur = str(row.get("credits") or "")
+        if len({ns(x) for x in _ANY_TRIPLE_RE.findall(cur)}) < 2 and "หรือ" not in cur:
+            continue
+        if ns(row.get("name_th")) in choice_names:
+            continue        # เล่มพิมพ์ช่องนี้เป็นทางเลือกหลายแบบ ("หรือ") จริง ไม่ใช่เซลล์เลื่อนคอลัมน์
+        vals = single.get(ns(row.get("name_th")), set())
+        if len(vals) != 1:
+            continue
+        want = next(iter(vals))
+        row["credits"] = want
+        keep.add(i)
+        notes.append(f"{row.get('code')}: หน่วยกิตหลายค่า ({cur!r}) แต่ชื่อวิชา {row.get('name_th')!r} "
+                     f"เล่มพิมพ์ค่าเดียว {want!r} ตรงกันทุกแถวที่อื่น -> แก้เป็น {want!r}")
+    return out, keep, notes
+
+
+# โปรแกรมที่ใช้ปี/เทอมจากแถวพี่น้องในเซลล์เดียวกัน เมื่อ OCR ยัดหลายวิชาไว้ในเซลล์เดียว (ตรวจแล้ว: BIT nocoop 4/1)
+SAME_CELL_SIBLING_TERM_PROGRAMS: set[str] = {"BIT"}
+
+
+def fill_term_from_same_cell_siblings(courses: list[dict], md_text: str
+                                      ) -> tuple[list[dict], list[str]]:
+    """เซลล์ <td> เดียวที่ OCR ยัดหลายวิชาติดกัน ('CODE ชื่อ ... 3(3-0-6)<br/>CODE ชื่อ ... 3(0-9-0)') ทำให้
+    Lab 7B ไม่ได้ปี/เทอมของบางวิชา (ได้ null) ทั้งที่ทุกวิชาในเซลล์เดียวกันอยู่ตารางเดียวกัน = เทอมเดียวกันแน่นอน
+
+    พบจริง: BIT nocoop 4/1 หน้า 29 '0603615 ความมั่นคงของระบบสารสนเทศ ... <br/>06036146 โครงงาน ...' ในเซลล์เดียว
+    06036115 ได้ปี/เทอม null และถูกจัดเป็นวิชาเลือกไม่ผูกเทอม ทั้งที่ 06036146 ในเซลล์เดียวกันได้ 4/1
+
+    ไม่เดา: แถวเป้าหมายต้องไม่มีปี/เทอมที่ใช้ได้, ต้องจับคู่กับรายการในเซลล์ได้ด้วยชื่อวิชา (ไม่ใช่รหัส เพราะรหัสอาจพัง),
+    และแถวพี่น้องในเซลล์เดียวกันที่มีปี/เทอมต้องให้ค่าเดียวกันทั้งหมด -- ปี/เทอม/หมวด/ประเภทคัดลอกจากพี่น้อง
+    """
+    ns = lambda t: re.sub(r"\s+", "", _normalize_name_th(str(t or "").strip()) or "")
+    ok_term = lambda r: (str(r.get("year") or "").isdigit() and 1 <= int(r["year"]) <= 8
+                         and str(r.get("semester") or "").isdigit() and 1 <= int(r["semester"]) <= 3)
+    entry_re = re.compile(r"(?<!\d)(\d{7,8})\s+(.*?)(?=(?<!\d)\d{7,8}\s+[\u0E00-\u0E7F]|$)", re.S)
+    cells: list[list[tuple[str, str]]] = []
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        for cell in re.findall(r"<td[^>]*>(.*?)</td>", table, flags=re.S):
+            text = re.sub(r"<[^>]+>", " ", re.sub(r"<br\s*/?>", "\n", cell))
+            ents = [(m.group(1), m.group(2)) for m in entry_re.finditer(text)]
+            if len(ents) >= 2:
+                cells.append(ents)
+    out = [dict(c) for c in courses]
+    notes: list[str] = []
+    for row in out:
+        if ok_term(row):
+            continue
+        key = ns(row.get("name_th"))
+        if len(key) < 10:
+            continue
+        for ents in cells:
+            mine = [i for i, (_, rest) in enumerate(ents) if key and key in ns(rest)]
+            if len(mine) != 1:
+                continue
+            sib_codes = {c for i, (c, _) in enumerate(ents) if i != mine[0] and len(c) == 8}
+            sibs = [r for r in out if str(r.get("code")) in sib_codes and ok_term(r)]
+            terms = {(int(r["year"]), int(r["semester"])) for r in sibs}
+            if len(terms) != 1:
+                continue
+            ref = sibs[0]
+            row["year"], row["semester"] = next(iter(terms))
+            for f in ("category", "type"):
+                if ref.get(f) is not None:
+                    row[f] = ref[f]
+            row.pop("flexible_year_semester", None)
+            notes.append(f"{row.get('code')}: ไม่มีปี/เทอม แต่อยู่เซลล์เดียวกับ {ref.get('code')} ในตารางดิบ "
+                         f"-> ใช้ปี {row['year']}/{row['semester']} หมวด/ประเภทตามพี่น้อง")
+            break
+    return out, notes
+
+
+# โปรแกรมที่แยกเซลล์ตารางที่ OCR ยัดหลายวิชาไว้ใต้รหัสซ้อน (rowspan) โดยเล่มพิมพ์ตัวคั่น "(Faculty requirement)" ไว้
+# ตรวจแล้ว: IT coop หน้า 43 (ปี 4/1)
+MERGED_FACULTY_CELL_PROGRAMS: set[str] = {"IT"}
+
+
+def split_merged_faculty_cells(courses: list[dict], md_text: str) -> tuple[list[dict], list[str]]:
+    """<td rowspan=2>060164xx<br/>90643021</td> + ชื่อ 'วิชาเลือก IT 1 / EN <br/>กลุ่มวิชาตามเกณฑ์ของคณะ
+    (Faculty requirement)<br/>ผู้ประกอบการสมัยใหม่ / EN' + แถวถัดไป (ไม่มีรหัส) 'วิชาเลือก หมวดศึกษาทั่วไป 1'
+    Lab 7B อ่านเซลล์นี้ผิดสามทาง: (ก) ชื่อของ 060164xx ติดชื่อ 90643021 ต่อท้าย (ข) 90643021 ได้ชื่อของแถวที่ 3
+    และถูกจัดเป็น 'เลือก' (ค) แถวที่ 3 ถูก 'อนุมาน' ไปไว้ภาคถัดไป ทั้งที่ตารางภาคถัดไปไม่มีชื่อนี้เลย
+
+    แก้เฉพาะเมื่อเล่มดิบยืนยันครบ: (1) ชื่อที่ติดกัน = ชื่อ 1 + ชื่อ 2 ตรงเป๊ะ (2) ตัวคั่น (Faculty requirement) พิมพ์อยู่ในเซลล์
+    (3) แถวที่ 3 ยืนยันด้วยชื่อ ไม่ใช่รหัส และตารางหน้าถัดไปไม่มีชื่อนั้น
+    ชนิด/หมวดของ 90643021 และหน่วยกิตของ 060164xx เอาจากแถวอื่นของเล่มเดียวกันที่พิมพ์ชื่อเดียวกัน
+    และต้องได้ค่าเดียว ไม่ตรงเงื่อนไขใด = ไม่แตะ ทุกแถวที่เปลี่ยนมี note"""
+    ns = lambda t: re.sub(r"\s+", "", t or "")
+    code_re = re.compile(r"\d{6}xx|\d{4}xxxx|\d{8}", re.I)
+    pages = dict(_iter_pages(md_text))
+    out = [dict(c) for c in courses]
+    notes: list[str] = []
+
+    def lines_of(cell: str) -> list[str]:
+        return [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", l)).strip()
+                for l in re.split(r"<br\s*/?>", cell) if re.sub(r"<[^>]+>", "", l).strip()]
+
+    def th_en(lines: list[str]) -> tuple[str, str]:
+        th = " ".join(l for l in lines if re.search(r"[\u0E00-\u0E7F]", l))
+        en = " ".join(l for l in lines if not re.search(r"[\u0E00-\u0E7F]", l))
+        return th.strip(), en.strip()
+
+    def same_book_values(code: str, name_th: str, field: str, skip: dict) -> set:
+        return {r.get(field) for r in out
+                if r is not skip and str(r.get("code")).lower() == code.lower()
+                and ns(r.get("name_th")) == ns(name_th) and r.get(field) not in (None, "")}
+
+    for pg, chunk in pages.items():
+        for table in re.findall(r"<table>.*?</table>", chunk, flags=re.S):
+            rows = re.findall(r"<tr>.*?</tr>", table, flags=re.S)
+            for ri, row in enumerate(rows[:-1]):
+                cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+                if len(cells) < 3:
+                    continue
+                codes = [c.strip() for c in re.split(r"<br\s*/?>", cells[0]) if c.strip()]
+                if len(codes) != 2 or not all(code_re.fullmatch(c) for c in codes):
+                    continue
+                nl = lines_of(cells[1])
+                mk = [i for i, l in enumerate(nl) if "Faculty requirement" in l]
+                if len(mk) != 1:
+                    continue
+                n1_th, n1_en = th_en(nl[:mk[0]])
+                n2_th, n2_en = th_en(nl[mk[0] + 1:])
+                nxt = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", rows[ri + 1], flags=re.S)
+                if len(nxt) != 2 or not (n1_th and n2_th and n1_en and n2_en):
+                    continue
+                n3_th, n3_en = th_en(lines_of(nxt[0]))
+                if not n3_th:
+                    continue
+                c1, c2 = codes
+                r1 = next((r for r in out if r.get("source_page") == pg and str(r.get("code")).lower() == c1.lower()
+                           and ns(r.get("name_th")) == ns(n1_th) + ns(n2_th)), None)
+                r2 = next((r for r in out if r.get("source_page") == pg and str(r.get("code")) == c2
+                           and ns(r.get("name_th")) == ns(n3_th)), None)
+                if r1 is None or r2 is None:
+                    continue
+                nextpage = ns(re.sub(r"<[^>]+>", " ", pages.get(pg + 1, "")))
+                r3 = next((r for r in out if r.get("source_page") == pg + 1 and ns(r.get("name_th")) == ns(n3_th)
+                           and str(r.get("note") or "").startswith("อนุมาน") and "x" in str(r.get("code")).lower()), None)
+                if r3 is not None and ns(n3_th) in nextpage:
+                    r3 = None
+                # (ก) ชื่อของ 060164xx
+                old1 = r1["name_th"]
+                r1["name_th"], r1["name_en"] = n1_th, n1_en
+                cr = same_book_values(c1, n1_th, "credits", r1)
+                if len(cr) == 1 and "หรือ" in next(iter(cr)):
+                    r1["credits"] = next(iter(cr))
+                    cnote = f" หน่วยกิตใช้ค่าที่เล่มพิมพ์ให้ชื่อเดียวกันที่อื่น {r1['credits']!r}"
+                else:
+                    cnote = ""
+                r1["note"] = f"แยกชื่อที่ติดกันจากเซลล์รวม 2 รหัส ({old1!r} -> {n1_th!r}) ตามตัวคั่น (Faculty requirement){cnote}"
+                notes.append(f"{c1} (หน้า {pg}): {r1['note']}")
+                # (ข) ชื่อ/ชนิดของ 90643021
+                old2 = r2["name_th"]
+                r2["name_th"], r2["name_en"] = n2_th, n2_en
+                for f in ("type", "category"):
+                    v = same_book_values(c2, n2_th, f, r2)
+                    if len(v) == 1:
+                        r2[f] = next(iter(v))
+                r2["note"] = f"ชื่อในแถวนี้เป็นของแถวที่ 3 ในเซลล์ ({old2!r}) แก้เป็น {n2_th!r} ตามที่เล่มพิมพ์หลังตัวคั่น"
+                notes.append(f"{c2} (หน้า {pg}): {r2['note']}")
+                # (ค) แถวที่ 3 ที่ถูกอนุมานไปภาคถัดไป -> ย้ายกลับมาภาคเดียวกับตารางที่พิมพ์ชื่อนี้
+                if r3 is not None:
+                    r3["year"], r3["semester"] = r2.get("year"), r2.get("semester")
+                    r3["source_page"] = pg
+                    r3["pages"] = [pg]
+                    r3["note"] = (f"ชื่อ {n3_th!r} พิมพ์อยู่ในตารางหน้า {pg} (ปี {r2.get('year')}/{r2.get('semester')}) "
+                                  f"และตารางหน้า {pg + 1} ไม่มีชื่อนี้ -> ย้ายจากภาคที่ Lab 7B อนุมาน")
+                    notes.append(f"{r3.get('code')}: {r3['note']}")
+    return out, notes
+
+
+
+# โปรแกรมที่เติม name_en ที่ว่าง (null) จาก <table> ดิบ และแก้ name_th ด้วยเสียงข้างมากของที่เล่มพิมพ์ทั้งเล่ม
+# ตรวจแล้ว: DSBA (90643021 name_en null ทั้งที่หน้า 16/28/35 พิมพ์ไว้; 90644042 หน้า 34 สะกดผิดจากหน้า 16/27)
+RAW_NAME_REPAIR_PROGRAMS: set[str] = {"DSBA"}
+
+
+def fill_missing_name_en_from_raw_tables(courses: list[dict], md_text: str) -> tuple[list[dict], list[str]]:
+    """แถวที่ name_en เป็น null ทั้งที่ <table> ดิบพิมพ์ชื่ออังกฤษของรหัสนั้นไว้ (เช่น 90643021: ช่องชื่อ
+    'ผู้ประกอบการสมัยใหม่ MODERN ENTREPRENEURS' คั่นด้วยช่องว่างไม่ใช่ <br/> หรือแถวต่อเนื่อง rowspan ที่มีแต่
+    'MODERN ENTREPRENEURS') -> เติมให้ ใช้เฉพาะเมื่อ (1) name_en ว่างจริง (2) รหัสเป็น 8 หลักเต็ม (3) ทุกที่ที่เล่มพิมพ์
+    ให้ผลเป็นข้อความเดียวกันเป๊ะ ไม่มีผู้สมัครมากกว่า 1 แบบ ไม่ตรง = ไม่แตะ ทุกแถวที่เติมมี note"""
+    latin_tail = re.compile(r"((?:[A-Z][A-Za-z0-9,&()\-/']*)(?:\s+[A-Za-z0-9,&()\-/']+)*)\s*$")
+    cands: dict[str, set[str]] = {}
+    for table in re.findall(r"<table>.*?</table>", md_text, flags=re.S):
+        rows = re.findall(r"<tr>.*?</tr>", table, flags=re.S)
+        cur = None
+        for row in rows:
+            cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+            texts = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", c)).strip() for c in cells]
+            if len(texts) >= 2 and re.fullmatch(r"\d{8}", texts[0]):
+                cur = texts[0]
+                name_cell = texts[1]
+                if re.search(r"[\u0E00-\u0E7F]", name_cell):
+                    m = latin_tail.search(name_cell)
+                    if m and m.group(1).isupper():
+                        cands.setdefault(cur, set()).add(m.group(1).strip())
+            elif len(texts) >= 1 and cur and not re.search(r"[\u0E00-\u0E7F\d]", texts[0]) and texts[0].isupper() \
+                    and len(texts) <= 2:
+                cands.setdefault(cur, set()).add(texts[0])
+                cur = None
+            else:
+                cur = None
+    out = [dict(c) for c in courses]
+    notes: list[str] = []
+    for row in out:
+        code = str(row.get("code") or "").strip()
+        if str(row.get("name_en") or "").strip() or not re.fullmatch(r"\d{8}", code):
+            continue
+        vals = cands.get(code, set())
+        if len(vals) == 1:
+            row["name_en"] = next(iter(vals))
+            notes.append(f"{code}: name_en ว่าง แต่ <table> ดิบพิมพ์ {row['name_en']!r} ตรงกันทุกที่ -> เติมให้")
+    return out, notes
+
+
+def vote_name_th_by_printed_majority(courses: list[dict], md_text: str) -> tuple[list[dict], list[str]]:
+    """รหัสเดียวกันมีหลายแถวที่ name_th สะกดต่างกัน (Lab 7B อ่านคนละหน้า) -> นับว่าแต่ละแบบปรากฏในเล่มดิบกี่ครั้ง
+    (เทียบแบบตัดช่องว่าง) ใช้แบบที่ปรากฏมากกว่าอย่างเด็ดขาด และต้องมีอย่างน้อย 2 ครั้ง; เสมอ = ไม่แตะ
+    ผู้สมัครมาจากแถวของ Lab 7B เองเท่านั้น (ไม่คิดคำสะกดเอง) และแบบหนึ่งต้องไม่เป็นสตริงย่อยของอีกแบบ"""
+    ns = lambda t: re.sub(r"\s+", "", t or "")
+    hay = ns(re.sub(r"<[^>]+>", " ", md_text))
+    by_code: dict[str, list[str]] = {}
+    for r in courses:
+        code = str(r.get("code") or "")
+        nm = ns(r.get("name_th"))
+        if re.fullmatch(r"\d{8}", code) and nm and nm not in by_code.setdefault(code, []):
+            by_code[code].append(nm)
+    best: dict[str, str] = {}
+    for code, variants in by_code.items():
+        if len(variants) < 2 or any(a != b and a in b for a in variants for b in variants):
+            continue
+        counts = {v: hay.count(v) for v in variants}
+        top = max(counts.values())
+        winners = [v for v, c in counts.items() if c == top]
+        if len(winners) == 1 and top >= 2:
+            best[code] = winners[0]
+    out = [dict(c) for c in courses]
+    notes: list[str] = []
+    for row in out:
+        code = str(row.get("code") or "")
+        want = best.get(code)
+        if want and ns(row.get("name_th")) != want:
+            old = row["name_th"]
+            src = next(r["name_th"] for r in courses if str(r.get("code")) == code and ns(r.get("name_th")) == want)
+            row["name_th"] = src
+            notes.append(f"{code}: name_th สะกดต่างกันระหว่างหน้า ({old!r}) แบบ {src!r} ปรากฏในเล่มดิบมากกว่า "
+                         f"({hay.count(want)} ครั้ง vs {hay.count(ns(old))}) -> ใช้เสียงข้างมาก")
+    return out, notes
+
 
 
 def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | None = None,
@@ -2718,6 +3514,11 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
     """
     sections = plan_sections(program, text=text)
     warnings: list[str] = []
+    # กู้รหัสที่ OCR อ่านพัง/หาย "ก่อนแยก section" เพื่อให้หาชื่อคู่จากทั้งเล่มได้
+    _fixed_courses, _code_notes = recover_codes_by_name(data.get("courses") or [])
+    if _code_notes:
+        data = {**data, "courses": _fixed_courses}
+        warnings.extend(_code_notes)
     stats = {"rows": 0, "only_one_plan": 0, "in_both_plans": 0,
              "unclassified_kept_in_both": 0, "no_page_info": 0, "forced_shared": 0}
     parts = {s: {**{k: v for k, v in data.items() if k != "courses"}, "courses": []}
@@ -2732,6 +3533,29 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
             f"เลขหน้าทุกหน้าของก้อน ก้อนที่คร่อมรอยต่อ nocoop/coop จะทำให้วิชาไปอยู่สองฝั่งเกินจริง "
             f"(ตั้ง LAB7_CHUNK=1 เพื่อให้แยกได้แม่น)")
 
+    # ตัดแถว "รวม <ยอดภาค>" ที่ OCR ยัดรหัสจาก rowspan มาให้ ก่อนขั้นซ่อมหน่วยกิต (ไม่งั้นค่า 3(3-0-6) ของ 9664xxxx
+    # จะถูกเติมให้แถวนี้ กลายเป็นช่องวิชาเกิน: BIT nocoop 4/1 หน้า 29 ยอดแผน 126 -> 129)
+    _kept = [c for c in (data.get("courses") or []) if not _is_total_row(c)]
+    if len(_kept) != len(data.get("courses") or []):
+        for c in data.get("courses") or []:
+            if _is_total_row(c):
+                warnings.append(f"{c.get('code')}: ตัดแถวยอดรวมของตาราง (name_th={c.get('name_th')!r} "
+                                f"credits={c.get('credits')!r} หน้า {_lab7b_page(c)}) ออก ไม่ใช่รายวิชา")
+        data = {**data, "courses": _kept}
+
+    if text and program in RAW_NAME_REPAIR_PROGRAMS:
+        _nv_rows, _nv_notes = vote_name_th_by_printed_majority(data.get("courses") or [], text)
+        _ne_rows, _ne_notes = fill_missing_name_en_from_raw_tables(_nv_rows, text)
+        if _nv_notes or _ne_notes:
+            data = {**data, "courses": _ne_rows}
+            warnings.extend(_nv_notes + _ne_notes)
+
+    if text and program in MERGED_FACULTY_CELL_PROGRAMS:
+        _mf_rows, _mf_notes = split_merged_faculty_cells(data.get("courses") or [], text)
+        if _mf_notes:
+            data = {**data, "courses": _mf_rows}
+            warnings.extend(_mf_notes)
+
     if text and program in RAW_TABLE_RECOVERY_PROGRAMS:
         # กู้ทางเลือก rowspan ที่ Lab 7B ทิ้ง + ซ่อมหน่วยกิต null จากตารางดิบ (ดูคอมเมนต์ที่ฟังก์ชันกู้คืน)
         recovered, rec_notes = recover_alt_group_siblings_from_raw_tables(
@@ -2742,6 +3566,22 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
             raw_table_credits = _raw_table_credits_map(text)
         if program in SHARED_CELL_CREDIT_PROGRAMS:
             raw_table_credits = merge_shared_cell_credits(raw_table_credits, text)
+
+    if text and program in CODELESS_ROW_RECOVERY_PROGRAMS:
+        _cl_rows, _cl_notes = recover_codeless_rows_from_raw_tables(data.get("courses") or [], text)
+        data = {**data, "courses": _cl_rows}
+        warnings.extend(_cl_notes)
+
+    if text and program in SAME_CELL_SIBLING_TERM_PROGRAMS:
+        _sc_rows, _sc_notes = fill_term_from_same_cell_siblings(data.get("courses") or [], text)
+        data = {**data, "courses": _sc_rows}
+        warnings.extend(_sc_notes)
+
+    if text and program in MULTICODE_OR_CELL_PROGRAMS:
+        or_grouped, or_notes = group_spaced_or_cells_from_raw_tables(
+            data.get("courses") or [], text, sections)
+        data = {**data, "courses": or_grouped}
+        warnings.extend(or_notes)
 
     if text and program in MULTICODE_CELL_GROUP_PROGRAMS:
         grouped, grp_notes = group_multicode_cells_from_raw_tables(
@@ -2764,6 +3604,19 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
         dup_filled_courses, table_notes = repair_credits_from_raw_tables(
             dup_filled_courses, raw_table_credits)
         warnings.extend(table_notes)
+    if text and program in NULL_CREDIT_FILL_FROM_RAW_PROGRAMS:
+        # เติมเฉพาะแถวที่หน่วยกิตว่างจริง ๆ จากค่าที่เล่มพิมพ์ใน <table> (IT 06016434/435: ช่องเดียว colspan พิมพ์
+        # "ชื่อ ... 3(2-2-5)" แต่ Lab 7B ปล่อยหน่วยกิตเป็น null) ไม่แตะแถวที่มีค่าอยู่แล้ว
+        _rawm = raw_table_credits or _raw_table_credits_map(text)
+        _filled: list[dict] = []
+        for _row in dup_filled_courses:
+            if str(_row.get("credits") or "").strip():
+                _filled.append(_row)
+                continue
+            _fx, _fn = repair_credits_from_raw_tables([_row], _rawm)
+            _filled.extend(_fx)
+            warnings.extend(_fn)
+        dup_filled_courses = _filled
     keep_inferred: set[int] = set()
     if text and program in CORROBORATED_INFERRED_CREDIT_PROGRAMS:
         keep_inferred, keep_notes = corroborated_inferred_credit_indexes(dup_filled_courses, text)
@@ -2773,6 +3626,19 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
             dup_filled_courses, raw_table_credits or _raw_table_credits_map(text))
         keep_inferred = keep_inferred | raw_keep
         warnings.extend(raw_notes)
+    if text and program in PRINTED_CREDIT_OVERRIDE_PROGRAMS:
+        dup_filled_courses, ov_keep, ov_notes = override_credits_with_unanimous_printed(
+            dup_filled_courses, _raw_table_credits_map(text))
+        keep_inferred = keep_inferred | ov_keep
+        warnings.extend(ov_notes)
+        dup_filled_courses, g_keep, g_notes = override_garbled_credits_by_printed_name(
+            dup_filled_courses, text)
+        keep_inferred = keep_inferred | g_keep
+        warnings.extend(g_notes)
+    if text and program in HEADER_CELL_CREDIT_PROGRAMS:
+        dup_filled_courses, h_keep, h_notes = fill_credits_from_header_cell(dup_filled_courses, text)
+        keep_inferred = keep_inferred | h_keep
+        warnings.extend(h_notes)
     dup_filled_courses, inferred_null_notes = null_inferred_credits(dup_filled_courses, keep_inferred)
     warnings.extend(inferred_null_notes)
     enriched_courses, enrich_notes = _enrich_alt_group_fillers(dup_filled_courses)
@@ -2833,6 +3699,83 @@ def split_lab7b_by_plan(data: dict, program: str, *, raw_table_credits: dict | N
     return parts, stats, warnings
 
 
+# ── แก้แถวเกินในแผนหลัง convert (DSBA CHK1/CHK7) ─────────────────────────────
+# แถวเกินที่เจอจริงและเกิดซ้ำทุกรอบ: placeholder ชื่อเป็นรหัสเปล่า, placeholder ซ้ำใน
+# ภาคเดียวกัน, รหัสจริงซ้ำข้ามภาค ทำให้หน่วยกิตรวมเกินที่หลักสูตรประกาศ
+# DROP_FROM_PLAN: รหัสที่ตรวจกับเล่มแล้วว่าไม่ควรอยู่ในแผน (เฉลยเป็นวิชาเลือกไม่ระบุภาค)
+POSTFIX_DROP_FROM_PLAN: dict[str, set[str]] = {"DSBA": {"06026217"}}
+_POSTFIX_BARE_CODE_RE = re.compile(r"^\d{4}x+$", re.I)
+
+
+def postfix_converted(converted: dict, report: dict, program: str | None = None) -> list[str]:
+    """แก้ converted (in place) แล้วคืนบันทึกการแก้ — ใส่ลง report["postfix"] ด้วย"""
+    log: list[str] = []
+    courses = {c["code"]: c for c in converted.get("courses") or []}
+    plan = list(converted.get("plan") or [])
+    term = lambda p: (p.get("year"), p.get("semester"))
+    nm = lambda code: ((courses.get(code) or {}).get("name_th") or "").strip()
+
+    # A. placeholder ที่ชื่อไทยเป็นรหัสเปล่า (เช่น "9064xxxx")
+    keep = []
+    for p in plan:
+        if p["code"].startswith("PLACEHOLDER") and _POSTFIX_BARE_CODE_RE.match(nm(p["code"])):
+            log.append(f"A ทิ้ง {p['code']} {term(p)} (ชื่อเป็นรหัสเปล่า)")
+        else:
+            keep.append(p)
+    plan = keep
+
+    # B. placeholder ซ้ำในภาคเดียวกัน (stem เดียวกัน ชื่อ/หน่วยกิตตรงกัน ไม่มี alt_group)
+    keep = []
+    for p in plan:
+        m = re.match(r"^(PLACEHOLDER_.+?)_\d+$", p["code"])
+        in_term = {q["code"] for q in plan if term(q) == term(p)}
+        if m and m.group(1) in in_term and not p.get("alt_group"):
+            a, b = courses.get(p["code"]) or {}, courses.get(m.group(1)) or {}
+            if (a.get("name_th") == b.get("name_th")
+                    and a.get("credits_text") == b.get("credits_text")
+                    and re.findall(r"\d+", a.get("name_th") or "") == re.findall(r"\d+", b.get("name_th") or "")):
+                log.append(f"B ทิ้ง {p['code']} {term(p)} (ซ้ำกับ {m.group(1)})")
+                continue
+        keep.append(p)
+    plan = keep
+
+    # C. รหัสจริงอยู่หลายภาค (ไม่ใช่ alt_group) -> เก็บภาคหลังสุด ต้องตรวจกับเล่ม
+    where: dict[str, list[int]] = {}
+    for i, p in enumerate(plan):
+        if not p["code"].startswith("PLACEHOLDER") and not p.get("alt_group"):
+            where.setdefault(p["code"], []).append(i)
+    drop = set()
+    for code, idxs in where.items():
+        if len({term(plan[i]) for i in idxs}) > 1:
+            last = max(idxs, key=lambda i: (plan[i].get("year") or 0, plan[i].get("semester") or 0))
+            for i in idxs:
+                if i != last:
+                    drop.add(i)
+                    log.append(f"C ทิ้ง {code} {term(plan[i])} (ซ้ำข้ามภาค เก็บ {term(plan[last])} — ตรวจกับเล่ม)")
+    plan = [p for i, p in enumerate(plan) if i not in drop]
+
+    # D. รหัสที่ตรวจกับเล่มแล้วว่าไม่ควรอยู่ในแผน
+    dd = POSTFIX_DROP_FROM_PLAN.get(program or "", set())
+    keep = []
+    for p in plan:
+        if p["code"] in dd:
+            log.append(f"D ทิ้ง {p['code']} {term(p)} (POSTFIX_DROP_FROM_PLAN)")
+        else:
+            keep.append(p)
+    plan = keep
+
+    used = {p["code"] for p in plan}
+    converted["courses"] = [c for c in converted.get("courses") or []
+                            if not (c["code"].startswith("PLACEHOLDER") and c["code"] not in used)]
+    converted["plan"] = plan
+    if log:
+        report["plan_items"] = len(plan)
+        report["converted_courses"] = len(converted["courses"])
+        report["postfix"] = log
+        report.setdefault("warnings", []).extend(f"postfix: {x}" for x in log)
+    return log
+
+
 def _write_converted(part: dict, pid: str, meta: dict, fallback: dict, outdir: Path,
                      program: str | None = None, section: str | None = None
                      ) -> tuple[dict, dict]:
@@ -2845,6 +3788,8 @@ def _write_converted(part: dict, pid: str, meta: dict, fallback: dict, outdir: P
         total_credits=meta.get("total_credits", fallback.get("total_credits")),
         years=meta.get("years", fallback.get("years")),
     )
+    for _l in postfix_converted(converted, report, program):
+        print(f"    ⚙ postfix {pid}: {_l}")
     outdir.mkdir(parents=True, exist_ok=True)
     out = outdir / "curriculum.json"
     out.write_text(json.dumps(converted, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -2890,6 +3835,8 @@ def _import_split(args, data: dict) -> None:
         fixed, repair_notes = repair_credits_unsplit(
             data.get("courses") or [], args.program, source_text)
         fixed, name_notes = trim_glued_names_from_tables(fixed, args.program, source_text)
+        fixed, name_notes2 = repair_names_unsplit(fixed, args.program, source_text)
+        name_notes = name_notes + name_notes2
         repair_notes = repair_notes + name_notes
         if repair_notes:
             data = {**data, "courses": fixed}
@@ -2944,6 +3891,8 @@ def cmd_import_lab7b(args) -> None:
         _txt = Path(args.source_md).read_text(encoding="utf-8")
         _fixed, _notes = repair_credits_unsplit(data.get("courses") or [], args.program, _txt)
         _fixed, _name_notes = trim_glued_names_from_tables(_fixed, args.program, _txt)
+        _fixed, _name_notes2 = repair_names_unsplit(_fixed, args.program, _txt)
+        _name_notes = _name_notes + _name_notes2
         _notes = _notes + _name_notes
         if _notes:
             data = {**data, "courses": _fixed}
@@ -2958,6 +3907,8 @@ def cmd_import_lab7b(args) -> None:
         total_credits=args.total_credits,
         years=args.years,
     )
+    for _l in postfix_converted(converted, report, args.program):
+        print(f"    ⚙ postfix: {_l}")
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(converted, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -3362,6 +4313,31 @@ SQL: SELECT COUNT(*) FROM plan_item WHERE year=3 AND semester=1 AND type='บั
 คำถาม: หน่วยกิตวิชาเลือกทั้งหมดเท่าไร
 SQL: SELECT SUM(credits) FROM plan_item WHERE type='เลือก'
 
+คำถาม: วิชาในหมวดวิชาศึกษาทั่วไปที่เรียนปี 1 มีรหัสวิชาอะไรบ้าง
+SQL: SELECT p.code FROM v_plan p WHERE p.category='หมวดวิชาศึกษาทั่วไป' AND p.year=1
+
+คำถาม: วิชาในหมวดวิชาเฉพาะที่มีชั่วโมงปฏิบัติมากกว่า 0 มีรหัสวิชาอะไรบ้าง
+SQL: SELECT c.code FROM course c JOIN plan_item p ON p.code=c.code WHERE p.category='หมวดวิชาเฉพาะ' AND c.lab_h>0
+
+คำถาม: วิชาแคลคูลัส 2 มีกี่หน่วยกิต
+SQL: SELECT credits FROM course WHERE name_th LIKE '%แคลคูลัส 2%'
+
+คำถาม: วิชาแคลคูลัส 2 ต้องเรียนวิชาอะไรมาก่อน
+SQL: SELECT requires FROM prerequisite WHERE code=(SELECT code FROM course WHERE name_th LIKE '%แคลคูลัส 2%') AND kind='pre'
+
+คำถาม: วิชาใดบ้างที่เป็นวิชาบังคับก่อนของวิชาอื่น
+SQL: SELECT DISTINCT requires FROM prerequisite WHERE kind='pre' AND requires IS NOT NULL
+
+คำถาม: ปี 1 เรียนรวมกี่หน่วยกิต
+SQL: SELECT SUM(credits) FROM v_semester_credits WHERE year=1
+
+คำถาม: ถ้าจะเรียนวิชา 06046406 ต้องผ่านวิชาอะไรมาก่อนทั้งหมด รวมทอด ๆ
+SQL: WITH RECURSIVE chain(x) AS (SELECT requires FROM prerequisite WHERE code='06046406' AND kind='pre' UNION SELECT p.requires FROM prerequisite p JOIN chain ON p.code=chain.x WHERE p.kind='pre') SELECT DISTINCT x FROM chain WHERE x IS NOT NULL
+
+คำถาม: วิชาเลือกที่เปิดให้เลือกมีทั้งหมดกี่วิชา
+SQL: SELECT COUNT(*) FROM elective_slot
+
+
 กติกา
 - เขียน SQL คำสั่งเดียว ขึ้นต้นด้วย SELECT หรือ WITH เท่านั้น
 - ห้ามใช้ INSERT UPDATE DELETE DROP หรือคำสั่งที่แก้ไขข้อมูล
@@ -3377,6 +4353,8 @@ SQL: SELECT SUM(credits) FROM plan_item WHERE type='เลือก'
   เพราะคำตอบต้องอ้างอิงเลขหน้าในเล่มหลักสูตรได้ — pages เก็บเป็นข้อความ JSON เช่น [23, 287]
   ห้ามเอาไปกรองหรือเทียบตัวเลขโดยตรง ให้เลือกมาเฉย ๆ
 - ตอบเป็น SQL ล้วน ไม่ต้องมีคำอธิบายและไม่ต้องมี markdown fence
+- ถ้าใช้ alias ต้องประกาศใน FROM ด้วย
+- ชั่วโมงบรรยาย/ปฏิบัติ (lecture_h/lab_h) อยู่ตาราง course ต้อง JOIN ด้วย code
 
 คำถาม: {question}
 SQL:"""
@@ -4751,6 +5729,165 @@ def cmd_selftest(args=None) -> bool:
        ("PDF_PAGE 13" in sliced13, "PDF_PAGE 14" in sliced13,
         "แผนการศึกษาที่ไม่เข้าโครงการสหกิจศึกษา" in sliced13),
        (True, False, True))
+
+    # ── ซ่อมหน่วยกิตรอบ v3: _is_total_row / fill_credits_from_header_cell / choice_names ──
+    ck("_is_total_row: 'รวม' เฉย ๆ + หน่วยกิตเป็นเลขยอด = แถวยอดรวม",
+       _is_total_row({"name_th": "รวม", "name_en": None, "credits": "12"}), True)
+    ck("_is_total_row: มีหน่วยกิตรูป n(a-b-c) = ไม่ใช่แถวยอดรวม",
+       _is_total_row({"name_th": "รวม", "name_en": None, "credits": "3(3-0-6)"}), False)
+    ck("_is_total_row: มี name_en = ไม่ใช่แถวยอดรวม",
+       _is_total_row({"name_th": "รวม", "name_en": "TOTAL", "credits": "12"}), False)
+    ck("_is_total_row: ชื่อที่แค่ขึ้นต้นด้วย 'รวม' = ไม่ใช่แถวยอดรวม",
+       _is_total_row({"name_th": "รวมพลังงาน", "name_en": None, "credits": "12"}), False)
+
+    def _hdr_md(n_vals, own_code_elsewhere=False):
+        vals = ["3 (3-0-6)", "3 (2-2-5)", "3 (2-2-5)"][:n_vals]
+        t = ('<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>มคอ. 2<br/>' + "<br/>".join(vals) + '</td></tr>'
+             '<tr><td>06026227</td><td>วิชาก</td><td></td></tr>'
+             '<tr><td>06026228</td><td>วิชาข</td><td></td></tr>'
+             '<tr><td>06026229</td><td>วิชาค</td><td></td></tr></table>')
+        if own_code_elsewhere:
+            t += '<table><tr><td>06026228</td><td>วิชาข</td><td>3(0-9-0)</td></tr></table>'
+        return t
+    hdr_courses = [{"code": c, "credits": None} for c in ("06026227", "06026228", "06026229")]
+    got_h, _, _ = fill_credits_from_header_cell(hdr_courses, _hdr_md(3))
+    ck("fill_credits_from_header_cell: จำนวนค่าหัวตาราง = จำนวนแถว -> จับคู่ตามลำดับ",
+       [r["credits"] for r in got_h], ["3(3-0-6)", "3(2-2-5)", "3(2-2-5)"])
+    got_h, _, _ = fill_credits_from_header_cell(hdr_courses, _hdr_md(2))
+    ck("fill_credits_from_header_cell: จำนวนไม่เท่ากัน (2 ค่า 3 แถว) -> ไม่แตะ",
+       [r["credits"] for r in got_h], [None, None, None])
+    got_h, _, _ = fill_credits_from_header_cell(hdr_courses, _hdr_md(3, own_code_elsewhere=True))
+    ck("fill_credits_from_header_cell: รหัสที่มีหน่วยกิตของตัวเองที่อื่นไม่ถูกเติม (ข้ามเฉพาะรหัสนั้น)",
+       [r["credits"] for r in got_h], ["3(3-0-6)", None, "3(2-2-5)"])
+    got_h, _, _ = fill_credits_from_header_cell(
+        [{"code": "06026227", "credits": "3(1-1-1)"}, {"code": "06026228", "credits": None},
+         {"code": "06026229", "credits": None}], _hdr_md(3))
+    ck("fill_credits_from_header_cell: แถวที่มีหน่วยกิตอยู่แล้วไม่ถูกทับ",
+       got_h[0]["credits"], "3(1-1-1)")
+
+    cn_md = ('<table>'
+             '<tr><td>060164xx</td><td>วิชาเลือกทางสารสนเทศ</td><td>3(3-0-6) หรือ 3(2-2-5)</td></tr>'
+             '<tr><td>060164xx</td><td>วิชาเลือกทางสารสนเทศ</td><td>3(0-9-0)</td></tr>'
+             '<tr><td>90642033</td><td>กฎหมายสำหรับคนรุ่นใหม่</td><td>3(3-0-6)</td></tr>'
+             '<tr><td>90642033</td><td>กฎหมายสำหรับคนรุ่นใหม่</td><td>3(3-0-6)</td></tr>'
+             '</table>')
+    got_c, _, _ = override_garbled_credits_by_printed_name(
+        [{"code": "060164xx", "name_th": "วิชาเลือกทางสารสนเทศ", "credits": "3(3-0-6) หรือ 3(2-2-5)"},
+         {"code": "90642033", "name_th": "กฎหมายสำหรับคนรุ่นใหม่", "credits": "3(0-9-0)<br/>3(3-0-6)"}],
+        cn_md)
+    ck("override_garbled: ช่องเลือกจริง ('หรือ' คั่นทุกช่วง) ไม่ถูกทับด้วยค่าเดี่ยวที่เลื่อนมา",
+       got_c[0]["credits"], "3(3-0-6) หรือ 3(2-2-5)")
+    ck("override_garbled: เซลล์ที่ยัดค่าหลายแถวติดกันยังถูกแก้เป็นค่าเดี่ยวที่เล่มพิมพ์ตรงกัน",
+       got_c[1]["credits"], "3(3-0-6)")
+
+    # ── split_merged_faculty_cells (IT coop หน้า 43: เซลล์รวม 2 รหัส + ตัวคั่น Faculty requirement) ──
+    mf_md = ("<!-- PDF_PAGE 43 -->\n<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต</td></tr>"
+             "<tr><td rowspan=\"2\">060164xx<br/>90643021</td><td>วิชาเลือกทางสารสนเทศ 1<br/>ELECTIVE IT 1<br/>"
+             "กลุ่มวิชาตามเกณฑ์ของคณะ (Faculty requirement)<br/>ผู้ประกอบการสมัยใหม่<br/>MODERN ENTREPRENEURS</td>"
+             "<td>3(0-9-0)</td></tr><tr><td>วิชาเลือก หมวดศึกษาทั่วไป 1<br/>ELECTIVE GE 1</td><td>3(3-0-6)</td></tr></table>\n"
+             "<!-- PDF_PAGE 44 -->\n<table><tr><td>รหัสวิชา</td><td>ชื่อวิชา</td><td>หน่วยกิต</td></tr>"
+             "<tr><td>9064xxxx</td><td>วิชาเลือก หมวดศึกษาทั่วไป 2<br/>ELECTIVE GE 2</td><td>3(3-0-6)</td></tr></table>\n")
+    def _mf_rows():
+        return [
+            {"code": "060164xx", "name_th": "วิชาเลือกทางสารสนเทศ 1 ผู้ประกอบการสมัยใหม่", "name_en": "x",
+             "credits": "3(0-9-0)", "year": 4, "semester": 1, "type": "เลือก", "source_page": 43},
+            {"code": "90643021", "name_th": "วิชาเลือกหมวดศึกษาทั่วไป 1", "name_en": "y", "credits": "3(3-0-6)",
+             "year": 4, "semester": 1, "type": "เลือก", "source_page": 43},
+            {"code": "9064xxxx", "name_th": "วิชาเลือกหมวดศึกษาทั่วไป 1", "name_en": "y", "credits": "3(3-0-6)",
+             "year": 4, "semester": 2, "type": "เลือก", "source_page": 44, "note": "อนุมานจากเลขลำดับที่ขาด"},
+            # แถวอ้างอิงจากหน้าอื่น: ชื่อเดียวกัน พิมพ์ค่าเดียว
+            {"code": "060164xx", "name_th": "วิชาเลือกทางสารสนเทศ 1", "name_en": "e",
+             "credits": "3(3-0-6) หรือ 3(2-2-5) หรือ 3(0-6-3)", "year": 3, "semester": 2, "source_page": 35},
+            {"code": "90643021", "name_th": "ผู้ประกอบการสมัยใหม่", "name_en": "MODERN ENTREPRENEURS",
+             "credits": "3(3-0-6)", "year": 4, "semester": 1, "type": "บังคับ", "category": "ศึกษาทั่วไป",
+             "source_page": 37},
+        ]
+    got_m, notes_m = split_merged_faculty_cells(_mf_rows(), mf_md)
+    ck("split_merged: ชื่อ 060164xx ถูกตัดชื่อ 90643021 ออก + หน่วยกิตใช้ค่าชื่อเดียวกันที่อื่น",
+       (got_m[0]["name_th"], got_m[0]["name_en"], got_m[0]["credits"]),
+       ("วิชาเลือกทางสารสนเทศ 1", "ELECTIVE IT 1", "3(3-0-6) หรือ 3(2-2-5) หรือ 3(0-6-3)"))
+    ck("split_merged: 90643021 ได้ชื่อ/ชนิดที่ถูก (ชนิดจากแถวชื่อเดียวกันที่อื่น)",
+       (got_m[1]["name_th"], got_m[1]["type"]), ("ผู้ประกอบการสมัยใหม่", "บังคับ"))
+    ck("split_merged: แถวที่ 3 ที่ถูกอนุมานไปภาคถัดไปถูกย้ายกลับ 4/1 หน้า 43",
+       (got_m[2]["year"], got_m[2]["semester"], got_m[2]["source_page"]), (4, 1, 43))
+    ck("split_merged: แถวหน้าอื่นไม่ถูกแตะ", (got_m[3], got_m[4]), (_mf_rows()[3], _mf_rows()[4]))
+    rows_nm = _mf_rows()
+    rows_nm[0]["name_th"] = "วิชาเลือกทางสารสนเทศ 1 ชื่ออื่นที่ไม่ตรงเซลล์"
+    got_nm, notes_nm = split_merged_faculty_cells(rows_nm, mf_md)
+    ck("split_merged: ชื่อที่ติดไม่ตรง 'ชื่อ 1 + ชื่อ 2' เป๊ะ = ไม่แตะอะไรเลย", (got_nm, notes_nm), (rows_nm, []))
+    rows_p44 = _mf_rows()
+    got_p, _ = split_merged_faculty_cells(rows_p44, mf_md.replace("ELECTIVE GE 2</td>", "ELECTIVE GE 2</td></tr><tr><td>วิชาเลือก หมวดศึกษาทั่วไป 1</td>"))
+    ck("split_merged: หน้าถัดไปมีชื่อแถวที่ 3 อยู่จริง = ไม่ย้ายภาคของแถวอนุมาน",
+       got_p[2]["semester"], 2)
+
+    # ── DSBA: fill_missing_name_en_from_raw_tables / vote_name_th_by_printed_majority ──
+    ne_md = ('<table><tr><td>90643021</td><td>ผู้ประกอบการสมัยใหม่ MODERN ENTREPRENEURS</td><td>3 (3-0-6)</td></tr></table>'
+             '<table><tr><td rowspan="2">90643021</td><td>กลุ่มวิชา*<br/>ผู้ประกอบการสมัยใหม่</td><td>3 (3-0-6)</td></tr>'
+             '<tr><td>MODERN ENTREPRENEURS</td><td></td></tr></table>'
+             '<table><tr><td>06026299</td><td>วิชาหนึ่ง ONE SUBJECT</td><td>3 (3-0-6)</td></tr>'
+             '<tr><td>06026298</td><td>วิชาสอง TWO SUBJECT</td><td>3 (3-0-6)</td></tr></table>'
+             '<table><tr><td>06026298</td><td>วิชาสอง TWO SUBJECTS</td><td>3 (3-0-6)</td></tr></table>')
+    got_ne, notes_ne = fill_missing_name_en_from_raw_tables(
+        [{"code": "90643021", "name_th": "ผู้ประกอบการสมัยใหม่", "name_en": None},
+         {"code": "06026299", "name_th": "วิชาหนึ่ง", "name_en": "KEEP ME"},
+         {"code": "06026298", "name_th": "วิชาสอง", "name_en": None}], ne_md)
+    ck("fill_missing_name_en: ช่องเดียวคั่นด้วยช่องว่าง + แถวต่อเนื่อง rowspan ให้ค่าเดียวกัน -> เติม",
+       got_ne[0]["name_en"], "MODERN ENTREPRENEURS")
+    ck("fill_missing_name_en: แถวที่มี name_en อยู่แล้วไม่ถูกทับ", got_ne[1]["name_en"], "KEEP ME")
+    ck("fill_missing_name_en: เล่มพิมพ์ 2 แบบ (SUBJECT/SUBJECTS) = ไม่เดา ไม่เติม", got_ne[2]["name_en"], None)
+
+    vt_rows = [{"code": "90644042", "name_th": "การสื่อสารและการนำเสนออย่างมืออาชีพ"},
+               {"code": "90644042", "name_th": "การสื่อสารและการนำเสนอออย่างมืออาชีพ"},
+               {"code": "06026257", "name_th": "ชื่อแบบก"}, {"code": "06026257", "name_th": "ชื่อแบบข"}]
+    vt_md = ("<td>90644042</td><td>การสื่อสารและการนำเสนออย่างมืออาชีพ</td> 90644042 การสื่อสารและการนำเสนออย่างมืออาชีพ "
+             "90644042 การสื่อสารและการนำเสนอออย่างมืออาชีพ <td>06026257</td><td>ชื่อแบบก</td> 06026257 ชื่อแบบข")
+    got_vt, notes_vt = vote_name_th_by_printed_majority(vt_rows, vt_md)
+    ck("vote_name_th: สะกดที่ปรากฏมากกว่า (2 vs 1) ชนะ แถวที่สะกดผิดถูกแก้",
+       [r["name_th"] for r in got_vt[:2]], ["การสื่อสารและการนำเสนออย่างมืออาชีพ"] * 2)
+    ck("vote_name_th: เสมอ (1 vs 1) = ไม่แตะ", [r["name_th"] for r in got_vt[2:]], ["ชื่อแบบก", "ชื่อแบบข"])
+    ck("vote_name_th: มี note เฉพาะแถวที่เปลี่ยน", len(notes_vt), 1)
+
+    # ── GENED: strip_credit_digit_from_name_en / restore_name_th_spacing_from_book / repair_names_unsplit ──
+    gn_md = ('<table><tr><td>*90641009</td><td>ทักษะการสื่อสาร 1<br/>INTERCULTURAL SKILLS IN ENGLISH 1</td><td>3 (3-0-6)</td></tr>'
+             '<tr><td>90643001</td><td>ปฏิบัติงาน 1<br/>PRACTICE UNDER MANAGEMENT SKILLS 1</td><td>1 (0-2-1)</td></tr>'
+             '<tr><td>90643039</td><td colspan="2">นวัตกรรม สจล. 3 (3-0-6)</td></tr></table>\n'
+             '90641004 โครงงานกลุ่ม 1 TEAM-PROJECT 1 1 (0-2-1)\n'
+             '90641007 พลเมืองดิจิทัล DIGITAL CITIZEN 3 (3-0-6)\n'
+             '90641009 ทักษะการสื่อสาร 1 INTERCULTURAL SKILLS IN ENGLISH 3 (3-0-6)\n'
+             '90643001 ปฏิบัติงาน 1 PRACTICE UNDER MANAGEMENT SKILLS 1 1 (0-2-1)\n'
+             '90643039 นวัตกรรม สจล. 3 (3-0-6)\n'
+             '90644044 พูดได้ พูดดี 3 (3-0-6)\n90644044 พูดได้พูดดี 3 (3-0-6)\n'
+             '90644099 คำสองแบบ 3 (3-0-6)\n90644099 คำ สองแบบ 3 (3-0-6)\n')
+    gn_rows = [
+        {"code": "90641004", "name_th": "โครงงานกลุ่ม 1", "name_en": "TEAM-PROJECT 1 1", "credits": "1(0-2-1)"},
+        {"code": "90641007", "name_th": "พลเมืองดิจิทัล", "name_en": "DIGITAL CITIZEN 3", "credits": "3(3-0-6)"},
+        {"code": "90641009", "name_th": "ทักษะการสื่อสาร 1", "name_en": "INTERCULTURAL SKILLS IN ENGLISH 3", "credits": "3(3-0-6)"},
+        {"code": "90643001", "name_th": "ปฏิบัติงาน 1", "name_en": "PRACTICE UNDER MANAGEMENT SKILLS 1", "credits": "1(0-2-1)"},
+        {"code": "90643039", "name_th": "นวัตกรรมสจล.", "name_en": "KMITL INNOVATION", "credits": "3(3-0-6)"},
+        {"code": "90644044", "name_th": "พูดได้พูดดี", "name_en": "BEST SPEECH", "credits": "3(3-0-6)"},
+        {"code": "90644099", "name_th": "คำสอง แบบ", "name_en": "TWO FORMS 2", "credits": "3(3-0-6)"},
+    ]
+    got_gn, notes_gn = strip_credit_digit_from_name_en(gn_rows, gn_md)
+    ck("strip_credit_digit: 'TEAM-PROJECT 1 1' (หน่วยกิต 1 ซ้ำท้ายชื่อ) -> 'TEAM-PROJECT 1'",
+       got_gn[0]["name_en"], "TEAM-PROJECT 1")
+    ck("strip_credit_digit: 'DIGITAL CITIZEN 3' -> 'DIGITAL CITIZEN'", got_gn[1]["name_en"], "DIGITAL CITIZEN")
+    ck("strip_credit_digit: <table> พิมพ์ชื่อ+เลขลำดับ -> ใช้ชื่อในตาราง ('...ENGLISH 3' -> '...ENGLISH 1')",
+       got_gn[2]["name_en"], "INTERCULTURAL SKILLS IN ENGLISH 1")
+    ck("strip_credit_digit: ชื่อที่ลงท้ายเลขจริงและพิมพ์เป็นชื่อเดี่ยวในเล่ม ไม่ถูกแตะ",
+       got_gn[3]["name_en"], "PRACTICE UNDER MANAGEMENT SKILLS 1")
+    ck("strip_credit_digit: เลขท้ายไม่ตรงหน่วยกิต/เล่มไม่พิมพ์ติดหน่วยกิต ไม่ถูกแตะ",
+       got_gn[6]["name_en"], "TWO FORMS 2")
+    ck("strip_credit_digit: note เฉพาะแถวที่เปลี่ยน (3 แถว)", len(notes_gn), 3)
+    got_sp, notes_sp = restore_name_th_spacing_from_book(gn_rows, gn_md)
+    ck("restore_name_th_spacing: เล่มพิมพ์แบบเดียว (colspan) -> คืนช่องว่าง", got_sp[4]["name_th"], "นวัตกรรม สจล.")
+    ck("restore_name_th_spacing: เล่มพิมพ์ 2 แบบ (มี/ไม่มีช่องว่าง) -> ไม่แตะ", got_sp[5]["name_th"], "พูดได้พูดดี")
+    ck("restore_name_th_spacing: เล่มพิมพ์ 2 แบบที่ไม่ตรงค่าเดิม -> ไม่แตะ แต่เตือน",
+       (got_sp[6]["name_th"], sum("ไม่แก้" in n for n in notes_sp)), ("คำสอง แบบ", 1))
+    ck("restore_name_th_spacing: ชื่อที่ถูกต้องอยู่แล้วไม่ถูกแตะ", got_sp[3]["name_th"], "ปฏิบัติงาน 1")
+    ck("repair_names_unsplit: โปรแกรมนอกเซ็ต (AIT) ไม่ถูกแตะ", repair_names_unsplit(gn_rows, "AIT", gn_md)[0], gn_rows)
+    ck("repair_names_unsplit: GENED รวมสองกฎ",
+       (lambda r: (r[4]["name_th"], r[0]["name_en"]))(repair_names_unsplit(gn_rows, "GENED", gn_md)[0]),
+       ("นวัตกรรม สจล.", "TEAM-PROJECT 1"))
 
     conn.close()
     db.unlink(missing_ok=True)

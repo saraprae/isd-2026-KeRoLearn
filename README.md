@@ -15,11 +15,12 @@ DSBA8 – LLM Course (isd-2026-KeRoLearn)
 
 เล่มหลักสูตรของมหาวิทยาลัยเป็นไฟล์ PDF ยาวหลายสิบหน้า การหาคำตอบอย่าง "วิชานี้กี่หน่วยกิต" หรือ "เทอม 2 ปี 1 ต้องเรียนอะไรบ้าง" ต้องเปิดอ่านเอง
 
-โปรเจกต์นี้ทำให้ถามเป็นภาษาไทยได้เลย:
+โปรเจกต์นี้ทำให้ถามเป็นภาษาไทยได้เลย (ตัวอย่างจริงที่รันบนเครื่องนี้ กับฐาน `work/lab8b_run/IT/nocoop/curriculum.db`):
 
 ```
-คำถาม:  <TODO: ใส่ตัวอย่างคำถามจริง เช่น "วิชา ... กี่หน่วยกิต">
-คำตอบ:  <TODO: ใส่ผลลัพธ์จริงที่ระบบตอบ พร้อมเลขหน้าอ้างอิง>
+คำถาม: หลักสูตรนี้มีทั้งหมดกี่หน่วยกิต
+SQL:    SELECT total_credits FROM program
+คำตอบ: 129
 ```
 
 ถ้าในเล่มไม่มีข้อมูลนั้น ระบบจะตอบว่า **"ไม่พบข้อมูลนี้ในเล่มหลักสูตร"** แทนการเดา
@@ -52,13 +53,26 @@ DSBA8 – LLM Course (isd-2026-KeRoLearn)
 
 ทำตามลำดับตั้งแต่ 2.1 ถึง 2.6 ทุกคำสั่งพิมพ์ใน Terminal (Windows: PowerShell, macOS/Linux: Terminal, หรือ Terminal ใน VS Code ผ่านเมนู `Terminal > New Terminal`)
 
+### 2.0 เปิดคอมใหม่ทุกครั้ง ต้องทำอะไรบ้าง (เช็กลิสต์)
+
+ติดตั้งครั้งแรกทำ 2.1–2.6 ให้ครบก่อน หลังจากนั้นทุกครั้งที่ปิดคอมแล้วเปิดใหม่ แค่ 4 ขั้นนี้:
+
+1. เปิด Terminal ในโฟลเดอร์โปรเจกต์ (root ที่มีไฟล์ `run_lab8b.py` กับ `requirements.txt`)
+2. เปิด venv ใหม่ (ดู 2.3 — สร้างแค่ครั้งแรก แต่ **activate ใหม่ทุกครั้ง**) แล้วเช็กว่าเห็น `(venv)` นำหน้า
+3. เปิด Ollama ค้างไว้ แล้วรัน `ollama list` ต้องเห็น `qwen3:4b` กับ `scb10x/typhoon-ocr1.5-3b` (ดู 2.5)
+4. เลือกทางใดทางหนึ่ง:
+   - ถามเลยจากผลเดิม → หัวข้อ 3 (ไม่ต้องมี PDF)
+   - รันใหม่ตั้งแต่ PDF → หัวข้อ 4 (ต้องมี PDF ใน `data/input/`, ดู 2.6)
+
+> Windows: ถ้าโปรแกรมพิมพ์ภาษาไทยแล้ว error เรื่อง encoding (เช่นตอนรัน `--help`) ให้รัน `$env:PYTHONUTF8=1` ใน Terminal นั้นก่อน แล้วรันคำสั่งใหม่
+
 ### 2.1 ตรวจว่ามี Python 3.12
 
 ```bash
 python --version
 ```
 
-- ควรขึ้น `Python 3.12.x`
+- ควรขึ้น `Python 3.12.x` (เครื่องนี้ใช้ `Python 3.12.8`)
 - ถ้า Windows ขึ้น error ให้ลอง `py --version`
 - ถ้า macOS/Linux ขึ้น error ให้ลอง `python3 --version`
 - ถ้ายังไม่มี ให้ติดตั้งจาก https://www.python.org/downloads/ (Windows: ติ๊ก **Add python.exe to PATH** ตอนติดตั้ง) แล้วเปิด Terminal ใหม่
@@ -127,21 +141,17 @@ pip install -r requirements.txt
 
 - ชื่อไฟล์ที่ถูกต้องคือ **`requirements.txt`** (มีตัว s ท้าย requirements)
 - `-r` แปลว่า "อ่านรายชื่อ package จากไฟล์นี้" ใช้เวลาสักครู่ เพราะต้องดาวน์โหลดหลายตัว
-- flow หลักใช้เฉพาะ `pymupdf`, `pillow`, `requests`, `pydantic>=2` ส่วนที่เหลือใน `requirements.txt` เป็นของ lab อื่น แต่ติดตั้งไว้ก็ไม่เป็นไร
-
-(ไม่บังคับ) ติดตั้ง `pythainlp` เพื่อให้ค่า WER ภาษาไทยแม่นขึ้น ถ้าไม่ติดตั้ง ระบบจะตัดคำด้วยช่องว่าง ซึ่งหยาบมากสำหรับภาษาไทย:
-
-```bash
-pip install pythainlp
-```
+- ในไฟล์มีครบทุกขั้นแล้ว: ของขั้น OCR (`pymupdf`, `pillow`, `pdfplumber`, `numpy`, `opencv-python`, `pytesseract`), ของขั้นวัดผลภาษาไทย (`pythainlp` ใช้ตัดคำแบบ newmm ให้ค่า WER แม่นขึ้น), และของขั้นฐานข้อมูล/ถามตอบ (`requests`, `pydantic>=2`) — ติดตั้งรอบเดียวใช้ได้ทุกขั้น ไม่ต้องติดตั้งอะไรเพิ่ม
 
 **วิธีเช็กว่าติดตั้งสำเร็จ:**
 
 ```bash
-python -c "import fitz, PIL, requests, pydantic; print('OK', pydantic.VERSION)"
+python -c "import fitz, PIL, requests, pydantic, pdfplumber, pythainlp, numpy, cv2, pytesseract; print('OK', pydantic.VERSION)"
 ```
 
 ควรขึ้น `OK 2.x.x` (เลขต้นต้องเป็น 2 ขึ้นไป)
+
+**โปรแกรม Tesseract OCR (ไม่บังคับ):** จำเป็นเฉพาะ pipeline baseline เปรียบเทียบ ขั้นหลัก (`-p vlm`) ไม่ใช้ ถ้าไม่มีเครื่องจะข้าม baseline ไปเอง เครื่องนี้มี `tesseract v5.5.3` อยู่แล้ว
 
 **ถ้าติดตั้งไม่ผ่าน**
 - `pip is not recognized` / `pip: command not found` → ใช้ `python -m pip install -r requirements.txt` แทน
@@ -164,7 +174,9 @@ ollama pull scb10x/typhoon-ocr1.5-3b        # โมเดล OCR (จำเป�
 ollama list
 ```
 
-ควรเห็นทั้ง `qwen3:4b` และ `scb10x/typhoon-ocr1.5-3b` (ไฟล์โมเดลมีขนาดหลาย GB ควรเชื่อมเน็ตให้เสถียร)
+ควรเห็นทั้ง `qwen3:4b` และ `scb10x/typhoon-ocr1.5-3b` (ไฟล์โมเดลมีขนาดหลาย GB ควรเชื่อมเน็ตให้เสถียร — เครื่องนี้มีขนาด 2.5 GB กับ 3.2 GB ตามลำดับ)
+
+ถ้าคำสั่ง `ollama` ต่อไม่ติด (connection refused) แปลว่าโปรแกรม Ollama ยังไม่เปิด: เปิดโปรแกรม Ollama (หรือรัน `ollama serve` ในอีกหน้าต่างหนึ่ง) ค้างไว้ก่อน แล้วรัน `ollama list` ใหม่
 
 ตัวแปรสภาพแวดล้อม (ตั้งเฉพาะเมื่อ Ollama ไม่ได้อยู่ที่ค่าเริ่มต้น):
 - `OLLAMA_HOST` — ฝั่ง 7B บังคับให้เป็น localhost เท่านั้น (ทำงานออฟไลน์)
@@ -180,6 +192,8 @@ data/input/
   IT_2560.pdf  DSBA_2560.pdf  BIT_2560.pdf  GENED_2559.pdf  GENED_2564.pdf
 ```
 
+ไฟล์ PDF **ไม่ได้อยู่ใน repo** (ถูก ignore ไว้ใน `.gitignore` ด้วยกฎ `data/input/*.pdf`) เช็กของจริงบนเครื่องด้วย `dir data\input` (Windows) หรือ `ls data/input` (macOS/Linux) — รอบไหนไม่มี PDF รอบนั้นจะถูกข้ามและนับเป็นล้มเหลวในสรุปท้าย (ดูหัวข้อ 4)
+
 ไฟล์เฉลย (ไม่บังคับ) อยู่ใน `data/ground_truth/` แล้ว เช่น `IT_academic_plan_no_coop.json`
 
 > ถ้าแค่อยากลองถามตอบ ไม่ต้องทำข้อ 2.6 ไปที่หัวข้อ 3 ได้เลย
@@ -188,13 +202,21 @@ data/input/
 
 ## 3. ลองถามคำถาม (ใช้ผลที่รันไว้แล้ว ไม่ต้อง OCR ใหม่)
 
-ใน repo มีผลที่รันเสร็จแล้วใน `work/` ทำ 2.1–2.5 แล้ว เปิด Ollama ค้างไว้ และ activate venv แล้ว ก็ลองถามได้ทันที:
+โฟลเดอร์ `work/` **ไม่อยู่ใน repo** เป็นผลที่สร้างบนเครื่องตอนรันตามหัวข้อ 4 (บนเครื่องนี้มีอยู่แล้วเพราะรันไว้ก่อน) ถ้าโคลนใหม่แล้ว `work/` ยังว่าง ให้ทำหัวข้อ 4 ก่อน แล้วค่อยกลับมาข้อนี้
+
+เมื่อมี `work/` แล้ว (ทำ 2.1–2.5 เปิด Ollama ค้างไว้ และ activate venv แล้ว) ก็ลองถามได้ทันทีโดยไม่ต้อง OCR ใหม่:
 
 ```bash
 python src/ocr_system/lab8b_curriculum_db.py ask -d work/lab8b_run/IT/nocoop/curriculum.db -q "<คำถามภาษาไทย>"
 ```
 
-ตัวอย่างคำถามที่ควรลอง: `<TODO: ใส่คำถามที่รู้ว่าได้ผลดี>`
+ตัวอย่างที่รันได้จริงบนเครื่องนี้:
+
+```bash
+python src/ocr_system/lab8b_curriculum_db.py ask -d work/lab8b_run/IT/nocoop/curriculum.db -q "หลักสูตรนี้มีทั้งหมดกี่หน่วยกิต"
+```
+
+> Windows: ถ้าข้อความไทยแสดงผลเพี้ยนหรือ error เรื่อง encoding ให้รัน `$env:PYTHONUTF8=1` ก่อน แล้วรันคำสั่งใหม่
 
 ระบบจะสร้างคำสั่ง SQL แบบอ่านอย่างเดียว แล้วสรุปคำตอบพร้อมเลขหน้าอ้างอิงจากแถวที่ค้นเจอจริง ถ้าไม่พบแถวใดจะตอบว่า **"ไม่พบข้อมูลนี้ในเล่มหลักสูตร"** โดยไม่ให้โมเดลเดาคำตอบ
 
@@ -234,6 +256,25 @@ python run_lab8b.py --all-runs --gt-dir data/ground_truth
 | `--dry-run` | แสดงคำสั่งโดยไม่รันจริง |
 
 OCR ทำทีละหน้าด้วยโมเดลในเครื่อง จึงใช้เวลานาน (ดูตารางเวลาในหัวข้อ 6) แนะนำให้ลองหลักสูตรเดียวก่อน
+
+### ลองกับเล่มเวอร์ชันอื่นโดยทำเฉลยเอง
+
+เฉลยมีไว้เทียบคะแนนเท่านั้น — **ไม่มีเฉลยก็รันได้** ขั้น 7B จะข้ามการเทียบเฉลย ขั้น 8B จะข้าม eval-gt แต่ยังได้ DB, verify และถามตอบตามปกติ ถ้าจะทำเฉลยเองสำหรับเล่มเวอร์ชันอื่น:
+
+1. สร้างไฟล์ JSON ใน `data/ground_truth/` ตั้งชื่อตามโปรแกรม เช่น `IT_academic_plan_coop.json` กับ `IT_academic_plan_no_coop.json` (โปรแกรมแผนเดียว เช่น AIT ใช้ `AIT_academic_plan.json`) — โปรแกรมจับคู่จากต้นชื่อไฟล์เอง ไม่สนตัวพิมพ์เล็ก-ใหญ่
+2. โครงไฟล์ (ตัวอย่าง 1 วิชา ค่า `plan` ใช้ `coop` / `no_coop`):
+```json
+{
+  "program": "IT",
+  "plan": "coop",
+  "courses": [
+    {"code": "06016401", "name_th": "...", "name_en": "...",
+     "credits": "3(3-0-6)", "year": "1", "semester": "1",
+     "category": "หมวดวิชาเฉพาะ", "type": "บังคับ", "prerequisite": "ไม่มี"}
+  ]
+}
+```
+3. รันตามปกติพร้อม `--gt-dir data/ground_truth` — ขั้น 7B จะรวมเฉลย coop+nocoop ให้ตอนเทียบ ส่วนขั้น 8B จะแยกเทียบทีละแผนให้เอง
 
 ### ภายในการรันทำอะไรบ้าง
 
@@ -344,6 +385,7 @@ time python run_lab8b.py --run IT --gt-dir data/ground_truth
 | ขึ้นว่า model not found | ยังไม่ได้ `ollama pull` | รันคำสั่ง pull ตามหัวข้อ 2.5 |
 | Ollama อยู่คนละที่กับค่าเริ่มต้น | — | ตั้ง `LAB8_OLLAMA_URL` (ฝั่ง 8B) หรือ `OLLAMA_HOST` (ฝั่ง 7B ต้องเป็น localhost เท่านั้น) |
 | รอบหนึ่งถูกนับว่าล้มเหลวทันที | ไม่มี PDF ใน `data/input/` | วางไฟล์ให้ชื่อตรงกับ run_id |
+| รัน `--help` แล้ว error เรื่อง encoding (Windows) | Terminal ใช้ cp1252 อ่านข้อความไทยใน help ไม่ได้ | รัน `$env:PYTHONUTF8=1` ก่อน แล้วรันคำสั่งใหม่ |
 | PowerShell activate venv ไม่ได้ (policy error) | ติดนโยบายการรันสคริปต์ | รัน `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` แล้วลองใหม่ |
 | `ModuleNotFoundError` ทั้งที่ติดตั้งแล้ว | ลืม activate venv (ต้อง activate ใหม่ทุกครั้งที่เปิด Terminal ใหม่) | ทำตาม 2.3 แล้วรันใหม่ |
 | ผลดูเหมือนของเก่า | มี `pred_vlm.json` ค้างจากรอบก่อน | ลบโฟลเดอร์ `work/lab7b_run/<run_id>/` แล้วรันใหม่ |
@@ -366,12 +408,13 @@ time python run_lab8b.py --run IT --gt-dir data/ground_truth
 
 ```
 run_lab8b.py                     จุดเริ่มต้น: รันทั้งสองขั้นต่อเนื่อง
+requirements.txt                 package ทั้งหมด (ติดตั้งครั้งเดียวด้วย pip install -r)
 src/ocr_system/
     lab7b_curriculum.py          ขั้น 7B: PDF → OCR → ข้อมูลหลักสูตร
     lab8b_curriculum_db.py       ขั้น 8B: ข้อมูล → SQLite → ตรวจสอบ → ถามตอบ
-data/input/                      วาง PDF เอง (ไม่อยู่ใน repo)
+src/lab7_metrics.py              ตัววัดผลเทียบเฉลย (Precision/Recall/F1, CER, WER)
+src/ocr_system/utils/            ฟังก์ชันช่วย (io ฯลฯ)
+data/input/                      วาง PDF เอง (ไม่อยู่ใน repo, ถูก ignore)
 data/ground_truth/               ไฟล์เฉลย
-work/                            ผลที่รันไว้แล้ว
+work/                            ผลที่รัน (lab7b_run/, lab8b_run/)
 ```
-
-<!-- TODO: ปรับรายการไฟล์ให้ตรงกับ repo จริง -->

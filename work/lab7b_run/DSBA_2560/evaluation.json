@@ -1,0 +1,303 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 86,
+        "cer": 0.011628,
+        "wer": null,
+        "exact_match_acc": 0.988372,
+        "n_sub": 0,
+        "n_del": 8,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 688,
+        "error_samples": [
+          {
+            "key": "06026129 [ตกแถว]",
+            "gt": "06026129",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 86,
+        "cer": 0.02242,
+        "wer": 0.031785,
+        "exact_match_acc": 0.965116,
+        "n_sub": 0,
+        "n_del": 53,
+        "n_ins": 5,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2587,
+        "error_samples": [
+          {
+            "key": "06026126",
+            "gt": "การบริหารเชิงกลยุทธ์และสมรรถนะของธุรกิจ",
+            "pred": "การบริหารเชิงกลยุทธ์และสมรรถะของธุรกิจ"
+          },
+          {
+            "key": "060261xx",
+            "gt": "วิชาเลือกทางวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ 2",
+            "pred": "วิชาเลือกทางพิเศษวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ 2"
+          },
+          {
+            "key": "06026129 [ตกแถว]",
+            "gt": "ฝึกวิชาชีพทางวิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ",
+            "pred": ""
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 86,
+        "cer": 0.020607,
+        "wer": 0.021448,
+        "exact_match_acc": 0.976744,
+        "n_sub": 0,
+        "n_del": 53,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2572,
+        "error_samples": [
+          {
+            "key": "06026140",
+            "gt": "COMPUTER SIMULATION AND MODELLING",
+            "pred": "COMPUTER SIMULATION AND MODELING"
+          },
+          {
+            "key": "06026129 [ตกแถว]",
+            "gt": "DATA SCIENCE AND BUSINESS ANALYTICS PROFESSIONAL PRACTICES",
+            "pred": ""
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 86,
+        "cer": 0.04039,
+        "wer": null,
+        "exact_match_acc": 0.872093,
+        "n_sub": 20,
+        "n_del": 9,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 718,
+        "error_samples": [
+          {
+            "key": "06026122",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "06026130",
+            "gt": "6(0-35-0)",
+            "pred": "6(0-36-0)"
+          },
+          {
+            "key": "06026131",
+            "gt": "6(0-35-0)",
+            "pred": "6(0-36-0)"
+          },
+          {
+            "key": "06026159",
+            "gt": "3(3-0-6)",
+            "pred": "3(2-2-5)"
+          },
+          {
+            "key": "06026160",
+            "gt": "3(3-0-6)",
+            "pred": "3(2-2-5)"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 86,
+        "cer": 0.005495,
+        "wer": null,
+        "exact_match_acc": 0.988372,
+        "n_sub": 0,
+        "n_del": 1,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 182,
+        "error_samples": [
+          {
+            "key": "06026129 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 86,
+        "cer": 0.05602,
+        "wer": null,
+        "exact_match_acc": 0.918605,
+        "n_sub": 24,
+        "n_del": 43,
+        "n_ins": 0,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1196,
+        "error_samples": [
+          {
+            "key": "90101xxx",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "90xxxxxx",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "xxxxxxxx",
+            "gt": "หมวดวิชาเลือกเสรี",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "xxxxxxxx",
+            "gt": "หมวดวิชาเลือกเสรี",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "90xxxxxx",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 86,
+        "cer": 0.03617,
+        "wer": null,
+        "exact_match_acc": 0.965116,
+        "n_sub": 10,
+        "n_del": 5,
+        "n_ins": 2,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 470,
+        "error_samples": [
+          {
+            "key": "06026130",
+            "gt": "เลือก",
+            "pred": "บังคับ"
+          },
+          {
+            "key": "06026131",
+            "gt": "เลือก",
+            "pred": "บังคับ"
+          },
+          {
+            "key": "06026129 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 85,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 485,
+        "error_samples": []
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 85,
+        "cer": 1.139442,
+        "wer": null,
+        "exact_match_acc": 0.564706,
+        "n_sub": 0,
+        "n_del": 6,
+        "n_ins": 280,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 251,
+        "error_samples": [
+          {
+            "key": "06026132",
+            "gt": "3/2, 4/1",
+            "pred": "1/1, 3/2, 4/1, 4/2"
+          },
+          {
+            "key": "06026133",
+            "gt": "3/2, 4/1",
+            "pred": "1/1, 3/2, 4/1, 4/2"
+          },
+          {
+            "key": "06026134",
+            "gt": "3/2, 4/1",
+            "pred": "1/1, 3/2, 4/1, 4/2"
+          },
+          {
+            "key": "06026135",
+            "gt": "3/2, 4/1",
+            "pred": "1/1, 3/2, 4/1, 4/2"
+          },
+          {
+            "key": "06026136",
+            "gt": "3/2, 4/1",
+            "pred": "1/1, 3/2, 4/1, 4/2"
+          }
+        ]
+      }
+    },
+    "overall_micro_cer": 0.056728,
+    "alignment": {
+      "matched": 85,
+      "missed": 1,
+      "spurious": 0,
+      "precision": 1.0,
+      "recall": 0.9884,
+      "f1": 0.9942,
+      "gt_total": 86,
+      "pred_total": 85,
+      "missed_codes": [
+        "06026129"
+      ],
+      "spurious_codes": []
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 85,
+      "n_duplicate_keys": 0,
+      "credits_by_term": {
+        "1/1": 18,
+        "1/2": 18,
+        "2/1": 19,
+        "2/2": 19,
+        "3/1": 18,
+        "3/2": 16,
+        "3/3": 3,
+        "4/1": 15,
+        "4/2": 18
+      },
+      "total_credits_fixed_terms": 144,
+      "issues": [
+        "06026130: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06026131: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "ภาค 3/3 มีแค่ 3 หน่วยกิต — น่าจะอ่านตกวิชา"
+      ]
+    }
+  }
+}

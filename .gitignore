@@ -2,18 +2,9 @@ data/input/*.pdf
 venv/
 __pycache__/
 *.pyc
-probe_stream.py
-probe.py
-program_meta.json
-splice_intermediate_md.py
-handoff.md
-work/lab8b_run/page29_retry
-work/lab8b_run/page35_retry
-work/lab8b_run/page255_retry
-work/lab7b_run/BIT_patch
-eval_gt.json
 *.env
-temp.md
-chk1_diag.py
-find_rows.py
-handoff_new.md
+lab8b_curriculum_db.py
+# # work/: เก็บเฉพาะชุดคำถาม eval อย่างอื่นทิ้งหมด
+# work/**
+# !work/**/
+# !work/**/gold_questions.json

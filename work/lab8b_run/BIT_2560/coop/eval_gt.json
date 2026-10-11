@@ -1,0 +1,285 @@
+{
+  "n_gt_courses": 61,
+  "n_pred_courses": 58,
+  "per_field": {
+    "code": {
+      "tp": 58,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9508,
+      "f1": 0.9748
+    },
+    "name_th": {
+      "tp": 54,
+      "fp": 4,
+      "fn": 7,
+      "precision": 0.931,
+      "recall": 0.8852,
+      "f1": 0.9076
+    },
+    "name_en": {
+      "tp": 55,
+      "fp": 3,
+      "fn": 6,
+      "precision": 0.9483,
+      "recall": 0.9016,
+      "f1": 0.9244
+    },
+    "credits": {
+      "tp": 58,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9508,
+      "f1": 0.9748
+    },
+    "year": {
+      "tp": 41,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9762,
+      "f1": 0.988
+    },
+    "semester": {
+      "tp": 41,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9762,
+      "f1": 0.988
+    },
+    "category": {
+      "tp": 48,
+      "fp": 10,
+      "fn": 13,
+      "precision": 0.8276,
+      "recall": 0.7869,
+      "f1": 0.8067
+    },
+    "type": {
+      "tp": 58,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.9508,
+      "f1": 0.9748
+    },
+    "prerequisite": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.8571,
+      "f1": 0.9231
+    }
+  },
+  "micro": {
+    "tp": 419,
+    "fp": 17,
+    "fn": 38,
+    "precision": 0.961,
+    "recall": 0.9168,
+    "f1": 0.9384
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "06036020",
+        "gt": "06036020",
+        "pred": null
+      },
+      {
+        "code": "06036019",
+        "gt": "06036019",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "PLACEHOLDER_XXXXXXXX_2",
+        "pred": null
+      }
+    ],
+    "name_th": [
+      {
+        "code": "06036083",
+        "gt": "การพัฒนาทักษะการอ่านและการเขียนภาษาอังกฤษ",
+        "pred": "การพัฒนาทักษะการอ่านและเขียนภาษาอังกฤษ"
+      },
+      {
+        "code": "06036018",
+        "gt": "สื่อสังคม และเครือข่ายสังคม",
+        "pred": "สื่อสังคมและเครือข่ายสังคม"
+      },
+      {
+        "code": "06036020",
+        "gt": "โครงงาน 2",
+        "pred": null
+      },
+      {
+        "code": "06036019",
+        "gt": "โครงงาน 1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "วิชาเลือกเสรี 2",
+        "pred": null
+      },
+      {
+        "code": "06036016",
+        "gt": "ธุรกิจอัจฉริยะ และข้อมูลขนาดใหญ่",
+        "pred": "ธุรกิจอัจฉริยะและข้อมูลขนาดใหญ่"
+      },
+      {
+        "code": "06036038",
+        "gt": "การบริหารสมรรถะของธุรกิจ",
+        "pred": "การบริหารสมรรถนะของธุรกิจ"
+      }
+    ],
+    "name_en": [
+      {
+        "code": "06036083",
+        "gt": "DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH",
+        "pred": "DEVELOPMENT OF READING AND WRITING SKILL IN ENGLISH"
+      },
+      {
+        "code": "06036020",
+        "gt": "PROJECT 2",
+        "pred": null
+      },
+      {
+        "code": "06036030",
+        "gt": "ADVANCE DATABASE SYSTEMS",
+        "pred": "ADVANCED DATABASE SYSTEMS"
+      },
+      {
+        "code": "06036019",
+        "gt": "PROJECT 1",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "FREE ELECTIVE COURSE 2",
+        "pred": null
+      },
+      {
+        "code": "06036016",
+        "gt": "BUSINESS INTELLIGENCE & BIG DATA",
+        "pred": "BUSINESS INTELLIGENCE AND BIG DATA"
+      }
+    ],
+    "credits": [
+      {
+        "code": "06036020",
+        "gt": "3(0-9-0)",
+        "pred": null
+      },
+      {
+        "code": "06036019",
+        "gt": "3(0-9-0)",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "3(3-0-6)",
+        "pred": null
+      }
+    ],
+    "year": [
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": 4,
+        "pred": null
+      }
+    ],
+    "semester": [
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": 2,
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "06036085",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036086",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036088",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036083",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036081",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "06036020",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "06036019",
+        "gt": "หมวดวิชาเฉพาะ",
+        "pred": null
+      },
+      {
+        "code": "06036087",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "หมวดวิชาเลือกเสรี",
+        "pred": null
+      },
+      {
+        "code": "06036089",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": "หมวดวิชาเฉพาะ"
+      }
+    ],
+    "type": [
+      {
+        "code": "06036020",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "06036019",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "PLACEHOLDER_XXXXXXXX_2",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ],
+    "prerequisite": [
+      {
+        "code": "06036020",
+        "gt": "06036019",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "BIT_2560_academic_plan_coop.json"
+  ]
+}

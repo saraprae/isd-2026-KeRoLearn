@@ -1,0 +1,295 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 67,
+        "cer": 0.029851,
+        "wer": null,
+        "exact_match_acc": 0.970149,
+        "n_sub": 0,
+        "n_del": 16,
+        "n_ins": 0,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 536,
+        "error_samples": [
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "06036019",
+            "pred": ""
+          },
+          {
+            "key": "06036020 [ตกแถว]",
+            "gt": "06036020",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 67,
+        "cer": 0.024433,
+        "wer": 0.045455,
+        "exact_match_acc": 0.925373,
+        "n_sub": 11,
+        "n_del": 19,
+        "n_ins": 12,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1719,
+        "error_samples": [
+          {
+            "key": "06036083",
+            "gt": "การพัฒนาทักษะการอ่านและการเขียนภาษาอังกฤษ",
+            "pred": "การพัฒนาทักษะการอ่านและเขียนภาษาอังกฤษ"
+          },
+          {
+            "key": "xxxxxxxx",
+            "gt": "วิชาเลือกเสรี 1",
+            "pred": "หลักปรัชญาแห่งวิทยาศาสตร์"
+          },
+          {
+            "key": "06036038",
+            "gt": "การบริหารสมรรถะของธุรกิจ",
+            "pred": "การบริหารสมรรถนะของธุรกิจ"
+          },
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "โครงงาน 1",
+            "pred": ""
+          },
+          {
+            "key": "06036020 [ตกแถว]",
+            "gt": "โครงงาน 2",
+            "pred": ""
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 67,
+        "cer": 0.022248,
+        "wer": 0.045455,
+        "exact_match_acc": 0.910448,
+        "n_sub": 17,
+        "n_del": 18,
+        "n_ins": 4,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1753,
+        "error_samples": [
+          {
+            "key": "06036016",
+            "gt": "BUSINESS INTELLIGENCE & BIG DATA",
+            "pred": "BUSINESS INTELLIGENCE AND BIG DATA"
+          },
+          {
+            "key": "06036030",
+            "gt": "ADVANCE DATABASE SYSTEMS",
+            "pred": "ADVANCED DATABASE SYSTEMS"
+          },
+          {
+            "key": "06036083",
+            "gt": "DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH",
+            "pred": "DEVELOPMENT OF READING AND WRITING SKILL IN ENGLISH"
+          },
+          {
+            "key": "xxxxxxxx",
+            "gt": "FREE ELECTIVE COURSE 1",
+            "pred": "PHILOSOPHY OF SCIENCE"
+          },
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "PROJECT 1",
+            "pred": ""
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 67,
+        "cer": 0.028369,
+        "wer": null,
+        "exact_match_acc": 0.970149,
+        "n_sub": 0,
+        "n_del": 16,
+        "n_ins": 0,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 564,
+        "error_samples": [
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "3(0-9-0)",
+            "pred": ""
+          },
+          {
+            "key": "06036020 [ตกแถว]",
+            "gt": "3(0-9-0)",
+            "pred": ""
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 67,
+        "cer": 0.012579,
+        "wer": null,
+        "exact_match_acc": 0.970149,
+        "n_sub": 0,
+        "n_del": 2,
+        "n_ins": 0,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 159,
+        "error_samples": [
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "06036020 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 67,
+        "cer": 0.161222,
+        "wer": null,
+        "exact_match_acc": 0.791045,
+        "n_sub": 44,
+        "n_del": 109,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 949,
+        "error_samples": [
+          {
+            "key": "06036081",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "06036085",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "06036082",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "06036084",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          },
+          {
+            "key": "06036090",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": "หมวดวิชาเฉพาะ"
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 67,
+        "cer": 0.026596,
+        "wer": null,
+        "exact_match_acc": 0.970149,
+        "n_sub": 0,
+        "n_del": 10,
+        "n_ins": 0,
+        "n_missing": 2,
+        "n_hallucinated": 0,
+        "n_ref_chars": 376,
+        "error_samples": [
+          {
+            "key": "06036019 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "06036020 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 65,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 346,
+        "error_samples": []
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 65,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 119,
+        "error_samples": []
+      }
+    },
+    "overall_micro_cer": 0.042631,
+    "alignment": {
+      "matched": 65,
+      "missed": 2,
+      "spurious": 2,
+      "precision": 0.9701,
+      "recall": 0.9701,
+      "f1": 0.9701,
+      "gt_total": 67,
+      "pred_total": 67,
+      "missed_codes": [
+        "06036019",
+        "06036020"
+      ],
+      "spurious_codes": [
+        "xxxxxxxx",
+        "xxxxxxxx"
+      ]
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 67,
+      "n_duplicate_keys": 1,
+      "credits_by_term": {
+        "1/1": 18,
+        "1/2": 18,
+        "2/1": 18,
+        "2/2": 18,
+        "3/1": 18,
+        "3/2": 18,
+        "4/1": 15,
+        "4/2": 12
+      },
+      "total_credits_fixed_terms": 135,
+      "issues": [
+        "06036036: prerequisite 90401013 ไม่มีอยู่ในรายการวิชา --> อาจอ่านรหัสผิด หรืออ่านตกวิชานั้น",
+        "06036046: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06036047: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester"
+      ]
+    }
+  }
+}

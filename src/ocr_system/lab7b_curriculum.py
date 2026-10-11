@@ -1102,6 +1102,8 @@ CATEGORY_BY_CODE_PREFIX: tuple[tuple[str, str], ...] = (
 
 
 def _clean_cell(raw: str) -> str:
+    # <figure>…</figure> = คำบรรยายรูปที่ VLM แปะมาในเซลล์ ต้องลบทั้งก้อนก่อนตัดแท็ก ไม่งั้นข้อความบรรยายค้างติดรหัสวิชา
+    raw = re.sub(r"<figure>.*?</figure>", "", raw, flags=re.DOTALL | re.IGNORECASE)
     s = re.sub(r"<br\s*/?>", "\n", raw, flags=re.IGNORECASE)
     s = re.sub(r"<[^>]+>", "", s)
     s = _html.unescape(s).replace("\u00a0", " ")
@@ -1391,6 +1393,143 @@ _LEAD_CODE_RE = re.compile(r"^\s*([0-9xX]{8})(?:\s+(.*))?$", re.DOTALL)
 _TOTAL_LINE_RE = re.compile(r"^รวม\s*(\d+)\s*$")
 
 
+_ELEC_NAME_RE = re.compile(
+    r"^วิชาเลือกกลุ่ม\s*(?P<label>[^A-Za-z0-9]*?)\s*(?P<n>\d+)?\s*(?:[A-Za-z].*)?$")
+_REAL_CODE_RE = re.compile(r"^\d{8}$")
+
+def _repair_misaligned_elective_rows(grid, state):
+    """ซ่อมตารางที่ VLM ทำ rowspan ของรหัสเลื่อน (เจอจริง: DSBA coop 3/2 หน้า 35)
+    state = {"n": เลขช่องวิชาเลือกกลุ่มล่าสุดของแผนนี้} ส่งต่อข้ามตาราง"""
+    rows = [(i, c, f) for i, (c, f) in enumerate(grid)
+            if len(c) >= 3 and not c[0].startswith(("รหัส", "รวม"))]
+    def first_line(c): return c[1].split("\n")[0].strip()
+    elec = [(i, c, f) for i, c, f in rows if _ELEC_NAME_RE.match(first_line(c))]
+    if not elec:
+        return grid
+    # 1) เลขลำดับช่อง: ถ้ามีเลขในชื่ออยู่แล้ว แค่จำค่าสูงสุดไว้ ไม่แตะ
+    nums = [int(m.group("n")) for _, c, _ in elec
+            if (m := _ELEC_NAME_RE.match(first_line(c))) and m.group("n")]
+    if nums:
+        state["n"] = max(state.get("n", 0), max(nums))
+        return grid
+    # ชื่อไม่มีเลข -> ใส่เลขตามรอบ: ชื่อกลุ่มเดิมโผล่ซ้ำ = เริ่มช่องใหม่
+    n = state.get("n", 0) + 1
+    seen: set[str] = set()
+    out = [(list(c), list(f)) for c, f in grid]
+    for i, c, _ in elec:
+        label = _ELEC_NAME_RE.match(first_line(c)).group("label").strip()
+        if label in seen:
+            n += 1
+            seen = set()
+        seen.add(label)
+        lines = out[i][0][1].split("\n")
+        lines[0] = f"{lines[0].strip()} {n}"
+        out[i][0][1] = "\n".join(lines)
+        # 2) แถวชื่อ 'วิชาเลือกกลุ่ม…' ต้องใช้รหัส wildcard เสมอ — ถ้าได้รหัสจริง 8 หลัก แสดงว่า rowspan เลื่อน
+        if _REAL_CODE_RE.match(out[i][0][0].strip()):
+            out[i][0][0] = "06026xxx"
+    state["n"] = n
+    # 3) รหัสจริงที่ถูกแย่งไปใส่แถววิชาเลือก ต้องคืนให้แถว 'วิชาจริง' ที่ตามหลัง (เรียงตามลำดับ)
+    first_bad = next((i for i, c, _ in elec if _REAL_CODE_RE.match(c[0].strip())), None)
+    if first_bad is not None:
+        seq: list[str] = []
+        for i, c, _ in rows:
+            if i >= first_bad and _REAL_CODE_RE.match(c[0].strip()) and c[0].strip() not in seq:
+                seq.append(c[0].strip())
+        real_rows = [i for i, c, _ in rows if i > first_bad and i not in {e[0] for e in elec}
+                     and c[1].strip()]
+        if len(seq) == len(real_rows):
+            for i, code in zip(real_rows, seq):
+                out[i][0][0] = code
+                out[i][1][0] = False          # รหัสนี้เป็นของแถวนี้เอง ไม่ใช่รหัสที่สืบมาจาก rowspan
+    return [(c, f) for c, f in out]
+
+
+_FACULTY_ROW_RE = re.compile(
+    r"<td[^>]*>\s*(\d{8})\s*</td>\s*<td[^>]*>\s*กลุ่มวิชาที่กำหนดโดยคณะ\*?\s*(.*?)\s*</td>", re.S)
+
+
+def _thai_key(text: str) -> str:
+    t = re.split(r"[A-Za-z]", text.replace("กลุ่มวิชาที่กำหนดโดยคณะ*", ""))[0]
+    return re.sub(r"\s+", "", t)
+
+
+def _faculty_group_codes(pages) -> dict[str, str]:
+    """ชื่อไทย -> รหัสจริงของวิชา 'กลุ่มวิชาที่กำหนดโดยคณะ*' จากทุกหน้าที่ OCR ได้รหัสครบ"""
+    out: dict[str, str] = {}
+    for _, text in pages:
+        for m in _FACULTY_ROW_RE.finditer(text):
+            k = _thai_key(re.sub(r"<[^>]+>", " ", m.group(2)))
+            if k:
+                out.setdefault(k, m.group(1))
+    return out
+
+
+def _fix_faculty_group_rows(grid, faculty_codes):
+    """แถวที่ VLM ทำเซลล์รหัสหาย: ชื่อ 'กลุ่มวิชาที่กำหนดโดยคณะ* …' ไปอยู่ใต้รหัส wildcard ของแถวบน
+    (เจอจริง: DSBA nocoop 3/1 หน้า 27 -> 90644042 กลายเป็น 9064xxxx) คืนรหัสจริงจากแถวชื่อเดียวกัน
+    ที่หน้าอื่นอ่านรหัสได้ ถ้าไม่มีให้คงเดิม"""
+    import difflib
+    out = []
+    for cells, inh in grid:
+        if (len(cells) >= 3 and re.search(r"[xX]", cells[0]) and
+                cells[1].strip().startswith("กลุ่มวิชาที่กำหนดโดยคณะ")):
+            k = _thai_key(cells[1].split("\n")[0])
+            best = max(faculty_codes, key=lambda n: difflib.SequenceMatcher(None, n, k).ratio(),
+                       default=None)
+            if best and difflib.SequenceMatcher(None, best, k).ratio() >= 0.9:
+                cells = [faculty_codes[best]] + list(cells[1:])
+                inh = [False] + list(inh[1:])
+        out.append((cells, inh))
+    return out
+
+
+def _drop_duplicate_ocr_rows(grid):
+    """ลบแถวที่ VLM พิมพ์วิชาเดิมซ้ำ (เจอจริง: DSBA coop 3/1 หน้า 34, 90644042 ซ้ำ)
+    เงื่อนไข (ต้องครบทุกข้อ): รหัสสืบมาจาก rowspan + รหัสเท่าแถวก่อนหน้า + หน่วยกิตสตริงเดียวกัน
+    + ชื่อไทยบรรทัดแรกแทบเหมือนกัน (>=0.97 หลังตัดคำนำ 'วิชา'/'การ') + ตัวเลขในชื่อเท่ากัน
+    วิชาเลือกที่ต่างกันแค่เลขท้าย (เลือกเสรี 1/2) หรือทางเลือกสหกิจในประเทศ/ต่างประเทศ จึงไม่โดนลบ"""
+    import difflib
+    def thai(c):
+        t = c[1].split("\n")[0].replace("กลุ่มวิชาที่กำหนดโดยคณะ*", "").replace(" ", "")
+        t = re.split(r"[A-Za-z]", t)[0]
+        for p in ("วิชา", "การ"):
+            if t.startswith(p):
+                t = t[len(p):]
+        return t
+    def digits(c): return re.findall(r"\d+", c[1].split("\n")[0])
+    out = []
+    for cells, inh in grid:
+        if (out and len(cells) >= 3 and inh and inh[0] and cells[2].strip()
+                and not cells[0].startswith(("รหัส", "รวม"))):
+            pc, _ = out[-1]
+            if (len(pc) >= 3 and pc[0].strip() == cells[0].strip()
+                    and pc[2].strip() == cells[2].strip()
+                    and digits(pc) == digits(cells)
+                    and difflib.SequenceMatcher(None, thai(pc), thai(cells)).ratio() >= 0.97):
+                continue
+        # แถวว่างที่เกิดจาก rowspan ของเซลล์ชื่อ (รหัสและชื่อสืบมาจากแถวบนทั้งคู่ ไม่มีหน่วยกิต) = สำเนาแถวบน
+        if (out and len(cells) >= 3 and len(inh) >= 2 and inh[1]
+                and not (cells[2] or "").strip()
+                and not cells[0].startswith(("รหัส", "รวม"))):
+            pc, _ = out[-1]
+            if len(pc) >= 3 and pc[0].strip() == cells[0].strip() and pc[1].strip() == cells[1].strip():
+                continue
+        # แถวต่อของหน่วยกิต "3(3-0-6) หรือ" / "3(2-2-5)" ของวิชาเลือกหมวดทั่วไปตัวเดียว ที่ VLM เขียนชื่อซ้ำเพี้ยน
+        # (เจอจริง: DSBA nocoop 3/1 ชื่อแถวสองกลายเป็น 'วิชาเลือกหมวดวิชาสังคมศาสตร์…') -> รวมหน่วยกิตเข้าแถวบน
+        if (out and len(cells) >= 3 and inh and inh[0]
+                and not cells[0].startswith(("รหัส", "รวม"))
+                and _CREDIT_ONLY_RE.match(cells[2] or "")):
+            pc, pi = out[-1]
+            if (len(pc) >= 3 and pc[0].strip() == cells[0].strip()
+                    and pc[2].rstrip().endswith("หรือ")
+                    and pc[1].startswith("วิชาเลือกหมวดวิชา") and cells[1].startswith("วิชาเลือกหมวดวิชา")):
+                out[-1] = ([pc[0], pc[1], pc[2].rstrip() + " " + cells[2].strip()], pi)
+                continue
+        out.append((cells, inh))
+    return out
+
+
 def _normalize_plan_rows(grid: list[tuple[list[str], list[bool]]]
                          ) -> list[tuple[list[str], list[bool]]]:
     """
@@ -1478,6 +1617,8 @@ def parse_plan_tables(pages: list[tuple[int, str]]
     plan: str | None = None                  # "nocoop" / "coop" (ค้างข้ามหน้า จนกว่าจะเจอหัวข้อแผนใหม่)
     term_texts: dict[tuple, str] = defaultdict(str)
     term_cells: dict[tuple, list[tuple[str, str]]] = defaultdict(list)   # (ช่องชื่อ, ช่องหน่วยกิต) รายแถวของตาราง
+    _fac_codes = _faculty_group_codes(pages)
+    _elec_state: dict[str, dict] = {}        # แผน -> {"n": เลขช่องวิชาเลือกกลุ่มล่าสุด} ใช้ซ่อมตารางที่ rowspan เลื่อน
 
     for pg, text in pages:
         # ⚠ ตาราง "<table>" ที่เปิดแล้วไม่ปิด (</table> ขาด) มักเกิดตอน OCR ถูกตัดกลางคัน
@@ -1504,17 +1645,23 @@ def parse_plan_tables(pages: list[tuple[int, str]]
                 continue
 
             grid = _normalize_plan_rows(_table_grid(m.group("table")))
+            grid = _repair_misaligned_elective_rows(grid, _elec_state.setdefault(str(plan), {}))
+            grid = _fix_faculty_group_rows(grid, _fac_codes)
+            grid = _drop_duplicate_ocr_rows(grid)
             # VLM บางครั้งใส่หัวข้อ "ปีที่ N ภาคการศึกษาที่ M" ไว้ใน <th> ของตารางเอง (ไม่ใช่ข้อความก่อนตาราง)
             # จนตารางแรกของแผนไม่รู้ปี/ภาคแล้วถูกข้ามทั้งตาราง (เจอจริง: BIT ปี 1 ภาค 1 ของแผนแรก)
+            # ⚠ แถว header เองอาจมีทั้ง "รหัสวิชา" และหัวข้อภาค ในแถวเดียว (เจอจริง: DSBA หน้า 23 รอบ OCR ใหม่
+            #   <tr><td>รหัสวิชา</td><th colspan="2">ปีที่ 1 ภาคการศึกษาที่ 1</th></tr>) จึงต้องเช็กหัวข้อภาคก่อน
+            #   แล้วค่อยหยุดที่แถว header — ไม่งั้นทั้งภาค 1/1 ถูกข้ามและหน่วยกิตรวมขาดไป 18
             for r_cells, _ in grid:
-                if any("รหัส" in c for c in r_cells):
-                    break
                 hm2 = _TERM_HEAD_RE.search(" ".join(r_cells).translate(_THAI_DIGITS))
                 if hm2:
                     year = int(hm2.group(1))
                     sem = 3 if hm2.group(2) == "ฤดูร้อน" else int(hm2.group(2))
                     seen_terms.add((year, sem))
                     seq += 1
+                    break
+                if any("รหัส" in c for c in r_cells):
                     break
             header = next((r for r, _ in grid if any("รหัส" in c for c in r)), None)
 
