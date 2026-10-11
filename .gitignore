@@ -1,10 +1,70 @@
-data/input/*.pdf
-venv/
-__pycache__/
-*.pyc
+# Local configuration; example templates may be versioned.
+.env
+.env.*
 *.env
-lab8b_curriculum_db.py
-# # work/: เก็บเฉพาะชุดคำถาม eval อย่างอื่นทิ้งหมด
-# work/**
-# !work/**/
-# !work/**/gold_questions.json
+!*.env.example
+!.env.example
+!.env.sample
+
+# Input documents and PDFs: provision locally, not in Git.
+/data/input/
+/lab10_fastapi/documents/*.pdf
+
+# Installed dependencies and virtual environments.
+venv/
+.venv/
+node_modules/
+
+# Python bytecode and tooling caches.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Runtime logs and generated test results.
+*.log
+*.log.*
+/work/lab10_*.jsonl*
+/lab10_fastapi/test_results/
+/lab11(frontend)/test_results/
+
+# Temporary SQLite sidecars; keep curriculum.db itself.
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# Local editor and operating-system files.
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Unused standalone copy at the repository root; keep src/ocr_system/ tracked.
+/lab8b_curriculum_db.py
+
+# Keep application code, compiled static assets, intent_classifier.json,
+# work/lab8b_run/**/curriculum.db and work/lab7b_run/ source exports in Git.
+
+# Existing branch diagnostic exclusions.
+probe_stream.py
+probe.py
+program_meta.json
+splice_intermediate_md.py
+handoff.md
+work/lab8b_run/page29_retry
+work/lab8b_run/page35_retry
+work/lab8b_run/page255_retry
+work/lab7b_run/BIT_patch
+eval_gt.json
+temp.md
+chk1_diag.py
+find_rows.py
+handoff_new.md

@@ -345,7 +345,7 @@ def main() -> None:
         "PYTHONUTF8": "1",
         "LAB7_CHUNK": "1",
         "LAB7B_NUM_CTX": "8192",
-        "LAB7B_NUM_PREDICT": "2000",
+        "LAB7B_NUM_PREDICT": "4096",
         "LAB7B_OCR_NUM_CTX": "8192",
         "LAB7B_OCR_NUM_PREDICT": "3000",
     })
