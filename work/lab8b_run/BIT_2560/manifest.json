@@ -1,0 +1,46 @@
+{
+  "program": "BIT_2560",
+  "source": "C:\\Users\\khims\\Music\\isd-2026-KeRoLearn-kim1\\work\\lab7b_run\\BIT_2560\\pred_vlm.json",
+  "source_md": "C:\\Users\\khims\\Music\\isd-2026-KeRoLearn-kim1\\work\\lab7b_run\\BIT_2560\\intermediate_vlm.md",
+  "split_by_plan": true,
+  "split_stats": {
+    "rows": 67,
+    "only_one_plan": 11,
+    "in_both_plans": 38,
+    "unclassified_kept_in_both": 18,
+    "no_page_info": 0,
+    "forced_shared": 0
+  },
+  "warnings": [
+    "06036086: เติมข้อมูลจริงจากหน้า 26 ให้แถวสังเคราะห์ (เดิมชื่อกลุ่มซ้ำ) ที่หน้า 30",
+    "XXXXXXXX: เติมข้อมูลจริงจากหน้า 26 ให้แถวสังเคราะห์ (เดิมชื่อกลุ่มซ้ำ) ที่หน้า 30",
+    "XXXXXXXX: เติมข้อมูลจริงจากหน้า 26 ให้แถวสังเคราะห์ (เดิมชื่อกลุ่มซ้ำ) ที่หน้า 30",
+    "XXXXXXXX: เติมข้อมูลจริงจากหน้า 26 ให้แถวสังเคราะห์ (เดิมชื่อกลุ่มซ้ำ) ที่หน้า 30"
+  ],
+  "programs": [
+    {
+      "program_id": "BIT_2560_nocoop",
+      "section": "nocoop",
+      "dir": "nocoop",
+      "curriculum": "nocoop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 61,
+      "courses": 61,
+      "plan_items": 42,
+      "elective_slots": 19,
+      "courses_with_source_page": 61
+    },
+    {
+      "program_id": "BIT_2560_coop",
+      "section": "coop",
+      "dir": "coop",
+      "curriculum": "coop\\curriculum.json",
+      "status": "ok",
+      "source_courses": 62,
+      "courses": 58,
+      "plan_items": 41,
+      "elective_slots": 19,
+      "courses_with_source_page": 60
+    }
+  ]
+}

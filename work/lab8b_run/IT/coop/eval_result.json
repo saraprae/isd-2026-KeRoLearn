@@ -1,0 +1,663 @@
+[
+  {
+    "level": "ง่าย",
+    "question": "วิชารหัส 06016405 ชื่อวิชาว่าอะไร",
+    "expect": {
+      "type": "value",
+      "value": "พื้นฐานความมั่นคงปลอดภัยไซเบอร์"
+    },
+    "sql": "SELECT name_th, pages FROM course WHERE code='06016405' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_th, pages FROM course WHERE code='06016405'\" }",
+    "answer_model_output": null,
+    "answer": "พื้นฐานความมั่นคงปลอดภัยไซเบอร์ (อ้างอิงหน้า 41, 325, 326)",
+    "source_pages": [
+      41,
+      325,
+      326
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 1.1
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชากีฬาและนันทนาการมีกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "1"
+    },
+    "sql": "SELECT credits FROM course WHERE name_th LIKE '%กีฬาและนันทนาการ%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM course WHERE name_th LIKE '%กีฬาและนันทนาการ%'\" }",
+    "answer_model_output": null,
+    "answer": "1",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชาโรงเรียนสร้างเสน่ห์มีชั่วโมงปฏิบัติกี่ชั่วโมง",
+    "expect": {
+      "type": "value",
+      "value": "2"
+    },
+    "sql": "SELECT lab_h, pages FROM course WHERE name_th LIKE '%โรงเรียนสร้างเสน่ห์%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT lab_h, pages FROM course WHERE name_th LIKE '%โรงเรียนสร้างเสน่ห์%'\"}",
+    "answer_model_output": null,
+    "answer": "2 (อ้างอิงหน้า 21, 38)",
+    "source_pages": [
+      21,
+      38
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชาโครงงาน 1 มีชั่วโมงปฏิบัติกี่ชั่วโมง",
+    "expect": {
+      "type": "value",
+      "value": "9"
+    },
+    "sql": "SELECT lab_h, pages FROM course WHERE name_th LIKE '%โครงงาน 1%' AND code IN (SELECT code FROM v_real_course) LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT lab_h, pages FROM course WHERE name_th LIKE '%โครงงาน 1%' AND code IN (SELECT code FROM v_real_course)\"}",
+    "answer_model_output": null,
+    "answer": "9 (อ้างอิงหน้า 43, 326)",
+    "source_pages": [
+      43,
+      326
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.8
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชาสหกิจศึกษาต่างประเทศมีชื่อภาษาอังกฤษว่าอะไร",
+    "expect": {
+      "type": "value",
+      "value": "OVERSEA COOPERATIVE EDUCATION"
+    },
+    "sql": "SELECT name_en FROM course WHERE name_th LIKE '%สหกิจศึกษาต่างประเทศ%' AND code NOT LIKE '060262%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT name_en FROM course WHERE name_th LIKE '%สหกิจศึกษาต่างประเทศ%' AND code NOT LIKE '060262%'\"}",
+    "answer_model_output": null,
+    "answer": "OVERSEA COOPERATIVE EDUCATION",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.9
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชาปัญญาประดิษฐ์ลงทะเบียนเรียนได้ในภาคเรียนไหนบ้าง",
+    "expect": {
+      "type": "value",
+      "value": "3/2, 4/1"
+    },
+    "sql": "SELECT terms FROM v_course_terms WHERE name_th LIKE '%ปัญญาประดิษฐ์%' AND terms IS NOT NULL LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT terms FROM v_course_terms WHERE name_th LIKE '%ปัญญาประดิษฐ์%' AND terms IS NOT NULL\"}",
+    "answer_model_output": null,
+    "answer": "3/2, 4/1",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
+  },
+  {
+    "level": "ง่าย",
+    "question": "ปีที่ 2 ภาคเรียนที่ 1 มีวิชาอะไรบ้าง (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016403",
+        "06016409",
+        "06016413",
+        "06066000",
+        "06066300",
+        "06066304"
+      ]
+    },
+    "sql": "SELECT code, pages FROM v_plan WHERE year=2 AND semester=1 LIMIT 200",
+    "n_rows": 6,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code, pages FROM v_plan WHERE year=2 AND semester=1\"}",
+    "answer_model_output": null,
+    "answer": "06016403, 06016409, 06016413, 06066000, 06066300, 06066304 (อ้างอิงหน้า 24, 25, 29, 40, 324, 325, 327, 328, 329, 356, 357, 358, 359, 360)",
+    "source_pages": [
+      24,
+      25,
+      29,
+      40,
+      324,
+      325,
+      327,
+      328,
+      329,
+      356,
+      357,
+      358,
+      359,
+      360
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.5
+  },
+  {
+    "level": "ง่าย",
+    "question": "หลักสูตรนี้ใช้เวลาเรียนตามแผนกี่ปี",
+    "expect": {
+      "type": "value",
+      "value": "4"
+    },
+    "sql": "SELECT years FROM program LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT years FROM program\"}",
+    "answer_model_output": null,
+    "answer": "4",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.4
+  },
+  {
+    "level": "ง่าย",
+    "question": "ก่อนจะลงเรียนวิชาโครงงาน 2 ต้องผ่านวิชาอะไรมาก่อน (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "value",
+      "value": "06016406"
+    },
+    "sql": "SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%โครงงาน %' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%โครงงาน 2%'\" }",
+    "answer_model_output": null,
+    "answer": "06016407",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": false,
+    "why": "ไม่พบค่า 06016406 (ได้ ['06016407'])",
+    "seconds": 0.7
+  },
+  {
+    "level": "ง่าย",
+    "question": "วิชา 06016416 จัดอยู่ในหมวดวิชาอะไร",
+    "expect": {
+      "type": "value",
+      "value": "หมวดวิชาเฉพาะ"
+    },
+    "sql": "SELECT DISTINCT category, type FROM v_plan WHERE code='06016416' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT category, type FROM v_plan WHERE code='06016416'\" }",
+    "answer_model_output": "{\"answer\": \"หมวดวิชาเฉพาะ\", \"source_pages\": []}",
+    "answer": "หมวดวิชาเฉพาะ",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 9.3
+  },
+  {
+    "level": "กลาง",
+    "question": "วิชาบังคับในหมวดวิชาศึกษาทั่วไปมีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "90641001",
+        "90641002",
+        "90641003",
+        "90642033",
+        "90643021",
+        "90644007",
+        "90644008",
+        "90644042"
+      ]
+    },
+    "sql": "SELECT code, pages FROM v_plan WHERE category='หมวดวิชาศึกษาทั่วไป' AND type='บังคับ' LIMIT 200",
+    "n_rows": 8,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code, pages FROM v_plan WHERE category='หมวดวิชาศึกษาทั่วไป' AND type='บังคับ'\" }",
+    "answer_model_output": null,
+    "answer": "90641001, 90641003, 90644007, 90641002, 90644008, 90643021, 90642033, 90644042 (อ้างอิงหน้า 21, 22, 23, 38, 39, 43, 44)",
+    "source_pages": [
+      21,
+      22,
+      23,
+      38,
+      39,
+      43,
+      44
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 11.0
+  },
+  {
+    "level": "กลาง",
+    "question": "ปี 4 เทอม 2 ต้องลงเรียนรวมกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "15"
+    },
+    "sql": "SELECT credits FROM v_semester_credits WHERE year=4 AND semester=2 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=4 AND semester=2\"}",
+    "answer_model_output": null,
+    "answer": "15",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.5
+  },
+  {
+    "level": "กลาง",
+    "question": "นักศึกษาเรียนครบปี 3 จะได้หน่วยกิตรวมเท่าไร",
+    "expect": {
+      "type": "value",
+      "value": "24"
+    },
+    "sql": "SELECT credits FROM v_year_credits WHERE year=3 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_year_credits WHERE year=3\"}",
+    "answer_model_output": null,
+    "answer": "24",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.4
+  },
+  {
+    "level": "กลาง",
+    "question": "วิชาไหนบ้างที่ต้องเรียนระบบเครือข่ายเบื้องต้นมาก่อน (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016419",
+        "06016420",
+        "06016421",
+        "06016422",
+        "06016423"
+      ]
+    },
+    "sql": "SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%ระบบเครือข่ายเบื้องต้น%' LIMIT 200",
+    "n_rows": 5,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%ระบบเครือข่ายเบื้องต้น%'\" }",
+    "answer_model_output": null,
+    "answer": "06016419, 06016420, 06016421, 06016422, 06016423",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.7
+  },
+  {
+    "level": "กลาง",
+    "question": "แนวคิดระบบฐานข้อมูลเป็นวิชาที่ต้องเรียนก่อนของวิชาใดบ้าง (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016457",
+        "06016458"
+      ]
+    },
+    "sql": "SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%แนวคิดระบบฐานข้อมูล%' LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT unlocks_code FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%แนวคิดระบบฐานข้อมูล%'\" }",
+    "answer_model_output": null,
+    "answer": "06016457, 06016458",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.7
+  },
+  {
+    "level": "กลาง",
+    "question": "วิชาในแผนปี 3 วิชาใดบ้างที่ไม่มีชั่วโมงบรรยาย (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016481",
+        "06016482"
+      ]
+    },
+    "sql": "SELECT code, pages FROM v_plan WHERE year=3 AND lecture_h=0 LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code, pages FROM v_plan WHERE year=3 AND lecture_h=0\"}",
+    "answer_model_output": null,
+    "answer": "06016481, 06016482 (อ้างอิงหน้า 42, 43, 356)",
+    "source_pages": [
+      42,
+      43,
+      356
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.5
+  },
+  {
+    "level": "กลาง",
+    "question": "วิชาโครงสร้างข้อมูลและอัลกอริทึมมีชั่วโมงศึกษาด้วยตนเองกี่ชั่วโมง",
+    "expect": {
+      "type": "value",
+      "value": "5"
+    },
+    "sql": "SELECT self_h, pages FROM course WHERE name_th LIKE '%โครงสร้างข้อมูลและอัลกอริทึม%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT self_h, pages FROM course WHERE name_th LIKE '%โครงสร้างข้อมูลและอัลกอริทึม%'\" }",
+    "answer_model_output": null,
+    "answer": "5 (อ้างอิงหน้า 39, 359)",
+    "source_pages": [
+      39,
+      359
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.8
+  },
+  {
+    "level": "กลาง",
+    "question": "มีวิชาเลือกกี่วิชาที่ลงทะเบียนได้ในปี 3 เทอม 2",
+    "expect": {
+      "type": "value",
+      "value": "53"
+    },
+    "sql": "SELECT COUNT(DISTINCT code) FROM elective_slot WHERE allowed_terms LIKE '%3/2%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(DISTINCT code) FROM elective_slot WHERE allowed_terms LIKE '%3/2%'\"}",
+    "answer_model_output": null,
+    "answer": "53",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "กลาง",
+    "question": "หมวดวิชาเลือกเสรีต้องเรียนรวมกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "6"
+    },
+    "sql": "SELECT SUM(credits) FROM v_category_credits WHERE category='หมวดวิชาเลือกเสรี' AND type='เลือก' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM v_category_credits WHERE category='หมวดวิชาเลือกเสรี' AND type='เลือก'\" }",
+    "answer_model_output": null,
+    "answer": "6",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
+  },
+  {
+    "level": "กลาง",
+    "question": "วิชาเลือกในหมวดวิชาศึกษาทั่วไปรวมกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "9"
+    },
+    "sql": "SELECT SUM(credits) FROM v_category_credits WHERE category='หมวดวิชาศึกษาทั่วไป' AND type='เลือก' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM v_category_credits WHERE category='หมวดวิชาศึกษาทั่วไป' AND type='เลือก'\" }",
+    "answer_model_output": null,
+    "answer": "9",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
+  },
+  {
+    "level": "ยาก",
+    "question": "ปี 3 เทอม 2 เรียนรวมกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "6"
+    },
+    "sql": "SELECT credits FROM v_semester_credits WHERE year=3 AND semester=2 LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM v_semester_credits WHERE year=3 AND semester=2\"}",
+    "answer_model_output": null,
+    "answer": "6",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.5
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาบังคับทุกหมวดรวมกันกี่หน่วยกิต",
+    "expect": {
+      "type": "value",
+      "value": "111"
+    },
+    "sql": "SELECT SUM(credits) FROM v_category_credits WHERE type='บังคับ' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT SUM(credits) FROM v_category_credits WHERE type='บังคับ'\" }",
+    "answer_model_output": null,
+    "answer": "111",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "ยาก",
+    "question": "หมวดวิชาใดมีหน่วยกิตรวมมากที่สุดในหลักสูตร",
+    "expect": {
+      "type": "value",
+      "value": "หมวดวิชาเฉพาะ"
+    },
+    "sql": "SELECT category FROM v_category_credits WHERE type='บังคับ' ORDER BY credits DESC LIMIT 1",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT category FROM v_category_credits WHERE type='บังคับ' ORDER BY credits DESC LIMIT 1\"}",
+    "answer_model_output": null,
+    "answer": "หมวดวิชาเฉพาะ",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาใดเป็นวิชาที่ต้องเรียนก่อนของวิชาอื่นมากที่สุด (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "value",
+      "value": "06016413"
+    },
+    "sql": "SELECT code FROM v_prereq_stats ORDER BY n_unlocks DESC LIMIT 1",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM v_prereq_stats ORDER BY n_unlocks DESC LIMIT 1\"}",
+    "answer_model_output": null,
+    "answer": "06016413",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.5
+  },
+  {
+    "level": "ยาก",
+    "question": "มีวิชากี่วิชาที่ถูกกำหนดให้เป็นวิชาที่ต้องเรียนก่อนของวิชาอื่น",
+    "expect": {
+      "type": "value",
+      "value": "9"
+    },
+    "sql": "SELECT COUNT(DISTINCT prereq_code) FROM v_prereq WHERE kind='pre' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(DISTINCT prereq_code) FROM v_prereq WHERE kind='pre'\" }",
+    "answer_model_output": null,
+    "answer": "9",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.6
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาที่ต้องเรียนการพัฒนาเกมขั้นต้นด้วยเกมเอนจิ้นมาก่อนมีชื่อวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้น",
+        "การพัฒนาเกมด้วยเทคโนโลยีเสมือนจริง"
+      ]
+    },
+    "sql": "SELECT DISTINCT unlocks_name FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%การพัฒนาเกมขั้นต้นด้วยเกมเอนจิ้น%' LIMIT 200",
+    "n_rows": 2,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT unlocks_name FROM v_unlocks WHERE kind='pre' AND base_name LIKE '%การพัฒนาเกมขั้นต้นด้วยเกมเอนจิ้น%'\" }",
+    "answer_model_output": null,
+    "answer": "การพัฒนาเกมขั้นสูงด้วยเกมเอนจิ้น, การพัฒนาเกมด้วยเทคโนโลยีเสมือนจริง",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.0
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาใดบ้างที่มีชั่วโมงปฏิบัติมากกว่าชั่วโมงบรรยาย (ตอบเป็นรหัสวิชา)",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016406",
+        "06016407",
+        "06016466",
+        "06016481",
+        "06016482",
+        "90641001",
+        "90641003"
+      ]
+    },
+    "sql": "SELECT code FROM course WHERE lab_h > lecture_h LIMIT 200",
+    "n_rows": 7,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT code FROM course WHERE lab_h > lecture_h\"}",
+    "answer_model_output": null,
+    "answer": "90641001, 90641003, 06016406, 06016407, 06016481, 06016482, 06016466",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 0.4
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาเลือกที่ลงทะเบียนได้ในปี 3 เทอม 2 และชื่อมีคำว่า 'เครือข่าย' มีกี่วิชา",
+    "expect": {
+      "type": "value",
+      "value": "4"
+    },
+    "sql": "SELECT COUNT(DISTINCT code) FROM elective_slot WHERE allowed_terms LIKE '%3/2%' AND name_th LIKE '%เครือข่าย%' LIMIT 200",
+    "n_rows": 1,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT COUNT(DISTINCT code) FROM elective_slot WHERE allowed_terms LIKE '%3/2%' AND name_th LIKE '%เครือข่าย%'\" }",
+    "answer_model_output": null,
+    "answer": "4",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตรง",
+    "seconds": 0.7
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาที่เรียนในปี 3 เทอม 1 และมีวิชาที่ต้องเรียนก่อน มีรหัสวิชาอะไรบ้าง",
+    "expect": {
+      "type": "set",
+      "value": [
+        "06016418",
+        "06016421",
+        "06016422",
+        "06016423",
+        "06066102"
+      ]
+    },
+    "sql": "SELECT DISTINCT code, pages FROM v_plan WHERE year=3 AND semester=1 AND code IN (SELECT course_code FROM v_prereq WHERE kind='pre') LIMIT 200",
+    "n_rows": 5,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT DISTINCT code, pages FROM v_plan WHERE year=3 AND semester=1 AND code IN (SELECT course_code FROM v_prereq WHERE kind='pre')\"}",
+    "answer_model_output": null,
+    "answer": "06066102, 06016418, 06016421, 06016422, 06016423 (อ้างอิงหน้า 42, 331, 333, 334, 358)",
+    "source_pages": [
+      42,
+      331,
+      333,
+      334,
+      358
+    ],
+    "page_warning": null,
+    "correct": true,
+    "why": "ครบ",
+    "seconds": 1.4
+  },
+  {
+    "level": "ยาก",
+    "question": "วิชาหุ่นยนต์ขั้นสูงมีกี่หน่วยกิต",
+    "expect": {
+      "type": "none",
+      "value": null
+    },
+    "sql": "SELECT credits FROM course WHERE name_th LIKE '%หุ่นยนต์ขั้นสูง%' LIMIT 200",
+    "n_rows": 0,
+    "error": null,
+    "sql_model_output": "{\"sql\": \"SELECT credits FROM course WHERE name_th LIKE '%หุ่นยนต์ขั้นสูง%'\" }",
+    "answer_model_output": null,
+    "answer": "ไม่พบข้อมูลนี้ในเล่มหลักสูตร",
+    "source_pages": [],
+    "page_warning": null,
+    "correct": true,
+    "why": "ตอบว่าไม่พบตามที่ควร",
+    "seconds": 0.8
+  }
+]

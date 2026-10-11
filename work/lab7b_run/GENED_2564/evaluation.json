@@ -1,0 +1,358 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 266,
+        "cer": 0.030075,
+        "wer": null,
+        "exact_match_acc": 0.969925,
+        "n_sub": 0,
+        "n_del": 64,
+        "n_ins": 0,
+        "n_missing": 8,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2128,
+        "error_samples": [
+          {
+            "key": "90642081 [ตกแถว]",
+            "gt": "90642081",
+            "pred": ""
+          },
+          {
+            "key": "90642083 [ตกแถว]",
+            "gt": "90642083",
+            "pred": ""
+          },
+          {
+            "key": "90644011 [ตกแถว]",
+            "gt": "90644011",
+            "pred": ""
+          },
+          {
+            "key": "90644013 [ตกแถว]",
+            "gt": "90644013",
+            "pred": ""
+          },
+          {
+            "key": "90644019 [ตกแถว]",
+            "gt": "90644019",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 266,
+        "cer": 0.064485,
+        "wer": 0.088868,
+        "exact_match_acc": 0.87594,
+        "n_sub": 4,
+        "n_del": 223,
+        "n_ins": 177,
+        "n_missing": 8,
+        "n_hallucinated": 0,
+        "n_ref_chars": 6265,
+        "error_samples": [
+          {
+            "key": "90642005",
+            "gt": "การคิดเชิงสร้างสรรค์",
+            "pred": "การคิดเชิงสร้างสรรค์รายวิชาบังคับก่อน : ไม่มี"
+          },
+          {
+            "key": "90642006",
+            "gt": "การคิดเชิงนวัตกรรม",
+            "pred": "การคิดเชิงนวัตกรรมรายวิชาบังคับก่อน : ไม่มี"
+          },
+          {
+            "key": "90642007",
+            "gt": "การคิดเชิงบวก",
+            "pred": "การคิดเชิงบวกรายวิชาบังคับก่อน : ไม่มี"
+          },
+          {
+            "key": "90642008",
+            "gt": "การแก้ปัญหา",
+            "pred": "การแก้ปัญหารายวิชาบังคับก่อน : ไม่มี"
+          },
+          {
+            "key": "90642016",
+            "gt": "วิธีการออกแบบเพื่อสร้างนวัตกรรม",
+            "pred": "วิธีการออกแบบเพื่อสร้างนวัตกรรม 4 (4-0-8)"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 266,
+        "cer": 0.090242,
+        "wer": 0.092511,
+        "exact_match_acc": 0.887218,
+        "n_sub": 0,
+        "n_del": 422,
+        "n_ins": 119,
+        "n_missing": 18,
+        "n_hallucinated": 0,
+        "n_ref_chars": 5995,
+        "error_samples": [
+          {
+            "key": "90642035",
+            "gt": "INDUSTRIAL EXPERIENCE FOR ENGINEERS",
+            "pred": "INDUSTRIAL EXPERIENCE FOR ENGINEERS 3"
+          },
+          {
+            "key": "90642080",
+            "gt": "INTRODUCTION TO MUSIC COMPOSITION",
+            "pred": "INTRODUCTION TO MUSIC COMPOSITION 3 90642081"
+          },
+          {
+            "key": "90642082",
+            "gt": "MUSIC APPRECIATION",
+            "pred": "MUSIC APPRECIATION 3 90642083"
+          },
+          {
+            "key": "90642118",
+            "gt": "APPLICATION SOFTWARE FOR BUSSINESS",
+            "pred": "APPLICATION SOFTWARE FOR BUSINESS"
+          },
+          {
+            "key": "90644012",
+            "gt": "ENGLISH FOR COMMUNICATION",
+            "pred": "ENGLISH FOR COMMUNICATION90644013"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 266,
+        "cer": 0.123062,
+        "wer": null,
+        "exact_match_acc": 0.864662,
+        "n_sub": 14,
+        "n_del": 248,
+        "n_ins": 0,
+        "n_missing": 31,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2129,
+        "error_samples": [
+          {
+            "key": "90641003",
+            "gt": "1(0-3-2)",
+            "pred": "None"
+          },
+          {
+            "key": "90642001",
+            "gt": "1(0-2-1)",
+            "pred": "None"
+          },
+          {
+            "key": "90642002",
+            "gt": "2(0-4-2)",
+            "pred": "None"
+          },
+          {
+            "key": "90642003",
+            "gt": "3(0-6-3)",
+            "pred": "None"
+          },
+          {
+            "key": "90642032",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 266,
+        "cer": 0.030075,
+        "wer": null,
+        "exact_match_acc": 0.969925,
+        "n_sub": 0,
+        "n_del": 8,
+        "n_ins": 0,
+        "n_missing": 8,
+        "n_hallucinated": 0,
+        "n_ref_chars": 266,
+        "error_samples": [
+          {
+            "key": "90642081 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90642083 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90644011 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90644013 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "90644019 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 266,
+        "cer": 0.030075,
+        "wer": null,
+        "exact_match_acc": 0.969925,
+        "n_sub": 0,
+        "n_del": 152,
+        "n_ins": 0,
+        "n_missing": 8,
+        "n_hallucinated": 0,
+        "n_ref_chars": 5054,
+        "error_samples": [
+          {
+            "key": "90642081 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90642083 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90644011 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90644013 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          },
+          {
+            "key": "90644019 [ตกแถว]",
+            "gt": "หมวดวิชาศึกษาทั่วไป",
+            "pred": ""
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 266,
+        "cer": 0.030075,
+        "wer": null,
+        "exact_match_acc": 0.969925,
+        "n_sub": 0,
+        "n_del": 40,
+        "n_ins": 0,
+        "n_missing": 8,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1330,
+        "error_samples": [
+          {
+            "key": "90642081 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90642083 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90644011 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90644013 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "90644019 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 258,
+        "cer": 1.625,
+        "wer": null,
+        "exact_match_acc": 0.992248,
+        "n_sub": 8,
+        "n_del": 8,
+        "n_ins": 10,
+        "n_missing": 1,
+        "n_hallucinated": 0,
+        "n_ref_chars": 16,
+        "error_samples": [
+          {
+            "key": "90644008",
+            "gt": "90644007",
+            "pred": "ภาษาอังกฤษพื้นฐาน 1"
+          },
+          {
+            "key": "90642020",
+            "gt": "90642019",
+            "pred": "None"
+          }
+        ]
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 258,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 0,
+        "error_samples": []
+      }
+    },
+    "overall_micro_cer": 0.064573,
+    "alignment": {
+      "matched": 258,
+      "missed": 8,
+      "spurious": 0,
+      "precision": 1.0,
+      "recall": 0.9699,
+      "f1": 0.9847,
+      "gt_total": 266,
+      "pred_total": 258,
+      "missed_codes": [
+        "90642081",
+        "90642083",
+        "90644011",
+        "90644013",
+        "90644019",
+        "90644021",
+        "90644023",
+        "90644024"
+      ],
+      "spurious_codes": []
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 258,
+      "n_duplicate_keys": 0,
+      "credits_by_term": {},
+      "total_credits_fixed_terms": 0,
+      "issues": [
+        "90642124: name_th อาจมีคำอังกฤษปนอยู่: 'เทคโนโลยีและนวัตกรรมทางวิทยาศาสตร์สำหรับ SDGs'"
+      ]
+    }
+  }
+}

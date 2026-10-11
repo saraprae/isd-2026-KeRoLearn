@@ -1,0 +1,250 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 287,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2296,
+        "error_samples": []
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 287,
+        "cer": 0.024259,
+        "wer": 0.039683,
+        "exact_match_acc": 0.979094,
+        "n_sub": 5,
+        "n_del": 1,
+        "n_ins": 156,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 6678,
+        "error_samples": [
+          {
+            "key": "90641008",
+            "gt": "พื้นฐานทักษะการสื่อสารภาษาอังกฤษ",
+            "pred": "พื้นฐานทักษะการสื่อสารภาษาอังกฤษเป็นรายวิชาบังคับก่อนที่ไม่นับหน่วยกิตใช้การเทียบผ่านจากการสอบวัดระดับมาตรฐานตามประกาศของสถาบันฯเพื่อการจัดการเรียนที่ตรงตามสมรรถนะของนักศึกษา3.2.2 แผนข."
+          },
+          {
+            "key": "90642054",
+            "gt": "สิ่งพิทักษ์ร่างกาย",
+            "pred": "สิ่งพีทักษ์ร่างกาย"
+          },
+          {
+            "key": "90642057",
+            "gt": "ภูมิคุ้มกาย",
+            "pred": "ภูมิคุ้มกัน"
+          },
+          {
+            "key": "90643016",
+            "gt": "สนุกกับธุรกิจออนไลน์",
+            "pred": "สนุกกับธุรกิจอ่อนไลน์"
+          },
+          {
+            "key": "90644026",
+            "gt": "ภาษาอังกฤษเพื่อการนำเสนอในงานสถาปัตยกรรม",
+            "pred": "ภาษาอังกฤษเพื่อการนำเสนองานในงานสถาปัตยกรรม"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 287,
+        "cer": 0.005359,
+        "wer": 0.03055,
+        "exact_match_acc": 0.89547,
+        "n_sub": 5,
+        "n_del": 2,
+        "n_ins": 27,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 6345,
+        "error_samples": [
+          {
+            "key": "90641004",
+            "gt": "TEAM-PROJECT 1",
+            "pred": "TEAM-PROJECT 1 1"
+          },
+          {
+            "key": "90641005",
+            "gt": "TEAM-PROJECT 2",
+            "pred": "TEAM-PROJECT 2 1"
+          },
+          {
+            "key": "90641006",
+            "gt": "TEAM-PROJECT 3",
+            "pred": "TEAM-PROJECT 3 1"
+          },
+          {
+            "key": "90641007",
+            "gt": "DIGITAL CITIZEN",
+            "pred": "DIGITAL CITIZEN 3"
+          },
+          {
+            "key": "90641009",
+            "gt": "INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 1",
+            "pred": "INTERCULTURAL COMMUNICATION SKILLS IN ENGLISH 3"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 287,
+        "cer": 0.062228,
+        "wer": null,
+        "exact_match_acc": 0.933798,
+        "n_sub": 6,
+        "n_del": 137,
+        "n_ins": 0,
+        "n_missing": 17,
+        "n_hallucinated": 0,
+        "n_ref_chars": 2298,
+        "error_samples": [
+          {
+            "key": "90642033",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "90642034",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "90642035",
+            "gt": "3(0-18-0)",
+            "pred": "None"
+          },
+          {
+            "key": "90642084",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6)"
+          },
+          {
+            "key": "90642103",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 287,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 287,
+        "error_samples": []
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 287,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 5453,
+        "error_samples": []
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 287,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1435,
+        "error_samples": []
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 287,
+        "cer": 7.125,
+        "wer": null,
+        "exact_match_acc": 0.989547,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 114,
+        "n_missing": 0,
+        "n_hallucinated": 3,
+        "n_ref_chars": 16,
+        "error_samples": [
+          {
+            "key": "90641009",
+            "gt": "None",
+            "pred": "พื้นฐานทักษะการสื่อสารภาษาอังกฤษ"
+          },
+          {
+            "key": "90641010",
+            "gt": "None",
+            "pred": "ทักษะการสื่อสารภาษาอังกฤษระหว่างวัฒนธรรม 1"
+          },
+          {
+            "key": "90642020",
+            "gt": "None",
+            "pred": "การออกแบบสะเต็มอย่างสร้างสรรค์ขั้นพื้นฐาน"
+          }
+        ]
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 287,
+        "cer": 0.0,
+        "wer": null,
+        "exact_match_acc": 1.0,
+        "n_sub": 0,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 0,
+        "error_samples": []
+      }
+    },
+    "overall_micro_cer": 0.01826,
+    "alignment": {
+      "matched": 287,
+      "missed": 0,
+      "spurious": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "gt_total": 287,
+      "pred_total": 287,
+      "missed_codes": [],
+      "spurious_codes": []
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 287,
+      "n_duplicate_keys": 0,
+      "credits_by_term": {},
+      "total_credits_fixed_terms": 0,
+      "issues": [
+        "90642124: name_th อาจมีคำอังกฤษปนอยู่: 'เทคโนโลยีและนวัตกรรมทางวิทยาศาสตร์สำหรับ SDGs'"
+      ]
+    }
+  }
+}

@@ -1,0 +1,499 @@
+{
+  "n_gt_courses": 161,
+  "n_pred_courses": 132,
+  "per_field": {
+    "code": {
+      "tp": 132,
+      "fp": 0,
+      "fn": 29,
+      "precision": 1.0,
+      "recall": 0.8199,
+      "f1": 0.901
+    },
+    "name_th": {
+      "tp": 119,
+      "fp": 13,
+      "fn": 42,
+      "precision": 0.9015,
+      "recall": 0.7391,
+      "f1": 0.8123
+    },
+    "name_en": {
+      "tp": 126,
+      "fp": 4,
+      "fn": 35,
+      "precision": 0.9692,
+      "recall": 0.7826,
+      "f1": 0.866
+    },
+    "credits": {
+      "tp": 127,
+      "fp": 1,
+      "fn": 34,
+      "precision": 0.9922,
+      "recall": 0.7888,
+      "f1": 0.8789
+    },
+    "year": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "semester": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "category": {
+      "tp": 132,
+      "fp": 0,
+      "fn": 29,
+      "precision": 1.0,
+      "recall": 0.8199,
+      "f1": 0.901
+    },
+    "type": {
+      "tp": 132,
+      "fp": 0,
+      "fn": 29,
+      "precision": 1.0,
+      "recall": 0.8199,
+      "f1": 0.901
+    },
+    "prerequisite": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  },
+  "micro": {
+    "tp": 768,
+    "fp": 18,
+    "fn": 198,
+    "precision": 0.9771,
+    "recall": 0.795,
+    "f1": 0.8767
+  },
+  "band": "ผ่านเกณฑ์กลาง (80–90%)",
+  "mismatch_examples": {
+    "code": [
+      {
+        "code": "90595002",
+        "gt": "90595002",
+        "pred": null
+      },
+      {
+        "code": "90595012",
+        "gt": "90595012",
+        "pred": null
+      },
+      {
+        "code": "90594009",
+        "gt": "90594009",
+        "pred": null
+      },
+      {
+        "code": "90595034",
+        "gt": "90595034",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "90595045",
+        "pred": null
+      },
+      {
+        "code": "90594014",
+        "gt": "90594014",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "90595036",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "90595043",
+        "pred": null
+      },
+      {
+        "code": "90591006",
+        "gt": "90591006",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "90591008",
+        "pred": null
+      },
+      {
+        "code": "90594012",
+        "gt": "90594012",
+        "pred": null
+      },
+      {
+        "code": "90594013",
+        "gt": "90594013",
+        "pred": null
+      },
+      {
+        "code": "90595033",
+        "gt": "90595033",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "90591010",
+        "pred": null
+      },
+      {
+        "code": "90594041",
+        "gt": "90594041",
+        "pred": null
+      },
+      {
+        "code": "90594011",
+        "gt": "90594011",
+        "pred": null
+      },
+      {
+        "code": "90591007",
+        "gt": "90591007",
+        "pred": null
+      },
+      {
+        "code": "90591005",
+        "gt": "90591005",
+        "pred": null
+      },
+      {
+        "code": "90591011",
+        "gt": "90591011",
+        "pred": null
+      },
+      {
+        "code": "90594015",
+        "gt": "90594015",
+        "pred": null
+      },
+      {
+        "code": "90595001",
+        "gt": "90595001",
+        "pred": null
+      },
+      {
+        "code": "90594010",
+        "gt": "90594010",
+        "pred": null
+      },
+      {
+        "code": "90595027",
+        "gt": "90595027",
+        "pred": null
+      },
+      {
+        "code": "90591009",
+        "gt": "90591009",
+        "pred": null
+      },
+      {
+        "code": "90591004",
+        "gt": "90591004",
+        "pred": null
+      },
+      {
+        "code": "90595003",
+        "gt": "90595003",
+        "pred": null
+      },
+      {
+        "code": "90595035",
+        "gt": "90595035",
+        "pred": null
+      },
+      {
+        "code": "90595004",
+        "gt": "90595004",
+        "pred": null
+      },
+      {
+        "code": "90594042",
+        "gt": "90594042",
+        "pred": null
+      }
+    ],
+    "name_th": [
+      {
+        "code": "90595034",
+        "gt": "ภาษาเวียดนามเพื่อการท่องเที่ยว",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "การสื่อสารและการนำเสนออย่างมืออาชีพ",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "ภาษามาเลย์เพื่อการท่องเที่ยว",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "ทักษะการสื่อสารผ่านการอภิปราย",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "สุนทรียะภาพถ่าย",
+        "pred": null
+      },
+      {
+        "code": "90595020",
+        "gt": "พูดได้ พูดดี พูดเป็น",
+        "pred": "พูดได้พูดดีพูดเป็น"
+      },
+      {
+        "code": "90595033",
+        "gt": "ภาษาจีนเพื่อการท่องเที่ยว",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "สุนทรียะดนตรี",
+        "pred": null
+      },
+      {
+        "code": "90592031",
+        "gt": "เกาหลี แฟนคลับ",
+        "pred": "เกาหลีแฟนคลับ"
+      },
+      {
+        "code": "90595027",
+        "gt": "ภาษาอังกฤษเพื่อการประชาสัมพันธ์",
+        "pred": null
+      }
+    ],
+    "name_en": [
+      {
+        "code": "90595034",
+        "gt": "VIETNAMESE FOR TRAVEL",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "PROFESSIONAL COMMUNICATION AND PRESENTATION",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "MALAY FOR TRAVEL",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "COMMUNICATION SKILLS THROUGH DEBATE",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "PHOTOGRAPHY APPRECIATION",
+        "pred": null
+      },
+      {
+        "code": "90595033",
+        "gt": "CHINESE FOR TRAVEL",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "MUSIC APPRECIATION",
+        "pred": null
+      },
+      {
+        "code": "90595027",
+        "gt": "ENGLISH FOR PUBLIC RELATIONS",
+        "pred": null
+      },
+      {
+        "code": "90595032",
+        "gt": "KOREAN FOR TRAVEL",
+        "pred": "FOR TRAVEL90595033"
+      },
+      {
+        "code": "90591004",
+        "gt": "ARTS OF EMOTION DEVELOPMENT",
+        "pred": null
+      }
+    ],
+    "credits": [
+      {
+        "code": "90595034",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "3(2-2-5)",
+        "pred": null
+      },
+      {
+        "code": "90595033",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90591002",
+        "gt": "1(0-3-2)",
+        "pred": null
+      },
+      {
+        "code": "90595027",
+        "gt": "3(3-0-6)",
+        "pred": null
+      },
+      {
+        "code": "90591004",
+        "gt": "3(3-0-6)",
+        "pred": null
+      }
+    ],
+    "category": [
+      {
+        "code": "90595034",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595033",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595027",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90591004",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      },
+      {
+        "code": "90595035",
+        "gt": "หมวดวิชาศึกษาทั่วไป",
+        "pred": null
+      }
+    ],
+    "type": [
+      {
+        "code": "90595034",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595045",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595036",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595043",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90591008",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595033",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90591010",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595027",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90591004",
+        "gt": "เลือก",
+        "pred": null
+      },
+      {
+        "code": "90595035",
+        "gt": "เลือก",
+        "pred": null
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "GENED_2559.json"
+  ]
+}

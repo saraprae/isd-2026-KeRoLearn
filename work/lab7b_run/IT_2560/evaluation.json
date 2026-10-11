@@ -1,0 +1,379 @@
+{
+  "vlm": {
+    "tokenizer": "pythainlp/newmm",
+    "attributes": {
+      "code": {
+        "label": "รหัสวิชา",
+        "n_items": 123,
+        "cer": 0.02439,
+        "wer": null,
+        "exact_match_acc": 0.97561,
+        "n_sub": 0,
+        "n_del": 24,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 984,
+        "error_samples": [
+          {
+            "key": "06016351 [ตกแถว]",
+            "gt": "06016351",
+            "pred": ""
+          },
+          {
+            "key": "06016381 [ตกแถว]",
+            "gt": "06016381",
+            "pred": ""
+          },
+          {
+            "key": "06016382 [ตกแถว]",
+            "gt": "06016382",
+            "pred": ""
+          }
+        ]
+      },
+      "name_th": {
+        "label": "ชื่อวิชา (ไทย) ⭐",
+        "n_items": 123,
+        "cer": 0.042655,
+        "wer": 0.052158,
+        "exact_match_acc": 0.926829,
+        "n_sub": 1,
+        "n_del": 61,
+        "n_ins": 89,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3540,
+        "error_samples": [
+          {
+            "key": "90201012",
+            "gt": "การพัฒนาทักษะการอ่านและการเขียนภาษาอังกฤษ",
+            "pred": "การพัฒนาทักษะการอ่านและเขียนภาษาอังกฤษ"
+          },
+          {
+            "key": "06016321",
+            "gt": "วิศวกรรมซอฟต์แวร์",
+            "pred": "แขนงวิชาวิศวกรรมซอฟต์แวร์วิศวกรรมซอฟต์แวร์"
+          },
+          {
+            "key": "06016341",
+            "gt": "การโปรแกรมสื่อประสม",
+            "pred": "แขนงวิชาการพัฒนาสื่อประสมและเกมการโปรแกรมสื่อประสม"
+          },
+          {
+            "key": "06016333",
+            "gt": "เทคโนโลยีการให้บริการอินเตอร์เน็ต",
+            "pred": "เทคโนโลยีการให้บริการอินเทอร์เน็ต"
+          },
+          {
+            "key": "06016343",
+            "gt": "การออกแบบและพัฒนาเกม",
+            "pred": "แขนงวิชาการพัฒนาสื่อประสมและเกมการออกแบบและพัฒนาเกม"
+          }
+        ]
+      },
+      "name_en": {
+        "label": "ชื่อวิชา (อังกฤษ) ⭐",
+        "n_items": 123,
+        "cer": 0.019503,
+        "wer": 0.02682,
+        "exact_match_acc": 0.910569,
+        "n_sub": 0,
+        "n_del": 69,
+        "n_ins": 4,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 3743,
+        "error_samples": [
+          {
+            "key": "06016335",
+            "gt": "INTRODUCTION TO CLOUD COMPUTIN",
+            "pred": "INTRODUCTION TO CLOUD COMPUTING"
+          },
+          {
+            "key": "06016393",
+            "gt": "COOPERATIV EDUCATION IN SOFTWARE ENGINEERING",
+            "pred": "COOPERATIVE EDUCATION IN SOFTWARE ENGINEERING"
+          },
+          {
+            "key": "06016352",
+            "gt": "ADVANCE DATABASE SYSTEMS",
+            "pred": "ADVANCED DATABASE SYSTEMS"
+          },
+          {
+            "key": "06016356",
+            "gt": "DISTRIBUTED COMPUTING SYSTEMS",
+            "pred": "DISTRIBUTED COMPUTING SYSTEM"
+          },
+          {
+            "key": "06016358",
+            "gt": "COMPUTER SIMULATION AND MODELLING",
+            "pred": "COMPUTER SIMULATION AND MODELING"
+          }
+        ]
+      },
+      "credits": {
+        "label": "หน่วยกิต",
+        "n_items": 123,
+        "cer": 0.104651,
+        "wer": null,
+        "exact_match_acc": 0.886179,
+        "n_sub": 12,
+        "n_del": 48,
+        "n_ins": 48,
+        "n_missing": 6,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1032,
+        "error_samples": [
+          {
+            "key": "06016322",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6) หรือ 3(2-2-5)"
+          },
+          {
+            "key": "06016331",
+            "gt": "3(2-2-5)",
+            "pred": "3(3-0-6) หรือ 3(2-2-5)"
+          },
+          {
+            "key": "06016332",
+            "gt": "3(3-0-6)",
+            "pred": "3(3-0-6) หรือ 3(2-2-5)"
+          },
+          {
+            "key": "06016352",
+            "gt": "3(3-0-6)",
+            "pred": "None"
+          },
+          {
+            "key": "06016353",
+            "gt": "3(2-2-5)",
+            "pred": "None"
+          }
+        ]
+      },
+      "year_sem": {
+        "label": "ปี/ภาค",
+        "n_items": 123,
+        "cer": 0.010989,
+        "wer": null,
+        "exact_match_acc": 0.97561,
+        "n_sub": 0,
+        "n_del": 3,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 273,
+        "error_samples": [
+          {
+            "key": "06016351 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "06016381 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          },
+          {
+            "key": "06016382 [ตกแถว]",
+            "gt": "/",
+            "pred": ""
+          }
+        ]
+      },
+      "category": {
+        "label": "หมวดวิชา",
+        "n_items": 123,
+        "cer": 0.023118,
+        "wer": null,
+        "exact_match_acc": 0.97561,
+        "n_sub": 0,
+        "n_del": 39,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 1687,
+        "error_samples": [
+          {
+            "key": "06016351 [ตกแถว]",
+            "gt": "หมวดวิชาเฉพาะ",
+            "pred": ""
+          },
+          {
+            "key": "06016381 [ตกแถว]",
+            "gt": "หมวดวิชาเฉพาะ",
+            "pred": ""
+          },
+          {
+            "key": "06016382 [ตกแถว]",
+            "gt": "หมวดวิชาเฉพาะ",
+            "pred": ""
+          }
+        ]
+      },
+      "ctype": {
+        "label": "บังคับ/เลือก",
+        "n_items": 123,
+        "cer": 0.022091,
+        "wer": null,
+        "exact_match_acc": 0.97561,
+        "n_sub": 0,
+        "n_del": 15,
+        "n_ins": 0,
+        "n_missing": 3,
+        "n_hallucinated": 0,
+        "n_ref_chars": 679,
+        "error_samples": [
+          {
+            "key": "06016351 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "06016381 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          },
+          {
+            "key": "06016382 [ตกแถว]",
+            "gt": "เลือก",
+            "pred": ""
+          }
+        ]
+      },
+      "prereq": {
+        "label": "วิชาบังคับก่อน",
+        "n_items": 120,
+        "cer": 0.016194,
+        "wer": null,
+        "exact_match_acc": 0.975,
+        "n_sub": 3,
+        "n_del": 9,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 741,
+        "error_samples": [
+          {
+            "key": "06016316",
+            "gt": "06016314 หรือ 06016315",
+            "pred": "06016314, 06016315"
+          },
+          {
+            "key": "06016346",
+            "gt": "06016312 หรือ 06016341",
+            "pred": "06016312, 06016341"
+          },
+          {
+            "key": "06016360",
+            "gt": "06016319 หรือ 06016320",
+            "pred": "06016319, 06016320"
+          }
+        ]
+      },
+      "flexible": {
+        "label": "ปี/ภาคยืดหยุ่น",
+        "n_items": 120,
+        "cer": 0.142857,
+        "wer": null,
+        "exact_match_acc": 0.675,
+        "n_sub": 39,
+        "n_del": 0,
+        "n_ins": 0,
+        "n_missing": 0,
+        "n_hallucinated": 0,
+        "n_ref_chars": 273,
+        "error_samples": [
+          {
+            "key": "06016352",
+            "gt": "3/2, 4/2",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016353",
+            "gt": "3/2, 4/2",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016354",
+            "gt": "3/2, 4/2",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016355",
+            "gt": "3/2, 4/2",
+            "pred": "3/2, 4/1"
+          },
+          {
+            "key": "06016356",
+            "gt": "3/2, 4/2",
+            "pred": "3/2, 4/1"
+          }
+        ]
+      }
+    },
+    "overall_micro_cer": 0.035825,
+    "alignment": {
+      "matched": 120,
+      "missed": 3,
+      "spurious": 12,
+      "precision": 0.9091,
+      "recall": 0.9756,
+      "f1": 0.9412,
+      "gt_total": 123,
+      "pred_total": 132,
+      "missed_codes": [
+        "06016351",
+        "06016381",
+        "06016382"
+      ],
+      "spurious_codes": [
+        "06016351",
+        "06016346",
+        "06016347",
+        "06016348",
+        "06016381",
+        "06016321",
+        "06016321",
+        "06016381",
+        "06016381",
+        "06016333",
+        "06016336",
+        "06036382"
+      ]
+    },
+    "internal_check": {
+      "ok": false,
+      "n_courses": 132,
+      "n_duplicate_keys": 3,
+      "credits_by_term": {
+        "1/1": 18,
+        "1/2": 18,
+        "2/1": 18,
+        "2/2": 30,
+        "3/1": 36,
+        "3/2": 49,
+        "4/1": 45,
+        "4/2": 27
+      },
+      "total_credits_fixed_terms": 241,
+      "issues": [
+        "06016397: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016398: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016333: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016336: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06036382: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016393: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016394: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016395: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "06016396: ปี/ภาค = 0 แต่ไม่ได้ระบุ flexible_year_semester",
+        "ภาค 2/2 มีถึง 30 หน่วยกิต — น่าจะมีวิชาซ้ำ",
+        "ภาค 3/1 มีถึง 36 หน่วยกิต — น่าจะมีวิชาซ้ำ",
+        "ภาค 3/2 มีถึง 49 หน่วยกิต — น่าจะมีวิชาซ้ำ",
+        "ภาค 4/1 มีถึง 45 หน่วยกิต — น่าจะมีวิชาซ้ำ",
+        "ภาค 4/2 มีถึง 27 หน่วยกิต — น่าจะมีวิชาซ้ำ"
+      ]
+    }
+  }
+}

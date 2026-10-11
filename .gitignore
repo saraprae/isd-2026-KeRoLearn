@@ -1,0 +1,10 @@
+data/input/*.pdf
+venv/
+__pycache__/
+*.pyc
+*.env
+lab8b_curriculum_db.py
+# # work/: เก็บเฉพาะชุดคำถาม eval อย่างอื่นทิ้งหมด
+# work/**
+# !work/**/
+# !work/**/gold_questions.json

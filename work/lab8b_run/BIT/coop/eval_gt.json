@@ -1,0 +1,99 @@
+{
+  "n_gt_courses": 64,
+  "n_pred_courses": 64,
+  "per_field": {
+    "code": {
+      "tp": 64,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "name_th": {
+      "tp": 63,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9844,
+      "recall": 0.9844,
+      "f1": 0.9844
+    },
+    "name_en": {
+      "tp": 64,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "credits": {
+      "tp": 64,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "year": {
+      "tp": 43,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "semester": {
+      "tp": 43,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "category": {
+      "tp": 64,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "type": {
+      "tp": 64,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "prerequisite": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "micro": {
+    "tp": 472,
+    "fp": 1,
+    "fn": 1,
+    "precision": 0.9979,
+    "recall": 0.9979,
+    "f1": 0.9979
+  },
+  "band": "ดีเยี่ยม (>91%)",
+  "mismatch_examples": {
+    "name_th": [
+      {
+        "code": "06036143",
+        "gt": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยูไอ",
+        "pred": "การเก็บความต้องการและสร้างต้นแบบในด้านยูเอ็กซ์ยู่ไอ"
+      }
+    ]
+  },
+  "ground_truth_files": [
+    "BIT_academic_plan_coop.json"
+  ]
+}
