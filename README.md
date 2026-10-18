@@ -189,7 +189,8 @@ py --version
 ### 2.2 โคลนหรือดาวน์โหลด zip
 
 ```powershell
-git clone -b demo1 --single-branch https://github.com/saraprae/isd-2026-KeRoLearn.git
+git clone https://github.com/saraprae/isd-2026-KeRoLearn.git
+cd isd-2026-KeRoLearn
 ls
 ```
 
