@@ -18,6 +18,7 @@ def _course_operand(body, patterns, operation):
                            or re.match(r"(?:ถ้า|ก่อน|ต้อง|มีวิชา|รวม|จำนวน|ขอ|แผน)",name)):
             continue
         return dict(start=start,end=start+len(name),text=name,operation=operation,
+                    **({"recursive":bool(match["recursive"])} if "recursive" in match.groupdict() else {}),
                     request_spans=[dict(start=0,end=match.start("name"),owner="requested_operation"),
                                    dict(start=start+len(name),end=len(body),owner="requested_operation")])
     return None
@@ -89,16 +90,33 @@ def course_candidates(name, lexicon):
     aliases={code for pattern,values in lexicon.get("alias_patterns",[]) if pattern.fullmatch(name) for code in values}
     return aliases | {code for stored,values in names.items() if wanted in key(stored) for code in values}
 
+# A complete wording frame, shared by rules, coverage, validation and model hints.
+# The position of NAME determines direction; the word ต่อ alone never does.
 def relationship_course_operand(body):
-    patterns=[
-        (r"ก่อนเรียน\s*(?:วิชา\s*)?(?P<name>.+?)\s*ต้องผ่านวิชาอะไรบ้าง","pre","before"),
-        (r"(?:วิชา\s*)?(?P<name>.+?)\s*มีวิชาบังคับก่อนอะไร","pre","before"),
-        (r"เงื่อนไขวิชาก่อนของ\s*(?P<name>.+?)\s*คืออะไร","pre","before"),
-        (r"(?:วิชา\s*)?(?P<name>.+?)\s*ต้องเรียนควบกับวิชาอะไร","co","before"),
-        (r"(?:วิชา\s*)?(?P<name>.+?)\s*เป็นวิชาก่อนของวิชาอะไรบ้าง","pre","after"),
-        (r"วิชาใดต้องผ่าน\s*(?P<name>.+?)\s*ก่อน","pre","after"),
+    ask = r"(?:วิชา|ตัว)?(?:อะไร|ไหน|ใด)"
+    recursive = r"(?:ทั้งสาย|ทุกทอด|ทางอ้อม)"
+    patterns = [
+        (rf"ก่อนเรียน\s*(?:วิชา\s*)?(?P<name>.+?)\s*ต้อง(?:ผ่าน|เรียน)\s*{ask}(?:มา)?(?:ก่อน)?(?:บ้าง)?", "pre", "before"),
+        (r"ต้องลงวิชา(?:อะไร|ไหน)ไว้ก่อนเพื่อ(?:ให้)?เรียน\s*(?:วิชา\s*)?(?P<name>.+?)(?:ได้)?", "pre", "before"),
+        (rf"(?:วิชา\s*)?(?P<name>.+?)\s*ต้อง(?:ผ่าน|เรียน)\s*{ask}(?:มา)?ก่อน(?:บ้าง)?", "pre", "before"),
+        (rf"(?:วิชา\s*)?(?P<name>.+?)\s*มีวิชาบังคับก่อน\s*(?:อะไร|ใด|ไหน)(?:บ้าง)?", "pre", "before"),
+        (rf"(?:วิชา\s*)?(?P<name>.+?)\s*ต่อจาก\s*{ask}(?:บ้าง)?", "pre", "before"),
+        (r"เงื่อนไขวิชาก่อนของ\s*(?P<name>.+?)\s*คืออะไร", "pre", "before"),
+        (rf"(?:วิชา\s*)?(?P<name>.+?)\s*ต้องเรียนควบกับ\s*{ask}(?:บ้าง)?", "co", "before"),
+        (rf"(?:วิชา\s*)?(?P<name>.+?)\s*เป็นวิชา(?:บังคับ)?ก่อนของ\s*{ask}(?:บ้าง)?", "pre", "after"),
+        (rf"{ask}(?:บ้าง)?\s*ต่อจาก\s*(?:วิชา\s*)?(?P<name>.+?)", "pre", "after"),
+        (rf"{ask}\s*ต้องผ่าน\s*(?:วิชา\s*)?(?P<name>.+?)\s*ก่อน", "pre", "after"),
     ]
-    for pattern,kind,direction in patterns:
-        operand=_course_operand(body,[pattern],"relations")
-        if operand:return {**operand,"relation_kind":kind,"direction":direction}
+    for pattern, kind, direction in patterns:
+        # Capture depth separately: it is an executed option, not ignored filler.
+        operand = _course_operand(body, [pattern + rf"\s*(?P<recursive>{recursive})?\s*(?:ครับ|ค่ะ|หน่อย)?"], "relations")
+        if operand:
+            return {**operand, "relation_kind":kind, "direction":direction}
     return None
+
+
+def ambiguous_relationship_operand(body):
+    """Only a bounded question with no before/after marker is ambiguous."""
+    return _course_operand(body, [
+        r"(?:วิชา\s*)?(?P<name>.+?)\s*ต่อ(?:วิชา)?(?:อะไร|ไหน|ใด)(?:บ้าง)?",
+    ], "relations")

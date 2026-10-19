@@ -29,6 +29,10 @@ The program/edition/track is ALREADY selected; never use its scope label as a
 course code or program-name WHERE filter. A recorded term credit total uses
 the slot-aware code calculator; elective allowed_terms is not qa_plan.year.
 Prerequisite questions require relationship tools, never a plain term list.
+Verified hints.relationship owns course operand, relation_kind, direction and depth.
+"X ต้องต่ออะไรก่อน" / "X ต่อจากวิชาอะไร" ask before X; "วิชาอะไรต่อจาก X" asks after X.
+Never guess a direction for "X ต่ออะไร"; ask before vs after.
+Do not change pre/co, recursive depth, negation or excluded courses to fit a tool.
 No JOIN, CTE, subquery, HAVING, window, LIMIT, OFFSET, writes or external files.
 Compose WHERE AND/OR/NOT, IN, BETWEEN, LIKE, IS NULL, ORDER BY and GROUP BY.
 Select plain columns or COUNT/SUM/AVG/MIN/MAX. Use ? parameters in SQL order.

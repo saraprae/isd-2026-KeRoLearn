@@ -61,11 +61,18 @@ QUESTION_WORDING_RULES = (
     {"id": "learn_what", "pattern": r"เรียน\s*ไรบ้าง", "replacement": "เรียนอะไรบ้าง"},
     {"id": "course_what", "pattern": r"(?P<head>(?:ราย)?วิชา)\s*ไรบ้าง", "replacement": r"\g<head>อะไรบ้าง"},
     {"id": "course_which", "pattern": r"(?P<head>(?:ราย)?วิชา)\s*ไหนบ้าง", "replacement": r"\g<head>อะไรบ้าง"},
+    # Whole relationship phrases only; names/literal searches are protected first.
+    {"id":"prerequisite_continue","pattern":r"ต้องต่อ\s*(?:วิชา)?(?:อะไร|ไหน|ใด)(?:มา)?ก่อน(?P<all>บ้าง)?","replacement":r"ต้องเรียนอะไรก่อน\g<all>"},
+    {"id":"prerequisite_enroll","pattern":r"ต้องลง\s*(?:วิชา)?(?:อะไร|ไหน|ใด)(?:มา)?ก่อน(?P<all>บ้าง)?","replacement":r"ต้องเรียนอะไรก่อน\g<all>"},
+    {"id":"prerequisite_pass","pattern":r"ต้องผ่านตัว(?:ไหน|อะไร|ใด)(?:มา)?ก่อน(?P<all>บ้าง)?","replacement":r"ต้องผ่านวิชาอะไรก่อน\g<all>"},
+    {"id":"prerequisite_required","pattern":r"มีวิชาบังคับก่อน(?:อะไร|ใด|ไหน)(?P<all>บ้าง)?","replacement":r"ต้องผ่านวิชาอะไรก่อน\g<all>"},
     {"id": "credit_question", "pattern": r"กี่\s*เครดิต", "replacement": "กี่หน่วยกิต"},
     # รวมคำลงท้ายที่ซ้อนกับ ไหมอ่ะ ใน match เดียว เพื่อไม่เหลือ ครับ/ค่ะ หลังแปลงครั้งแรก.
     {"id": "question_particle", "pattern": r"ไหมอ่ะ(?:\s*(?:ครับ|ค่ะ|อ่ะ))*(?=\s*[?？.!]*\s*$)|ไหมอ่ะ|มั้ย", "replacement": "ไหม"},
     {"id": "polite_suffix", "pattern": r"(?:\s*(?:ครับ|ค่ะ|อ่ะ|งับ|ค้าบ|ฮะ))+(?=\s*[?？.!]*\s*$)", "replacement": ""},
 )
+# Keep the existing application/version label; derive invalidation from rule content.
+_WORDING_SIGNATURE = hashlib.sha256(json.dumps(QUESTION_WORDING_RULES, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 _WORDING_PATTERNS = tuple((rule, re.compile(rule["pattern"])) for rule in QUESTION_WORDING_RULES)
 _WORDING_TRIGGER = re.compile("|".join(
     "(?:" + re.sub(r"\(\?P<[^>]+>", "(?:", rule["pattern"]) + ")" for rule in QUESTION_WORDING_RULES
@@ -337,6 +344,9 @@ Draft under assumptions -> draft_study_plan; keep uniqueness/pre/co checks and u
 Average per term uses a code-verified numerator and denominator, not a study draft.
 Do not route an average to draft_study_plan because it contains จบ. If its basis is unclear -> clarify.
 A prerequisite condition can be described from DB without certifying registration rights.
+"X ต้องต่ออะไรก่อน" and "X ต่อจากวิชาอะไร" ask BEFORE X.
+"วิชาอะไรต่อจาก X" asks AFTER X. Follow verified_hints.relationship direction/kind.
+"X ต่ออะไร" has no direction: clarify before vs after; do not guess.
 Never turn an unpassed source into a dependent or ignore pre/co; code verifies each relationship.
 A draft is not actual offerings or certified graduation/registration.
 Track differences by year, cross-program course sets/intersections, averages and catalog track listings
@@ -402,6 +412,10 @@ PLAN_EXAMPLES = {
     ],
     "relations": [
         ("วิชา 06026215 ต้องผ่านอะไรก่อน", "prerequisites", "name_any", None),
+        ("วิชา 06046401 ต้องต่ออะไรก่อน", "prerequisites", "name_any", None),
+        ("วิชา 06046401 ต่อจากวิชาอะไร", "prerequisites", "name_any", None),
+        ("วิชาอะไรต่อจาก 06046401", "reverse_prerequisites", "name_any", None),
+        ("วิชา 06046401 ต่ออะไร", "clarify", "name_any", None),
         ("วิชา 06026215 เป็นวิชาก่อนของวิชาอะไรบ้าง", "reverse_prerequisites", "name_any", None),
         ("วิชาปี 2 อะไรบ้างที่ต้องผ่านวิชาปี 1 ก่อน", "course_progression", "name_any", None),
         ("วิชา 06046406 ต้องผ่านวิชาอะไรมาก่อนทั้งสาย", "prerequisite_chain", "name_any", None),
@@ -433,6 +447,7 @@ PLAN_EXAMPLES = {
 PLAN_EXAMPLE_PAIRS = {
     "lookup": [("ปัญญาประดิษฐ์กี่หน่วยกิต", 'วิชาที่ชื่อมีคำว่า "ปัญญาประดิษฐ์"'),
                ('วิชาที่ชื่อมี "สุขภาพ" มีอะไรบ้าง', 'วิชา "สุขภาพ" มีกี่หน่วยกิต')],
+    "relations": [("วิชา 06046401 ต่อจากวิชาอะไร", "วิชาอะไรต่อจาก 06046401")],
     "categories": [("วิชา 06026215 เป็นวิชาบังคับหรือวิชาเลือก", "ขอเฉพาะวิชาบังคับของปี 2")],
     "planning": [
         ("จบใน 3.5 ปี เฉลี่ยกี่หน่วยกิต", "จบใน 3.5 ปี แต่ละเทอมต้องลงวิชาอะไร"),
@@ -552,7 +567,13 @@ def _relationship_kind(text: str) -> str:
     return "both" if co and pre else "co" if co else "pre"
 
 
-from .query_roles import scalar_course_operand as _scalar_course_operand, registration_course_operand as _registration_course_operand, course_candidates as _course_candidates
+from .query_roles import (
+    scalar_course_operand as _scalar_course_operand,
+    registration_course_operand as _registration_course_operand,
+    course_candidates as _course_candidates,
+    relationship_course_operand as _relationship_course_operand,
+    ambiguous_relationship_operand as _ambiguous_relationship_operand,
+)
 
 
 def _name_request_span(question: str) -> dict | None:
@@ -771,6 +792,8 @@ def coverage_check(question: str, plan: QueryPlan, hints: dict) -> dict:
     # Scope ถูกตรวจชื่อ/แผนก่อนแล้ว; claim เฉพาะช่วงนั้น ไม่เพิ่มรหัสหลักสูตร
     # เป็นคำที่ลบทิ้งได้ทั่วประโยค จึงไม่กลบชื่อวิชาหรือเงื่อนไขค้นหา.
     spans = list(hints.get("scope_spans", []))
+    if plan.intent in {"prerequisites", "reverse_prerequisites"} and hints.get("relationship"):
+        spans.extend(hints.get("relationship_spans", []))
     def claim(pattern, owner):
         for match in re.finditer(pattern,q,re.I):
             spans.append(dict(start=match.start(),end=match.end(),text=match[0],owner=owner))
@@ -900,6 +923,9 @@ def _capability_issue(h: dict, lexicon: dict | None) -> str | None:
 
 def _structured_rule(h: dict) -> QueryPlan | None:
     """สร้างแผนจาก hints ที่มีบทบาทครบ; ข้อมูล/เงื่อนไขกำกวมคืนเหตุผลโดยไม่เดาจาก Qwen."""
+    if h.get("ambiguous_relation_direction"):
+        return QueryPlan(intent="clarify", issue="ต้องการทราบวิชาที่ต้องเรียนก่อน หรือวิชาที่เรียนต่อหลังจากวิชานี้ครับ",
+                         diagnostics={"failure_stage":"roles","reason_code":"ambiguous_relation_direction","complete":False})
     if h.get("program_name_requested"):
         return QueryPlan(intent="program_info", search_field=h["field"] or "name_any")
     if h.get("program_metrics"):
@@ -959,7 +985,8 @@ def _structured_rule(h: dict) -> QueryPlan | None:
                          credits_any_of=h["credits_any_of"], missing_credits=h["missing_credits"],
                          search_field=h["field"] or "name_any", search_term=h["term"])
     if h["relation_requested"] and h["codes"] and not (h["years"] or h["semesters"]):
-        reverse = bool(re.search(r"เป็นวิชา(?:บังคับ)?ก่อน(?:โดยตรง)?ของ|ตัวต่อ", h.get("body", "")))
+        reverse = (h.get("relation_direction") == "after" if h.get("relation_direction") else
+                   bool(re.search(r"เป็นวิชา(?:บังคับ)?ก่อน(?:โดยตรง)?ของ|ตัวต่อ", h.get("body", ""))))
         return QueryPlan(intent="reverse_prerequisites" if reverse else "prerequisites",
                          course_codes=h["codes"], prerequisite_kind=h.get("relation_kind", "pre"))
     # ฟิลด์/คำค้น/รหัสเป็น predicate ที่ parser ยืนยันแล้ว; coverage และ validator
@@ -1069,7 +1096,7 @@ def prepare_question(question: str, *, lexicons=(), catalog=None) -> dict:
     protected, changes, canonical = (), (), normalized
     if _WORDING_TRIGGER.search(normalized):
         protected = _wording_protected_spans(normalized, lexicons, catalog)
-        canonical, changes = _canonical_wording(normalized, protected, QUESTION_WORDING_VERSION)
+        canonical, changes = _canonical_wording(normalized, protected, QUESTION_WORDING_VERSION + ":" + _WORDING_SIGNATURE)
     return {
         "version": QUESTION_WORDING_VERSION, "original_question": question,
         "normalized_question": normalized, "canonical_question": canonical,
@@ -1190,7 +1217,7 @@ def _prompt_hints(hints: dict) -> dict:
     และ container ว่างเป็นค่าเริ่มต้นที่ backend ยังคงเก็บและตรวจครบ.
     """
     internal = {"normalized", "body", "scope_spans", "program_mentions", "name_mentions",
-                "category_spans", "scope_issue", "scope_intent", "scope_reason", "sort_start",
+                "relationship_spans", "category_spans", "scope_issue", "scope_intent", "scope_reason", "sort_start",
                 "draft_spans", "draft_uncovered", "draft_issue", "draft_status", "draft_reason"}
     return {key: value for key, value in hints.items()
             if key not in internal and value is not None and value is not False and value != [] and value != {}}
@@ -1610,8 +1637,10 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
     categories = _category_hints(category_text)
     progression = _progression_hints(q)
     draft = _draft_hints(q)
+    relationship = _relationship_course_operand(body)
+    ambiguous_relationship = _ambiguous_relationship_operand(body)
     relation_text = category_text  # ชื่อ/คำค้นจริงที่มีคำว่า 'ก่อน' ไม่ใช่คำสั่ง relationship.
-    relation_requested = bool(progression["progression"] or _COREQUISITE_REQUEST_RE.search(relation_text) or re.search(
+    relation_requested = bool(relationship or ambiguous_relationship or progression["progression"] or _COREQUISITE_REQUEST_RE.search(relation_text) or re.search(
         r"ต้องผ่าน|ต้องเรียน.*ก่อน|ต้องลงวิชา.*ไว้ก่อน.*เพื่อ(?:ให้)?เรียน|วิชา(?:บังคับ)?ก่อน|เป็นวิชา(?:บังคับ)?ก่อน|วิชาควบ|เรียนควบ|ต้องเรียน.*ควบ",
         relation_text))
     category_defaults = {"free_elective":["หมวดวิชาเลือกเสรี","หมวดวิชาเสรี"],
@@ -1700,7 +1729,11 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
         program_name_requested=program_name_requested,
         program_credit_requested=bool(metadata_scope and not (term or _CODE_RE.search(q) or study["years"] or study["semesters"])
                                       and re.search(r"ยอดเครดิต|จำนวนเครดิต", q)),
-        relation_kind=_relationship_kind(relation_text),
+        relation_kind=relationship["relation_kind"] if relationship else _relationship_kind(relation_text),
+        relation_direction=relationship["direction"] if relationship else None,
+        relationship=({key:relationship[key] for key in ("text","direction","relation_kind","recursive")} if relationship else None),
+        relationship_spans=relationship["request_spans"] if relationship else [],
+        ambiguous_relation_direction=bool(ambiguous_relationship),
     )
 
 
@@ -2736,6 +2769,8 @@ def validate_plan(plan: QueryPlan, question: str, *, catalog: ProgramCatalog | N
             raise ValueError("These prerequisite filters are not supported; return unsupported")
         if re.search(r"เป็นวิชา(?:บังคับ)?ก่อน(?:โดยตรง)?ของ", question) and plan.intent != "reverse_prerequisites":
             raise ValueError("Prerequisite direction is reversed")
+        if h.get("relation_direction") and (plan.intent == "reverse_prerequisites") != (h["relation_direction"] == "after"):
+            raise ValueError("Preserve the parsed prerequisite direction")
         required_kind = h["relation_kind"]
         if plan.prerequisite_kind != required_kind:
             raise ValueError(f"Use prerequisite_kind={required_kind}")
@@ -3576,21 +3611,9 @@ def _description_course_operand(body):
 
 
 def _prerequisite_course_operand(body):
-    """A direct prerequisite request without a proposed study term."""
-    match=re.fullmatch(
-        r"\s*[:：]?\s*ต้องลงวิชา(?:อะไร|ไหน)ไว้ก่อนเพื่อ(?:ให้)?เรียน\s*(?:วิชา\s*)?"
-        r"(?P<name>.+?)(?:ได้)?\s*[?？]?\s*",body)
-    if match is None:
-        match = re.fullmatch(r"\s*(?:วิชา\s*)?(?P<name>.+?)\s*(?:ต้องผ่าน|ต้องเรียน|มีวิชาบังคับก่อน)(?:วิชา)?(?:อะไร|ไหน|ใด)(?:มา)?ก่อน(?:บ้าง)?\s*(?:ครับ|ค่ะ|หน่อย)?[?？]?\s*", body)
-    if match is None:return None
-    raw=match["name"];name=raw.strip()
-    quoted=_QUOTED_RE.fullmatch(name)
-    if quoted:name=next(value for value in quoted.groups() if value is not None)
-    if not 3<=len(name)<=120:return None
-    # A term or extra constraint must use the appropriate operation, not vanish.
-    if not quoted and (_STUDY_RE.search(name) or re.search(r"ยกเว้น|ไม่รวม|ทั้งสาย|ทุกทอด",name)):return None
-    start=match.start("name")+len(raw)-len(raw.lstrip())+bool(quoted)
-    return dict(start=start,end=start+len(name),text=name)
+    """Use the shared, bounded relationship role; no second direction parser."""
+    operand = _relationship_course_operand(body)
+    return operand if operand and operand["relation_kind"] == "pre" and operand["direction"] == "before" else None
 
 
 def _proposed_course_operand(body):
@@ -3707,6 +3730,12 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     prerequisite_operand = _prerequisite_course_operand(body) if snapshots and not proposed_operand else None
     registration_operand = _registration_course_operand(body) if snapshots else None
     scalar_operand = _scalar_course_operand(body) if snapshots else None
+    relationship_operand = _relationship_course_operand(body) if snapshots else None
+    ambiguous_relationship = _ambiguous_relationship_operand(body) if snapshots else None
+    if ambiguous_relationship:
+        return QueryPlan(intent="clarify", issue="ต้องการทราบวิชาที่ต้องเรียนก่อน หรือวิชาที่เรียนต่อหลังจากวิชานี้ครับ",
+                         diagnostics={"failure_stage":"roles", "reason_code":"ambiguous_relation_direction",
+                                      "course_term":ambiguous_relationship["text"], "complete":False})
     course_operand = proposed_operand or prerequisite_operand or description_operand or registration_operand or scalar_operand
     if course_operand:
         name = course_operand["text"]
@@ -3761,6 +3790,8 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     if scalar_operand:operation,source=scalar_operand["operation"],"course"
     if registration_operand:operation,source="registration_conditions","course"
     if prerequisite_operand:operation,source="relations","course"
+    if relationship_operand:
+        operation,source=("graph_walk" if relationship_operand["recursive"] else "relations"),"course"
     if description_operand:operation,source="lookup","course"
     if proposed:operation,source="proposed_term","course"
     if proposed and any(not 1<=year<=20 or not 1<=semester<=3 for year,semester in study["terms"]):
@@ -3857,6 +3888,11 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     for m in _QUOTED_RE.finditer(body):
         if any(s["owner"]=="course_name" and s["start"]<=m.start() and m.end()<=s["end"] for s in spans):continue
         term=next(value for value in m.groups() if value is not None)
+        if (relationship_operand and m.start() <= relationship_operand["start"]
+                and relationship_operand["end"] <= m.end() and term == relationship_operand["text"]):
+            # These quotes identify the root course, not a filter on its neighbours.
+            spans.append(dict(start=m.start(),end=m.end(),owner="course_name"))
+            continue
         prefix=body[:m.start()]
         field="name_en" if re.search(r"ชื่อ(?:ภาษา)?อังกฤษ",prefix) else "name_th" if re.search(r"ชื่อ(?:ภาษา)?ไทย",prefix) else "description_th" if "คำอธิบาย" in prefix else "name_any"
         exclude=bool(re.search(r"ไม่มีคำว่า|ไม่เอาคำว่า|ยกเว้นคำว่า",prefix[-35:]))
@@ -3979,7 +4015,9 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
         average_source=composed["average_source"], average_years=composed["average_years"],
         registration_mode="pair" if operation=="registration_conditions" and len(codes)==2 else composed["registration_mode"],
         unpassed_code=unpassed_code, registration_target=registration_target)
-    if scalar_operand and scalar_operand["operation"]=="relations":
+    if relationship_operand:
+        spec=spec.model_copy(update={field:relationship_operand[field] for field in ("direction","relation_kind","recursive")})
+    elif scalar_operand and scalar_operand["operation"]=="relations":
         spec=spec.model_copy(update={field:scalar_operand[field] for field in ("direction","relation_kind") if field in scalar_operand})
     if operation=="average_credits":
         if not re.search(r"ต่อเทอม|ต่อภาคเรียน|แต่ละเทอม|เทอมละ",text):
@@ -4038,7 +4076,7 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
                        for field in categories["requested_fields"]):
                     return reject("capability", "missing_classification_output", f"ฐาน {target.program}/{target.track} ไม่ได้เก็บหมวดหรือประเภทที่ขอแสดง", "unsupported")
     if compound and (spec.years or spec.semesters or spec.terms):return reject("roles","compound_metadata_scope","ต้องการเทียบยอดหลักสูตร หรือยอดแผนปี/เทอมที่ระบุ กรุณาแยกความหมาย")
-    if proposed_operand or prerequisite_operand:
+    if proposed_operand:
         spans.append(dict(start=0,end=len(body),owner="validated_prerequisite_request"))
     if proposed:
         for m in re.finditer(r"ถ้า|สลับ|ย้าย|ไปเรียน|อยากเรียน|ต้องการเรียน|จะเรียน|จะลง(?:ทะเบียน|เรียน)?|จะผิดเงื่อนไข|เงื่อนไขวิชาก่อน|ไหม|ต้องผ่าน(?:วิชา)?(?:อะไร|ไหน)(?:มา)?ก่อน(?:บ้าง)?|(?:ได้)?ต้องเตรียมวิชา(?:อะไร|ไหน)",body):spans.append(dict(start=m.start(),end=m.end(),owner="proposed_term_condition"))
@@ -5774,6 +5812,13 @@ class QwenTextToSQL:
         known = set(hints.get("codes", [])) | {c for hit in hints.get("name_mentions", []) if len(hit["codes"]) == 1 for c in hit["codes"]}
         if not isinstance(codes, list) or any(c not in known for c in codes):
             raise SQLPlanError("invented_tool_operand", "Tool course codes must come from the question or a unique DB name")
+        frame = hints.get("relationship")
+        if frame and proposal.result_kind in {"prerequisite_chain", "dependent_terms"}:
+            expected_direction = "before" if proposal.result_kind == "prerequisite_chain" else "after"
+            if frame["direction"] != expected_direction:
+                raise SQLPlanError("changed_relation_direction", "Preserve the shared relationship direction", repairable=False)
+            if proposal.result_kind == "dependent_terms" and frame["recursive"]:
+                raise SQLPlanError("changed_relation_depth", "This tool cannot discard requested recursive depth", repairable=False)
         relation = args.get("prerequisite_kind", hints.get("relation_kind", "pre"))
         if relation != hints.get("relation_kind", "pre"):
             raise SQLPlanError("changed_relation_kind", "Preserve prerequisite vs corequisite")
@@ -5783,7 +5828,7 @@ class QwenTextToSQL:
             if len(codes) != 1:
                 raise SQLPlanError("missing_tool_operand", "Specify one course for this relation", repairable=False)
             relation_words = re.search(r"วิชาก่อน|ต้องผ่าน|ก่อนเรียน|ตัวต่อ|วิชาควบ|prereq|ต่อยอด|ทั้งสาย|สายวิชา", question, re.I)
-            if not relation_words:
+            if not relation_words and not frame:
                 raise SQLPlanError("unrequested_tool", "Question did not request a prerequisite relation")
         if proposal.result_kind in {"draft_study_plan", "check_student_plan"} and not re.search(r"แผน|ตาราง|จบ|สำเร็จ", question):
             raise SQLPlanError("unrequested_tool", "Question did not request study planning")
@@ -5793,7 +5838,7 @@ class QwenTextToSQL:
             raise SQLPlanError("invented_duration", "Requested duration must be stated in the question")
         if proposal.result_kind == "prerequisite_chain" and not re.search(r"ทั้งสาย|ทั้งหมด|ทุกทอด|ทุกชั้น|ทางอ้อม|ย้อน.*สาย", question):
             raise SQLPlanError("changed_relation_depth", "A full prerequisite chain must be requested", repairable=False)
-        if proposal.result_kind == "dependent_terms" and not re.search(r"ตัวต่อ|ต่อยอด|วิชาปลายทาง|เรียน.*ต่อ", question):
+        if proposal.result_kind == "dependent_terms" and not (frame and frame["direction"] == "after") and not re.search(r"ตัวต่อ|ต่อยอด|วิชาปลายทาง|เรียน.*ต่อ", question):
             raise SQLPlanError("changed_relation_direction", "Dependent courses must be requested", repairable=False)
         if proposal.result_kind == "conditional_prerequisites" and not re.search(r"(?:ยัง)?ไม่ผ่าน|สอบตก", question):
             raise SQLPlanError("changed_relation_direction", "An unpassed course must be stated", repairable=False)

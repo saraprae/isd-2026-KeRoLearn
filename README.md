@@ -98,7 +98,7 @@ DSBA8 – LLM Course (isd-2026-KeRoLearn)
 | Python | รัน pipeline PDF, ฐานข้อมูล และ backend |
 | PyMuPDF / Pillow | อ่าน PDF, เรนเดอร์หน้าเป็นภาพ และเตรียมภาพ |
 | Typhoon-OCR | อ่านภาพหน้าเอกสารภาษาไทย/อังกฤษให้เป็นข้อความ |
-| Qwen3:4b ผ่าน Ollama | ช่วยสกัดข้อมูลเมื่อจำเป็น และเลือก intent/คำค้นในกรณีที่กฎของโค้ดจัดการไม่ได้ |
+| Qwen3:4b ผ่าน Ollama | ช่วยสกัดข้อมูล และเสนอ SQL/พารามิเตอร์เครื่องมือเมื่อกฎตอบไม่ครบ; เส้นทางเดิมใช้เลือก intent/คำค้น |
 | SQLite | เก็บข้อมูลเป็นไฟล์ `curriculum.db` ใช้ผ่าน Python ไม่ต้องเปิด database server |
 | FastAPI / Uvicorn | รับ API และให้บริการหน้าเว็บ |
 | HTML / JavaScript / CSS | หน้า Lab 11 ใช้เลือกบริบท ส่งคำถาม และแสดงผล |
@@ -112,7 +112,7 @@ DSBA8 – LLM Course (isd-2026-KeRoLearn)
 ```text
 isd-2026-KeRoLearn/
 ├── README.md
-├── requirements.txt                  รายการหลัก; ชุดที่ตรวจตอนนี้ไฟล์ว่าง
+├── requirements.txt                  dependencies สำหรับ PDF และเว็บ
 ├── pyproject.toml                    ระบุ Python >= 3.10
 ├── run_lab8b.py                      runner ต่อ Lab 7B → Lab 8B
 ├── src/
@@ -133,9 +133,13 @@ isd-2026-KeRoLearn/
 │       ├── config.py
 │       ├── database.py
 │       ├── model_service.py
+│       ├── sql_planner.py
+│       ├── query_roles.py
+│       ├── edition_comparison.py
+│       ├── verified_rules.py
+│       ├── curriculum_rules.json
 │       ├── schemas.py
 │       ├── intent_classifier.json
-│       ├── requirements.txt
 │       └── .env                     ตั้งค่าเฉพาะเครื่อง ต้องสร้างเองเมื่อโคลนใหม่
 └── lab11(frontend)/
     └── static/
@@ -145,7 +149,7 @@ isd-2026-KeRoLearn/
 ```
 
 > ใช้ไฟล์ Lab 8 ที่ `src/ocr_system/lab8b_curriculum_db.py` ในทุกคำสั่ง
-> ไฟล์ชื่อเดียวกันที่รากโปรเจกต์เป็นแค่อีกสำเนาหนึ่ง ไม่ใช่ตัวที่ Lab 10 import
+> Lab 10 import ไฟล์นี้เพื่อเปิดฐานและตรวจ SQL ไม่ได้เรียก CLI `ask()` ของ Lab 8 เป็นเส้นทางถามบนเว็บ
 
 ### 1.3 คำศัพท์ที่ใช้ในคู่มือ
 
@@ -173,9 +177,9 @@ isd-2026-KeRoLearn/
 python --version
 ```
 
-- โปรเจกต์ระบุ Python **ตั้งแต่ 3.10** ใน `pyproject.toml`
-- การตรวจคำสั่งของชุดนี้ใช้ Python **3.11.9**
-- คู่มือไม่ได้ยืนยันว่าเวอร์ชันที่ใหม่กว่าจะผ่านทุกขั้น
+- แนะนำ **Python 3.12**; ชุดที่ตรวจใช้งานจริงเป็น **3.12.3**
+- แม้ `pyproject.toml` ระบุ Python ตั้งแต่ 3.10 แต่ `requirements.txt` ล็อก `numpy==2.5.3` ซึ่งต้องใช้ **Python ≥ 3.12**
+- คู่มือไม่ได้ยืนยันว่าเวอร์ชันอื่นจะผ่านทุกขั้น
 
 ถ้า `python` ใช้ไม่ได้ ให้ลอง:
 
@@ -184,7 +188,7 @@ py --version
 ```
 
 ติดตั้งจาก [เว็บไซต์ Python](https://www.python.org/downloads/) ถ้าจำเป็น แล้วเปิด PowerShell ใหม่หลังติดตั้ง
-ถ้าใช้ `py` ให้ใช้ `py -m venv venv` ในขั้นสร้าง venv แทน `python -m venv venv`
+ถ้าใช้ `py` ให้ใช้ `py -3.12 -m venv .venv` ในขั้นสร้าง venv แทน `python -m venv .venv`
 
 ### 2.2 โคลนหรือดาวน์โหลด zip
 
@@ -207,36 +211,41 @@ ls
 จากรากโปรเจกต์:
 
 ```powershell
-python -m venv venv
+python -m venv .venv
 ```
 
 ทำเมื่อ **ยังไม่มี** venv ที่ใช้งานได้ ถ้ามีแล้วให้ข้ามไปข้อ 3.2
 
 venv คือที่เก็บ Python และ packages เฉพาะโปรเจกต์นี้ หากย้ายโครงการไปเครื่องอื่นหรือตำแหน่งอื่น
-ควรสร้าง venv ใหม่ที่ปลายทาง ตาม [คู่มือ venv ของ Python](https://docs.python.org/3.11/library/venv.html)
+ควรสร้าง venv ใหม่ที่ปลายทาง ตาม [คู่มือ venv ของ Python](https://docs.python.org/3.12/library/venv.html)
 
 ### 3.2 เปิดใช้ venv
 
 ```powershell
-.\venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 python -c "import sys; print(sys.executable)"
+$env:PYTHONUTF8 = '1'
+$env:PYTHONIOENCODING = 'utf-8'
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 ```
 
-path ที่พิมพ์ออกมาต้องลงท้ายด้วย `isd-2026-KeRoLearn\venv\Scripts\python.exe` (หรือชื่อโฟลเดอร์โปรเจกต์ของคุณ)
+สามบรรทัดท้ายตั้ง UTF-8 สำหรับ Terminal นี้ เพื่อรักษาข้อความไทยในคำสั่งและข้อมูลที่ส่งต่อให้ Python
+
+path ที่พิมพ์ออกมาต้องลงท้ายด้วย `isd-2026-KeRoLearn\.venv\Scripts\python.exe` (หรือชื่อโฟลเดอร์โปรเจกต์ของคุณ)
 
 ถ้า PowerShell ไม่ยอมรัน `Activate.ps1` ใช้ Python ใน venv โดยตรงได้ ไม่ต้องเปลี่ยน execution policy:
 
 ```powershell
-.\venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe --version
 ```
 
-จากนั้นแทนคำว่า `python` ในคำสั่งของคู่มือด้วย `.\venv\Scripts\python.exe`
+จากนั้นแทนคำว่า `python` ในคำสั่งของคู่มือด้วย `.\.venv\Scripts\python.exe`
 การ activate มีผลเฉพาะ Terminal ปัจจุบัน ถ้าเปิด Terminal ใหม่ต้อง activate ใหม่
 
 ### 3.3 ติดตั้ง packages สำหรับทั้ง PDF และเว็บ
 
 
-คู่มือนี้แก้ด้วยคำสั่งติดตั้งต่อไปนี้ (ไม่แก้ไฟล์ requirements):
+ติดตั้ง dependencies จาก `requirements.txt` ที่รากโปรเจกต์:
 
 ```powershell
 python -m pip install --upgrade pip
@@ -245,21 +254,22 @@ python -m pip install -r requirements.txt
 
 | Package | ใช้กับอะไร |
 |---|---|
-| `fastapi`, `uvicorn[standard]` | API และเว็บ |
+| `fastapi`, `uvicorn` | API และเว็บ |
 | `python-dotenv` | อ่านไฟล์ `.env` |
 | `requests` | ติดต่อ Ollama |
-| `pydantic` รุ่น 2 (ตาม requirements ของ Lab 10) | ตรวจ schema |
+| `pydantic` รุ่น 2 | ตรวจ schema |
 | `pymupdf` | อ่าน/เรนเดอร์ PDF (โค้ดปัจจุบัน import ชื่อ `fitz`) |
 | `pillow` | เตรียมภาพ |
 | `pdfplumber` | อ่าน PDF ในเส้นทางที่ใช้ข้อความ |
 | `pythainlp` | ตัดคำไทยสำหรับการประเมินข้อความ |
+| `sqlglot` | อ่านโครงสร้างและตรวจ SQL ที่ Qwen เสนอ |
 
 `sqlite3` มากับ Python อยู่แล้ว **ไม่ต้อง** `pip install sqlite3`
 
 ### 3.4 ตรวจว่าติดตั้งเข้า Python ตัวที่ถูกต้อง
 
 ```powershell
-python -c "import fitz, PIL, pdfplumber, pythainlp, requests, pydantic, fastapi, uvicorn, dotenv; print('IMPORT OK'); print('Pydantic:', pydantic.__version__)"
+python -c "import fitz, PIL, pdfplumber, pythainlp, requests, pydantic, fastapi, uvicorn, dotenv, sqlglot; print('IMPORT OK'); print('Pydantic:', pydantic.__version__)"
 python -m pip check
 ```
 
@@ -504,7 +514,7 @@ python run_lab8b.py --all-runs --gt-dir data/ground_truth
 ใช้เมื่ออยากตรวจทีละจุด หรือต้องการแก้การแปลงโดยไม่เสียเวลา OCR ใหม่
 เลือกทำ **ส่วน 6 หรือส่วนนี้** ตามงาน ไม่ต้องรันทั้งสองทางติดกันโดยไม่มีเหตุผล
 
-### 7.1 ทำเฉพาะ Lab 6B
+### 7.1 ทำเฉพาะ Lab 7B
 
 ```powershell
 python src/ocr_system/lab7b_curriculum.py --run IT -p vlm --input-dir data/input -o work/lab7b_run --gt-dir data/ground_truth
@@ -817,8 +827,12 @@ CURRICULUM_DB_PATH=work/lab8b_run/IT/nocoop/curriculum.db
 | `CURRICULUM_MAX_ROWS` | `100` | เพดานขนาด/แสดงผลบางเส้นทาง (ไม่ใช่ยอดวิชาทั้งหลักสูตร) |
 | `CURRICULUM_CLASSIFIER_MODE` | `shadow` | off / shadow / active |
 | `CURRICULUM_PLANNER_EXAMPLE_LIMIT` | `6` | ตัวอย่างพรอมพ์ที่เลือกต่อคำถาม รับค่า 2–6 |
-| `CURRICULUM_OLLAMA_OUTPUT_TOKENS` | `128` | output budget ของรอบแรก |
-| `CURRICULUM_OLLAMA_OUTPUT_RETRY_TOKENS` | `256` | budget ของรอบซ่อมที่อนุญาต |
+| `CURRICULUM_OLLAMA_OUTPUT_TOKENS` | `128` | output budget รอบแรกของ intent planner เดิม |
+| `CURRICULUM_OLLAMA_OUTPUT_RETRY_TOKENS` | `256` | output budget เมื่อผลของ intent planner ถูกตัด |
+| `CURRICULUM_SQL_PLANNER_ENABLED` | true | เปิดเส้นทาง Qwen เสนอ SQL/พารามิเตอร์เครื่องมือ |
+| `CURRICULUM_SQL_OUTPUT_TOKENS` | `256` | output budget สำหรับ SQL ทั่วไป |
+| `CURRICULUM_SQL_COMPLEX_OUTPUT_TOKENS` | `512` | output budget สำหรับ SQL ที่เข้าเงื่อนไขงานซับซ้อน |
+| `CURRICULUM_SQL_RETRY_OUTPUT_TOKENS` | `768` | output budget ของรอบซ่อม SQL ที่อนุญาต |
 | `CURRICULUM_OLLAMA_KEEP_ALIVE` | `10m` | ระยะเวลาเก็บโมเดลไว้หลังใช้ |
 | `CURRICULUM_OLLAMA_WARMUP` | false | โหลดโมเดลเตรียมไว้เมื่อเริ่มแอป (ตัวอย่าง .env เปิดไว้) |
 | `CURRICULUM_LOG_ENABLED` | false | เปิดบันทึก planner/performance แบบ JSONL |
@@ -837,7 +851,7 @@ CURRICULUM_DB_PATH=work/lab8b_run/IT/nocoop/curriculum.db
 - `active`: ใช้ candidate เมื่อผ่าน confidence/capability/validation/coverage ตามเงื่อนไขของระบบ ถ้าไม่ผ่านจะไปเส้นทางถัดไป
 
 เปลี่ยนเป็น `active` เมื่อมี `intent_classifier.json` ตรงกับชุดโค้ด และมีผลทดสอบรองรับ
-การเปิด active **ไม่ได้ทำให้ทุกคำถามเลิกเรียก Qwen**
+classifier ใช้ในเส้นทาง intent เดิมเมื่อคำถามไม่เข้า SQL fallback การเปิด active **ไม่ได้ทำให้ทุกคำถามเลิกเรียก Qwen**
 
 ### 10.5 หลักสูตร ฉบับ และแผนที่ config รองรับ
 
@@ -851,7 +865,7 @@ CURRICULUM_DB_PATH=work/lab8b_run/IT/nocoop/curriculum.db
 | GENED | `2564` | พ.ศ. 2564 | default |
 
 - API ยังใช้ ID `default` สำหรับชุดหลัก เพื่อรักษาความเข้ากันได้
-- **อย่าส่ง `edition="2565"`** แทนเอง เว้นแต่ catalog ของชุดที่ใช้มี ID นั้นจริง
+- หน้าเว็บส่ง ID ตาม catalog; backend รับปีที่จับคู่ได้ชัดเจนตามหลักสูตรด้วย เช่น IT/`2565` และ AIT/`2566` จะ resolve เป็น `default` หากปีเดียวมีหลายฉบับต้องเลือก ID ให้ชัดเจน
 - Catalog แสดงเฉพาะฐานที่มีอยู่ตาม mapping จึงไม่ควรเลือก AIT/coop หรือสร้างโฟลเดอร์ปลอมเพื่อให้ปรากฏในเมนู
 
 <a id="part-11"></a>
@@ -1007,11 +1021,11 @@ Test-Path -LiteralPath '.\lab11(frontend)\static\style.css'
 
 ### 12.2 รันเซิร์ฟเวอร์
 
-เปิด PowerShell ใหม่ → เข้า root → เปิด venv → ตั้ง UTF-8 → ตรวจ Ollama แล้วรัน:
+เปิด PowerShell ใหม่ → เข้า root → เปิด venv → ตั้ง UTF-8 → ตรวจ Ollama แล้วรัน (เปลี่ยน path ให้ตรงเครื่องของคุณ):
 
 ```powershell
-Set-Location -LiteralPath 'C:\Users\panyh\Downloads\isd-2026-KeRoLearn'
-.\venv\Scripts\Activate.ps1
+Set-Location -LiteralPath 'C:\Users\panyh\isd-2026-KeRoLearn'
+.\.venv\Scripts\Activate.ps1
 $env:PYTHONUTF8 = '1'
 $env:PYTHONIOENCODING = 'utf-8'
 
@@ -1021,7 +1035,7 @@ python -m uvicorn lab10_fastapi.curriculum_app.main:app --reload --host 127.0.0.
 ถ้าไม่ activate ให้ใช้:
 
 ```powershell
-.\venv\Scripts\python.exe -m uvicorn lab10_fastapi.curriculum_app.main:app --reload --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m uvicorn lab10_fastapi.curriculum_app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 - `--reload` เหมาะกับการพัฒนา ถ้าใช้งานโดยไม่แก้โค้ดจะเอา flag นี้ออกก็ได้
@@ -1156,7 +1170,7 @@ Lab 11 ส่ง `page_size=20` **อย่านับแค่ 20 แถวท
 
 ### 14.2 ตัวอย่าง POST /api/ask
 
-เปิดอีก PowerShell แล้วตั้ง UTF-8 ตามส่วน 2.4:
+เปิดอีก PowerShell เข้า root เปิด `.venv` และตั้ง UTF-8 ตามส่วน 3.2:
 
 ```powershell
 $request = @{
@@ -1192,16 +1206,20 @@ $response.performance | ConvertTo-Json -Depth 12
 |---|---|---|
 | `question` | จำเป็น | ความยาว 2–500 ตัวอักษร |
 | `program` | จำเป็น | รหัสจาก catalog |
-| `edition` | ไม่บังคับ | ID ฉบับ (หน้าเว็บส่งเสมอ) |
+| `edition` | ไม่บังคับ | ID ฉบับจาก catalog หรือปีที่จับคู่ได้ชัดเจน (หน้าเว็บส่ง ID เสมอ) |
 | `track` | ขึ้นกับหลักสูตร | ถ้ามีสองแผนต้องเลือกให้ชัด |
 | `page` | ไม่บังคับ | หน้าของ rows เริ่มที่ 1 |
 | `page_size` | ไม่บังคับ | รับ 1–1000 (หน้าเว็บใช้ 20) |
 | `student_plan` | ใช้เมื่อตรวจแผน | รายการปี/เทอม/รหัสที่ตั้งใจลง |
 | `completed_courses` | ใช้เมื่อตรวจ/ร่าง | รหัสที่ผู้ใช้ระบุว่าเรียนผ่านแล้ว |
+| `completed_grades` | ไม่บังคับ | รหัสวิชา → เกรดตัวเลข 0–4 สำหรับเงื่อนไขที่ต้องตรวจเกรด |
+| `approved_equivalences` | ไม่บังคับ | รหัสวิชาที่ผู้ใช้ระบุว่ามีผลเทียบเคียงที่ได้รับอนุมัติแล้ว |
+| `category_allocations` | ไม่บังคับ | รหัสวิชา → `specialized`, `general_education` หรือ `free_elective` สำหรับระบุหมวดที่ต้องการนับ |
 | `max_credits_per_term` | ไม่บังคับ | สมมติฐานเพดานหน่วยกิตของตัวตรวจ/ร่าง (default 30) |
 
 - `program` กับ `track` เป็นบริบท ไม่ใช่ตัวเลขที่ Qwen ต้องเดา
 - รหัสวิชาใน student context ต้องเป็น **ข้อความเลข 8 หลัก**
+- เกรด ผลเทียบเคียง และการจัดหมวดเป็นข้อมูลที่ผู้ใช้ส่ง ไม่ใช่ผลอนุมัติจากทะเบียนของมหาวิทยาลัย
 
 ### 14.4 ตัวอย่างตรวจแผนเบื้องต้น
 
@@ -1324,9 +1342,11 @@ flowchart TD
     C --> D["ตรวจ cache ตามเส้นทาง"]
     D -->|มีคำตอบที่ใช้ได้| K["ส่งผลกลับ"]
     D -->|ต้องสร้างแผน| E["กฎ / plan cache"]
-    E -->|ยังไม่พอ| F["classifier ตาม config → Qwen เมื่อจำเป็น"]
-    E --> G["ตรวจความหมายและ capability"]
+    E -->|โค้ดเข้าใจครบ| G["ตรวจแผนหรือ SQL เงื่อนไข และ capability"]
+    E -->|ยังไม่ครบและใช้ SQL fallback ได้| F["Qwen เสนอ SQL / พารามิเตอร์เครื่องมือ"]
+    E -->|ไม่เข้า SQL fallback| M["classifier ตาม config / Qwen เลือก intent"]
     F --> G
+    M --> G
     G -->|กำกวมหรือไม่รองรับ| H["ถามกลับ / แจ้งข้อจำกัด"]
     G -->|ตรวจผ่าน| I["SQL / executor อ่าน DB และคำนวณ"]
     I --> J["render คำตอบ + citations + diagnostics"]
@@ -1346,6 +1366,10 @@ flowchart TD
 | `database.py` | เปิดฐานที่เลือก, catalog, lexicon, query, revision, source document catalog |
 | `schemas.py` | ตรวจ input และกำหนด response/citation/performance |
 | `model_service.py` | เตรียมคำถาม, hints, rules, classifier/Qwen, validation, compiler/executor, renderer, cache |
+| `sql_planner.py` | พรอมพ์/ตัวอย่าง SQL และตัวตรวจ SQL/params ที่ Qwen เสนอ |
+| `query_roles.py` | จับบทบาทชื่อ คำค้น และทิศทางความสัมพันธ์ร่วมกัน |
+| `edition_comparison.py` | เปรียบเทียบชุดรหัสระหว่างสองฉบับที่ลงทะเบียน |
+| `verified_rules.py`, `curriculum_rules.json` | อ่านเกณฑ์ที่ตรวจไว้ ใช้เมื่อ PDF ตรง hash ของรายการนั้น |
 | `intent_classifier.json` | ข้อมูลโมเดล classifier ตามชุดโค้ด (ไม่ใช่ฐานข้อมูลหลักสูตร) |
 
 ### 15.4 ฟังก์ชันสำคัญใน model_service.py
@@ -1363,21 +1387,21 @@ flowchart TD
 | `available()` | อ่านรายการโมเดลจาก Ollama | ไม่ทำ inference |
 | `warmup()` | เตรียมโมเดลล่วงหน้าเมื่อเปิดใน config | ส่งคำขอเตรียมโมเดล |
 | `_chat()` | ติดต่อ Ollama `/api/chat` ด้วย prompt และ schema | เรียก |
-| `_plan()` | ใช้ cache/rules/classifier ก่อน แล้วค่อย fallback | เรียกเมื่อจำเป็น |
+| `_plan()` | ใช้ cache/rules แล้วเลือก SQL fallback หรือเส้นทาง classifier/intent เดิม | เรียกเมื่อจำเป็น |
+| `_plan_sql()` | ส่ง schema/hints ให้ Qwen เสนอ SQL หรือเครื่องมือ แล้วตรวจข้อเสนอ | เรียก |
 | `_ask_uncached()` | สร้างแผน query และคำตอบเมื่อไม่มี answer cache | อาจเรียกผ่าน `_plan` |
 | `_ask_data()` / executors | อ่านข้อมูลและคำนวณงานประกอบ | ใช้โค้ดคำนวณ |
 | `summarize()` / `render_answer()` | สร้างภาษาไทยจากแผนและ rows ที่ใช้จริง | ไม่เรียก |
 | `ask()` / `_ask_core()` | เลือกฉบับ ควบคุมบริบท deadline/cache/locks และผลตอบกลับ | ขึ้นกับเส้นทาง |
 
-ชื่อคลาส `QwenTextToSQL` คงมาจากการพัฒนาเดิม แต่เส้นทางของ Lab 10 ปัจจุบัน **ให้ Qwen เลือกแผน ไม่ได้ให้เขียน SQL อิสระเป็นคำตอบสุดท้าย**
+Lab 10 มีทั้งเส้นทาง **Qwen เสนอ SQL/พารามิเตอร์เครื่องมือ** และเส้นทาง **เลือก intent เดิม** ทุกเส้นทางต้องผ่านการตรวจของโค้ดก่อนอ่าน DB หรือคำนวณ และโค้ดเป็นผู้สร้างคำตอบสุดท้าย
 
 ### 15.5 พรอมพ์ Qwen ส่งอะไรและรับอะไร
 
-- `PLAN_PROMPT` = กติกาหลัก
-- `PLAN_EXAMPLES` = กลุ่มตัวอย่าง
-- `planner_prompt()` = เลือกตัวอย่างและ capabilities ที่เกี่ยวข้อง (**ไม่ส่งข้อมูลทั้ง DB เข้าโมเดลทุกครั้ง**)
+- **SQL fallback:** `SQL_PROMPT`, `EXAMPLES` และ `select_examples()` ใน `sql_planner.py` ใช้คำถาม schema ของฐานจริง และ verified hints ให้ Qwen เสนอ `sql`, `params`, `result_kind` ตาม `SQL_SCHEMA`; งานเครื่องมือใช้ `tool_args` เพิ่มตามที่จำเป็น
+- **Intent planner เดิม:** `PLAN_PROMPT` เป็นกติกา, `PLAN_EXAMPLES` เก็บตัวอย่าง และ `planner_prompt()` เลือกตัวอย่าง/capabilities เมื่อไม่เข้า SQL fallback หรือปิดเส้นทาง SQL
 
-โมเดลคืนสามฟิลด์ตาม `CHOICE_SCHEMA`:
+ทั้งสองเส้นทาง **ไม่ส่งข้อมูลทั้ง DB เข้าโมเดลทุกครั้ง** ตัวอย่างผลจาก intent planner เดิมมีสามฟิลด์ตาม `CHOICE_SCHEMA`:
 
 ```json
 {
@@ -1387,8 +1411,8 @@ flowchart TD
 }
 ```
 
-โค้ดจะประกอบปี/เทอม/ตัวกรองจาก verified hints และตรวจซ้ำอีกครั้ง
-Qwen **ไม่สร้าง** เลขหน้า หน่วยกิต หรือคำรับรองสิทธิ์การลงทะเบียน
+ในเส้นทาง intent โค้ดประกอบปี/เทอม/ตัวกรองจาก verified hints แล้ว compile SQL ส่วน SQL fallback ตรวจแหล่งข้อมูล คอลัมน์ params และเงื่อนไขที่ Qwen เสนอ ก่อนรันภายใน deadline; ซ่อมได้ไม่เกินหนึ่งรอบเมื่อแก้ได้
+Qwen **ไม่สร้างข้อเท็จจริง** เรื่องเลขหน้า หน่วยกิต หรือสิทธิ์การลงทะเบียน ผลค้นมาจาก DB และกฎที่ตรวจไว้ตามบริบท
 
 ตัวอย่างเส้นแบ่งความหมายที่ระบบต้องรักษาไว้:
 
@@ -1400,6 +1424,8 @@ Qwen **ไม่สร้าง** เลขหน้า หน่วยกิต
 | จบ 3.5 ปีแต่ละเทอมลงวิชาอะไร | ขอร่างตาราง |
 | วิชาที่ชื่อมีคำว่า "สุขภาพ" | ค้นหลายรายการ |
 | วิชา "สุขภาพ…" มีกี่หน่วยกิต | ถามวิชาเฉพาะ (อาจต้องแยกชื่อที่กำกวม) |
+| แคลคูลัส 2 ต้องเรียนอะไรก่อน / ต้องต่ออะไรก่อน | ค้นวิชาก่อน (`before`) เหมือนกัน; ใน AIT ได้แคลคูลัส 1 ตาม DB |
+| วิชาอะไรต่อจากแคลคูลัส 2 | ค้นวิชาถัดไป (`after`); ถ้าถามแค่ “แคลคูลัส 2 ต่ออะไร” ให้ถามกลับเรื่องทิศทาง |
 
 ตัวตรวจช่วยลดความเสี่ยง แต่ไม่ได้รับประกันว่าทุกความหมายถูกต้อง
 Coverage มีทั้งเส้นทางบังคับและเส้นทางที่แค่บันทึกผล จึงยังต้องทดสอบ rows และหลักฐานจริง
@@ -1436,8 +1462,8 @@ Coverage มีทั้งเส้นทางบังคับและเ�
 4. เปิด browser
 
 ```powershell
-Set-Location -LiteralPath 'C:\Users\panyh\Downloads\isd-2026-KeRoLearn'
-.\venv\Scripts\Activate.ps1
+Set-Location -LiteralPath 'C:\Users\panyh\isd-2026-KeRoLearn'
+.\.venv\Scripts\Activate.ps1
 $env:PYTHONUTF8 = '1'
 $env:PYTHONIOENCODING = 'utf-8'
 $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
@@ -1471,7 +1497,7 @@ python -m uvicorn lab10_fastapi.curriculum_app.main:app --host 127.0.0.1 --port 
 
 | สิ่งที่ต้องมี | เพื่ออะไร |
 |---|---|
-| `lab10_fastapi/` | backend และ classifier ตาม config |
+| `lab10_fastapi/` | backend, classifier และ `curriculum_rules.json` ที่โค้ดใช้อ่านกฎ |
 | `lab11(frontend)/static/` | หน้าเว็บ |
 | `src/ocr_system/lab8b_curriculum_db.py` พร้อม package ที่เกี่ยวข้อง | open_db / guard_sql และการ import |
 | `work/lab8b_run/**/curriculum.db` ที่ต้องใช้ | ข้อเท็จจริงสำหรับ query |
@@ -1479,6 +1505,8 @@ python -m uvicorn lab10_fastapi.curriculum_app.main:app --host 127.0.0.1 --port 
 | `lab10_fastapi/curriculum_app/.env` ของเครื่องปลายทาง | config และทะเบียน PDF |
 | PDF ตามทะเบียน | เปิดเอกสารอ้างอิง (บางไฟล์อยู่ใน data/input บางไฟล์อยู่ใน documents) |
 | Python packages และโมเดล Ollama | รันบริการและ fallback |
+
+กฎใน `curriculum_rules.json` ใช้ได้เฉพาะรายการที่ PDF ตรง SHA-256; ถ้าไฟล์ขาดหรือ hash ไม่ตรง ระบบจะไม่ใช้เกณฑ์ของรายการนั้น การลงทะเบียน PDF สำหรับปุ่มอ้างอิงใน `.env` เป็นคนละส่วนกับกฎนี้
 
 ถ้าจะสร้าง DB ใหม่ที่ปลายทาง ต้องมี `run_lab8b.py`, Lab 7B, `src/lab7_metrics.py` และ PDF เต็มเล่มด้วย
 (เฉลยช่วยประเมินแต่ไม่จำเป็นต่อการถามทั่วไป)
@@ -1516,10 +1544,10 @@ Path ที่สัมพันธ์กับ PROJECT_ROOT จะตามโ�
 | อาการ | สาเหตุที่ควรตรวจ | วิธีดำเนินการ |
 |---|---|---|
 | `python` ไม่พบ หรือเปิด Microsoft Store | PATH / ตัว Python | ใช้ `py` ตรวจเวอร์ชัน หรือติดตั้ง Python แล้วเปิด Terminal ใหม่ |
-| activate venv ไม่ได้ | policy / ไม่มีไฟล์ | ใช้ `venv\Scripts\python.exe` โดยตรง หรือสร้าง venv ถ้ายังไม่มี |
-| `ModuleNotFoundError` | ติดตั้งผิด Python หรือ requirements ที่ root ว่าง | ตรวจ `sys.executable` แล้วติดตั้งตามส่วน 3.3 |
-| Pydantic error ตั้งแต่ import | รุ่นไม่ตรง | ติดตั้ง requirements ของ Lab 10 และตรวจว่าเป็นรุ่น 2 |
-| ข้อความไทยเพี้ยน | encoding ของ terminal/HTTP | ทำส่วน 2.4 และส่ง JSON เป็น UTF-8 bytes |
+| activate venv ไม่ได้ | policy / ไม่มีไฟล์ | ใช้ `.venv\Scripts\python.exe` โดยตรง หรือสร้าง venv ถ้ายังไม่มี |
+| `ModuleNotFoundError` | ติดตั้งผิด Python หรือยังไม่ได้ติดตั้ง dependencies | ตรวจ `sys.executable` แล้วติดตั้งตามส่วน 3.3 |
+| Pydantic error ตั้งแต่ import | รุ่นไม่ตรง | ติดตั้ง requirements ที่รากโปรเจกต์และตรวจว่าเป็นรุ่น 2 |
+| ข้อความไทยเพี้ยน | encoding ของ terminal/HTTP | ทำส่วน 3.2 และส่ง JSON เป็น UTF-8 bytes |
 | `ollama` ไม่พบ | ยังไม่ติดตั้ง / Terminal เก่า | ติดตั้งแล้วเปิด Terminal ใหม่ |
 | connection refused ที่ 11434 | service ยังไม่เปิด | เปิด Ollama หรือตรวจ `ollama serve` |
 | พอร์ต 11434 ถูกใช้ | service เดิมเปิดอยู่แล้ว | ใช้ service เดิม ตรวจ `/api/tags` |
@@ -1538,7 +1566,7 @@ Path ที่สัมพันธ์กับ PROJECT_ROOT จะตามโ�
 | ไม่มีหลักสูตรในเมนู | DB ขาด หรือ path ไม่ตรง config | ตรวจ catalog และไฟล์ DB |
 | AIT ไม่มี coop/nocoop | catalog มีแค่ default | ใช้แผนเดียว ไม่แทนฐานเงียบ ๆ |
 | GENED ถามปี/เทอมไม่ได้ | เป็นแคตตาล็อก ไม่มี plan_item | ถามข้อมูล course หรือแจ้งว่าขาดแผนรายปี |
-| เลือกปี 2565 แล้ว API ไม่รับ | ส่งปีเป็น edition ID ผิด | ใช้ `default` ตาม catalog ของชุดนี้ |
+| เลือกปีหลักสูตรแล้ว API ไม่รับ | ไม่มีฐานของปีนั้น หรือปีเดียวตรงหลายฉบับ | ตรวจ program และ ID จาก catalog; ปีที่จับคู่ได้ชัดเจน เช่น IT/2565 ใช้แทน `default` ได้ |
 | ตารางเห็นแค่ 20 รายการ | เป็น pagination | อ่าน `total_count` และหน้าถัดไป |
 | ไม่มี citations | ข้อมูลชนิดนั้นไม่ได้เก็บหน้า / ผลไม่รองรับหลักฐาน | ตรวจ DB และ source **ไม่สร้างเลขหน้าเอง** |
 | มีหน้าแต่ไม่มีปุ่ม PDF | registry/hash/path/mapping ไม่ครบ | ทำส่วน 11 แล้ว restart |
