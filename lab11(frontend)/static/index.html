@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Curriculum Assistant</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=readable-v4">
 </head>
 <body>
   <h1>Curriculum Book Assistant</h1>
@@ -57,6 +57,16 @@
       </div>
     </div>
 
+    <section id="answer-notices" class="answer-notices" hidden aria-label="ข้อจำกัดที่มีผลต่อคำตอบ"></section>
+
+    <section id="answer-results" class="answer-results" hidden aria-labelledby="results-heading">
+      <div class="results-header">
+        <h3 id="results-heading">รายละเอียดรายวิชา</h3>
+        <p id="result-count" class="result-count" role="status"></p>
+      </div>
+      <div id="rows-table" class="table-scroll"></div>
+    </section>
+
     <div id="copy-fallback" class="copy-fallback" hidden>
       <p>คัดลอกอัตโนมัติไม่ได้ เลือกข้อความแล้วกด Ctrl+C หรือคัดลอกจากเมนูของอุปกรณ์</p>
       <textarea readonly aria-label="คำตอบสำหรับคัดลอก"></textarea>
@@ -65,19 +75,18 @@
     <section id="answer-analysis" class="answer-analysis" hidden aria-label="ข้อสมมติและผลตรวจเพิ่มเติม"></section>
 
     <section id="answer-citations" class="answer-citations" aria-labelledby="citations-heading" hidden>
-      <h3 id="citations-heading">หลักฐานและที่มาของเลขหน้า</h3>
+      <h3 id="citations-heading">หลักฐานอ้างอิง</h3>
       <p id="citations-description" class="citations-description"></p>
       <div id="citations-list" class="citations-list"></div>
     </section>
 
     <details id="response-details" class="response-details" hidden>
       <summary>
-        <span>ดูข้อมูลประกอบคำตอบ</span>
+        <span>รายละเอียดการประมวลผล</span>
         <span id="row-count" class="row-count"></span>
       </summary>
       <div class="response-details-body">
-        <h3>ข้อมูลจากหลักสูตร</h3>
-        <div id="rows-table" class="table-scroll"></div>
+        <div id="performance-details"></div>
         <details class="technical-details">
           <summary>ดูข้อมูลดิบ (JSON)</summary>
           <pre id="rows">-</pre>
@@ -90,6 +99,6 @@
     </details>
   </section>
 
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js?v=readable-v2" defer></script>
 </body>
 </html>

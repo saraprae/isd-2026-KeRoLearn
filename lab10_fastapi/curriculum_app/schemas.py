@@ -19,6 +19,9 @@ class StudentContext(BaseModel):
     student_plan: list[StudentTerm] | None = Field(default=None, max_length=24)
     completed_courses: list[Annotated[str, Field(pattern=r"^[0-9]{8}$")]] = Field(default_factory=list, max_length=500)
     max_credits_per_term: Annotated[int, Field(strict=True, ge=1, le=60)] = 30
+    completed_grades: dict[Annotated[str, Field(pattern=r"^[0-9]{8}$")], Annotated[float, Field(ge=0, le=4)]] = Field(default_factory=dict)
+    approved_equivalences: list[Annotated[str, Field(pattern=r"^[0-9]{8}$")]] = Field(default_factory=list, max_length=500)
+    category_allocations: dict[Annotated[str, Field(pattern=r"^[0-9]{8}$")], Literal["specialized", "general_education", "free_elective"]] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def unique_terms(self):
@@ -75,7 +78,7 @@ class AskPerformance(BaseModel):
     """เวลาของ request ปัจจุบัน; stages เป็นเวลาที่ไม่ซ้อนกัน หน่วยมิลลิวินาที."""
     total_ms: float = Field(ge=0)
     stages_ms: dict[str, Annotated[float, Field(ge=0)]]
-    plan_source: Literal["unknown", "preflight", "rules", "qwen", "classifier", "plan_cache",
+    plan_source: Literal["unknown", "preflight", "rules", "qwen", "qwen_sql", "classifier", "plan_cache",
                          "short_plan_cache", "answer_cache"]
     intent: str | None = None
     answer_cache_hit: bool = False

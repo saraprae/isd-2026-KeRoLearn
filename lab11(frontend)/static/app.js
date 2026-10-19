@@ -27,7 +27,59 @@ const processingTime = document.getElementById("processing-time");
 const answerCitations = document.getElementById("answer-citations");
 const citationsList = document.getElementById("citations-list");
 const answerAnalysis = document.getElementById("answer-analysis");
+const answerResults = document.getElementById("answer-results");
+const answerNotices = document.getElementById("answer-notices");
 const numberFormat = new Intl.NumberFormat("th-TH", { maximumFractionDigits: 20 });
+
+const resultLabels = {
+  program: "หลักสูตร", edition: "ฉบับ", edition_label: "ปีหลักสูตร", track: "แผนการเรียน",
+  difference: "อยู่เฉพาะแผน", code: "รหัสวิชา", name_th: "ชื่อภาษาไทย", name_en: "ชื่อภาษาอังกฤษ",
+  course_name: "ชื่อวิชา", credits: "หน่วยกิต", total_credits: "หน่วยกิตรวม", years: "ระยะเวลา (ปี)",
+  year: "ปี", semester: "เทอม", category: "หมวดวิชา", type: "ประเภทวิชา", degree: "ปริญญา",
+  lecture_h: "ชั่วโมงบรรยาย", lab_h: "ชั่วโมงปฏิบัติ", self_h: "ชั่วโมงศึกษาด้วยตนเอง",
+  description_th: "คำอธิบายรายวิชา", alt_group: "กลุ่มตัวเลือก", note: "หมายเหตุ",
+  root_code: "วิชาที่ถาม", requires: "รหัสวิชาก่อน/วิชาควบ", required_name: "ชื่อวิชาก่อน/วิชาควบ",
+  source_code: "รหัสวิชาก่อน", source_name: "ชื่อวิชาก่อน", target_code: "รหัสตัวต่อ", target_name: "ชื่อวิชาตัวต่อ",
+  kind: "ชนิดความสัมพันธ์", depth: "ระดับในสายวิชาก่อน", terms: "ปี/เทอมตามแผน",
+  requirements: "เงื่อนไขทั้งหมดที่บันทึก", status: "ผลตรวจ", reason: "เหตุผล",
+  n_courses: "จำนวนวิชา / ช่องตามแผน", n_listed: "รายการรวมตัวเลือก", n_slots: "ช่องที่ต้องเรียน",
+  count: "จำนวน", slot_count: "ช่องที่ต้องเรียน", known_slot_credits: "หน่วยกิตช่องที่ทราบค่า",
+  known_credits: "หน่วยกิตที่ทราบค่า", average_credits: "หน่วยกิตเฉลี่ย", terms_count: "จำนวนเทอม",
+  distinct_codes: "จำนวนรหัสไม่ซ้ำ", real_course_codes: "จำนวนรหัสวิชาจริง", placeholder_slots: "ช่องเลือก",
+  missing_credit_slots: "ช่องที่ไม่ระบุหน่วยกิต", incomplete_alt_slots: "ช่องที่ข้อมูลตัวเลือกไม่ครบ",
+  term_breakdown: "รายละเอียดรายเทอม", section: "กลุ่มข้อมูล", value: "ค่า", rank: "อันดับ"
+};
+
+function resultLabel(key, data) {
+  return data?.analysis?.labels?.[key] || resultLabels[key] || key;
+}
+
+function resultColumns(rows) {
+  // Returned columns are the projection selected by the backend. Hide only provenance,
+  // which is displayed through citations; do not infer new filters from question text.
+  const keys = [...new Set(rows.flatMap(row => Object.keys(row)))].filter(key =>
+    !["pages", "course_pages", "plan_pages", "citation_id", "document_id"].includes(key));
+  const priority = ["program", "edition_label", "track", "year", "semester", "code", "name_th", "name_en", "credits"];
+  return [...priority.filter(key => keys.includes(key)), ...keys.filter(key => !priority.includes(key))];
+}
+
+function resultValue(key, value) {
+  if (value === null || value === undefined) return "ยังไม่มีข้อมูล";
+  if (key === "track") return trackLabel(value);
+  if (key === "difference") return {coop_only: "สหกิจศึกษา", nocoop_only: "ไม่สหกิจศึกษา"}[value] || value;
+  if (key === "kind") return {pre: "ต้องผ่านก่อน", co: "เรียนควบ"}[value] || value;
+  if (key === "status") return {pass: "ผ่านข้อที่ตรวจ", fail: "พบเงื่อนไขไม่ผ่าน", conditional: "มีเงื่อนไข", unknown: "ข้อมูลไม่พอ", draft: "ร่าง", incomplete: "ยังตรวจไม่ครบ"}[value] || value;
+  if (typeof value === "number") return numberFormat.format(value);
+  if (typeof value === "boolean") return value ? "ใช่" : "ไม่ใช่";
+  return typeof value === "object" ? JSON.stringify(value) : String(value);
+}
+
+function countText(data) {
+  const returned = Number.isInteger(data.returned_count) ? data.returned_count : data.rows.length;
+  const total = Number.isInteger(data.total_count) ? data.total_count : data.rows.length;
+  const page = Number.isInteger(data.page) ? ` · หน้า ${numberFormat.format(data.page)}` : "";
+  return `พบทั้งหมด ${numberFormat.format(total)} รายการ · แสดง ${numberFormat.format(returned)} รายการ${page}`;
+}
 
 function createElement(tag, className, text) {
   const element = document.createElement(tag);
@@ -71,6 +123,10 @@ function resetResult() {
   answerContext.hidden = true;
   answerHighlights.hidden = true;
   answerHighlights.replaceChildren();
+  answerResults.hidden = true;
+  answerNotices.hidden = true;
+  answerNotices.replaceChildren();
+  document.getElementById("performance-details").replaceChildren();
   responseDetails.hidden = true;
   responseDetails.open = false;
   responseDetails.querySelectorAll("details").forEach((details) => { details.open = false; });
@@ -101,7 +157,7 @@ function comparisonRows(rows) {
     && typeof row.program === "string" && row.program.trim()
     && typeof row.track === "string" && row.track.trim()
     && (Object.hasOwn(row, "total_credits") || Object.hasOwn(row, "years")))) return null;
-  return new Set(rows.map(row => `${row.program}/${row.track}`)).size === rows.length ? rows : null;
+  return new Set(rows.map(row => `${row.program}/${row.edition || row.edition_label || ""}/${row.track}`)).size === rows.length ? rows : null;
 }
 
 function appendMetric(row, key, label, unit) {
@@ -117,20 +173,28 @@ function appendMetric(row, key, label, unit) {
   answerHighlights.append(card);
 }
 
-function renderHighlights(rows) {
+function renderHighlights(rows, data) {
   answerHighlights.replaceChildren();
   answerHighlights.hidden = true;
   const targets = comparisonRows(rows);
   if (targets) {
     for (const row of targets) {
-      const scope = `${row.program} · ${row.track}`;
+      const scope = [row.program, row.edition_label, trackLabel(row.track)].filter(Boolean).join(" · ");
       appendMetric(row, "total_credits", `${scope} — หน่วยกิตรวมหลักสูตร`, "หน่วยกิต");
       appendMetric(row, "years", `${scope} — ระยะเวลาหลักสูตร`, "ปี");
     }
     answerHighlights.hidden = answerHighlights.childElementCount === 0;
     return;
   }
-  if (rows.length !== 1 || !rows[0] || typeof rows[0] !== "object") return;
+  const result = data?.analysis?.result;
+  if (result && typeof result === "object" && !Array.isArray(result) && result.source !== "qa_program" && Number.isFinite(result.count)) {
+    const realCodes = ["distinct_real_course_codes", "real_course_codes", "distinct_codes"].includes(result.count_basis);
+    if (realCodes) appendMetric({n_courses: result.count}, "n_courses", "รหัสวิชาจริงที่ตรงเงื่อนไข", "วิชา");
+  }
+  if (rows.length !== 1 || !rows[0] || typeof rows[0] !== "object") {
+    answerHighlights.hidden = answerHighlights.childElementCount === 0;
+    return;
+  }
   const row = rows[0];
   const partial = (row.missing_credit_slots || 0) > 0 || (row.incomplete_alt_slots || 0) > 0;
   const planned = row.year !== undefined && row.semester !== undefined;
@@ -138,11 +202,12 @@ function renderHighlights(rows) {
     ["total_credits", partial ? "หน่วยกิตที่ระบุ" : row.year !== undefined ? "หน่วยกิตรวมในปีนี้" : "หน่วยกิตรวมหลักสูตร", "หน่วยกิต"],
     ["credits", partial ? "หน่วยกิตที่ระบุ" : planned ? "หน่วยกิตในเทอมนี้" : "หน่วยกิตรายวิชา", "หน่วยกิต"],
     ["years", "ระยะเวลาหลักสูตร", "ปี"],
-    ["n_courses", planned ? "ช่องวิชาตามแผน" : "วิชาที่ตรงเงื่อนไข", planned ? "ช่อง" : "วิชา"],
+    ["n_courses", planned && result?.count_basis !== "distinct_real_course_codes" ? "ช่องวิชาตามแผน" : "วิชาที่ตรงเงื่อนไข", planned && result?.count_basis !== "distinct_real_course_codes" ? "ช่อง" : "วิชา"],
     ["n_listed", "รายการรวมตัวเลือก", "รายการ"],
     ["n_slots", "ช่องวิชาที่ต้องเรียน", "ช่อง"]
   ];
   for (const [key, label, unit] of metrics) {
+    if (key === "n_courses" && result?.count_basis === "distinct_real_course_codes") continue;
     appendMetric(row, key, label, unit);
   }
   answerHighlights.hidden = answerHighlights.childElementCount === 0;
@@ -206,108 +271,279 @@ function renderAnswer(text) {
   } else answerBody.replaceChildren(content);
 }
 
-function renderRows(rows, extraLabels = {}) {
-  const container = document.getElementById("rows-table");
-  container.replaceChildren();
-  if (rows.length === 0) {
-    container.append(createElement("p", "table-empty", "ไม่มีแถวข้อมูลสำหรับคำถามนี้"));
-    return;
-  }
-  const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
-  const labels = {
-    program: "หลักสูตร", track: "แผนการเรียน", difference: "อยู่เฉพาะแผน",
-    root_code: "วิชาที่ถาม", depth: "ระดับในสายวิชาก่อน", terms: "ปี/เทอมตามแผน",
-    requirements: "วิชาก่อนทั้งหมด", status: "ผลตรวจ", reason: "เหตุผล",
-    code: "รหัสวิชา", name_th: "ชื่อภาษาไทย", name_en: "ชื่อภาษาอังกฤษ", degree: "ปริญญา",
-    credits: "หน่วยกิต", total_credits: "หน่วยกิตรวม", years: "ระยะเวลา (ปี)",
-    year: "ปี", semester: "เทอม", alt_group: "กลุ่มตัวเลือก", note: "หมายเหตุ",
-    lecture_h: "ชั่วโมงบรรยาย", lab_h: "ชั่วโมงปฏิบัติ", self_h: "ชั่วโมงศึกษาด้วยตนเอง",
-    description_th: "คำอธิบาย", course_name: "ชื่อวิชา", requires: "รหัสวิชาที่ต้องเรียน",
-    required_name: "ชื่อวิชาที่ต้องเรียน", kind: "ประเภทเงื่อนไข", n_courses: "จำนวนวิชา / ช่องตามแผน",
-    category: "หมวดวิชา", type: "ประเภทวิชา", source_code: "รหัสวิชาก่อน", source_name: "ชื่อวิชาก่อน",
-    target_code: "รหัสตัวต่อ", target_name: "ชื่อวิชาตัวต่อ", requirements: "เงื่อนไขทั้งหมดที่บันทึก",
-    n_listed: "รายการรวมตัวเลือก", n_slots: "ช่องที่ต้องเรียน", term_breakdown: "รายละเอียดรายเทอม",
-    missing_credit_slots: "ช่องที่ไม่ระบุหน่วยกิต", incomplete_alt_slots: "ช่องที่ตัวเลือกมีข้อมูลไม่ครบ"
-  };
-  Object.assign(labels, extraLabels);
-  const valueNode = (value) => {
-    if (value === null || value === undefined) return createElement("span", "table-missing", "ไม่ระบุ");
-    if (typeof value === "boolean") return createElement("span", "", value ? "ใช่" : "ไม่ใช่");
-    if (typeof value !== "object") {
-      const text = String(value);
-      if (text.length < 250) return createElement("span", "", text);
-      const details = createElement("details", "data-value");
-      details.append(createElement("summary", "", "อ่านรายละเอียดทั้งหมด"), createElement("p", "", text));
-      return details;
+function rowCitationGroups(row, data, fields = resultColumns([row])) {
+  const graph = typeof row.requires === "string" || typeof row.source_code === "string";
+  const codes = new Set([row.code, row.course_code, graph && row.requires, row.source_code, row.target_code].filter(Boolean));
+  const wantsPlan = fields.some(field => ["year", "semester", "terms", "category", "type", "alt_group"].includes(field));
+  return citationGroups(data).map((group, index) => ({...group, number: index + 1, id: `citation-${index + 1}`})).filter(({citation}) => {
+    for (const key of ["program", "track", "edition"]) {
+      if (row[key] && citation[key] && row[key] !== citation[key]) return false;
     }
-    const details = createElement("details", "data-value");
-    details.append(createElement("summary", "", Array.isArray(value) ? `${numberFormat.format(value.length)} รายการ` : "ดูรายละเอียด"));
-    const list = createElement(Array.isArray(value) ? "ol" : "dl");
-    for (const [key, item] of Object.entries(value)) {
-      if (Array.isArray(value)) {
-        const entry = createElement("li"); entry.append(valueNode(item)); list.append(entry);
-      } else {
-        const entry = createElement("dd"); entry.append(valueNode(item));
-        list.append(createElement("dt", "", labels[key] || key), entry);
+    const source = citation.evidence_source && citation.evidence_source !== "unknown" ? citation.evidence_source : citation.source;
+    if (codes.size) {
+      if (!codes.has(citation.course_code)) return false;
+      if (source === "course") return true;
+      if (["plan_item", "study_plan", "elective_slot"].includes(source) && wantsPlan && !graph) {
+        return (!Number.isInteger(row.year) || row.year === citation.year)
+          && (!Number.isInteger(row.semester) || row.semester === citation.semester);
       }
+      return source === "prerequisite" && graph;
     }
-    details.append(list);
+    if (Number.isInteger(row.year) || Number.isInteger(row.semester)) {
+      return ["plan_item", "study_plan"].includes(source)
+        && (!Number.isInteger(row.year) || row.year === citation.year)
+        && (!Number.isInteger(row.semester) || row.semester === citation.semester);
+    }
+    return source === "program" && fields.some(field => ["total_credits", "years", "degree"].includes(field));
+  });
+}
+
+function appendCitationLinks(container, groups, label) {
+  if (!groups.length) return;
+  const links = createElement("span", "inline-citations");
+  if (label) links.append(createElement("span", "inline-citation-label", label));
+  for (const group of groups) {
+    const link = createElement("a", "inline-reference", `[${group.number}]`);
+    link.href = `#${group.id}`;
+    const source = evidenceNames[group.citation.evidence_source] || evidenceNames.unknown;
+    link.title = `${source}: ${group.references.map(citationPageText).join("; ")}`;
+    link.setAttribute("aria-label", `ดูหลักฐาน ${group.number} ${source}`);
+    link.addEventListener("click", event => {
+      const card = document.getElementById(group.id);
+      if (!card) return;
+      event.preventDefault();
+      for (let parent = card.parentElement; parent; parent = parent.parentElement) {
+        if (parent.tagName === "DETAILS") parent.open = true;
+      }
+      card.scrollIntoView({block: "nearest", behavior: "auto"});
+      card.focus({preventScroll: true});
+    });
+    links.append(link);
+  }
+  container.append(links);
+}
+
+function valueNode(key, value, data) {
+  if (value === null || value === undefined) return createElement("span", "table-missing", "ยังไม่มีข้อมูล");
+  if (typeof value !== "object") {
+    const text = resultValue(key, value);
+    if (text.length < 250) return createElement("span", key === "code" ? "course-code" : "", text);
+    const details = createElement("details", "data-value");
+    details.append(createElement("summary", "", "อ่านรายละเอียดทั้งหมด"), createElement("p", "", text));
     return details;
-  };
-  const table = createElement("table", "result-table");
-  table.append(createElement("caption", "visually-hidden", "ข้อมูลจากฐานข้อมูลที่ใช้ประกอบคำตอบ"));
+  }
+  const details = createElement("details", "data-value");
+  details.append(createElement("summary", "", Array.isArray(value) ? `${numberFormat.format(value.length)} รายการ` : "ดูรายละเอียด"));
+  const list = createElement(Array.isArray(value) ? "ol" : "dl");
+  for (const [field, item] of Object.entries(value)) {
+    const entry = createElement(Array.isArray(value) ? "li" : "dd");
+    entry.append(valueNode(field, item, data));
+    if (!Array.isArray(value)) list.append(createElement("dt", "", resultLabel(field, data)));
+    list.append(entry);
+  }
+  details.append(list);
+  return details;
+}
+
+function courseCard(row, data) {
+  const card = createElement("article", "course-card");
+  const heading = createElement("div", "course-card-header");
+  const title = createElement("div");
+  title.append(createElement("span", "course-code", row.code || row.course_code));
+  if (row.name_th || row.name_en || row.course_name) title.append(createElement("h4", "course-title", row.name_th || row.name_en || row.course_name));
+  if (row.name_th && row.name_en) title.append(createElement("p", "course-english", row.name_en));
+  heading.append(title);
+  if (Object.hasOwn(row, "credits")) heading.append(createElement("span", "credit-badge", row.credits == null ? "หน่วยกิตยังไม่มีข้อมูล" : `${numberFormat.format(row.credits)} หน่วยกิต`));
+  card.append(heading);
+  const fields = resultColumns([row]).filter(key => !["code", "course_code", "name_th", "name_en", "course_name", "credits", "description_th"].includes(key));
+  if (fields.length) {
+    const values = createElement("dl", "course-fields");
+    for (const key of fields) {
+      const entry = createElement("dd"); entry.append(valueNode(key, row[key], data));
+      values.append(createElement("dt", "", resultLabel(key, data)), entry);
+    }
+    card.append(values);
+  }
+  if (typeof row.description_th === "string" && row.description_th.trim()) {
+    const preview = createElement("p", "description-preview", row.description_th);
+    const full = createElement("details", "course-description");
+    full.append(createElement("summary", "", "อ่านคำอธิบายรายวิชาเต็ม"), createElement("p", "", row.description_th));
+    full.addEventListener("toggle", () => { preview.hidden = full.open; });
+    card.append(preview, full);
+  } else card.append(createElement("p", "table-missing", "ยังไม่มีคำอธิบายรายวิชาในข้อมูล"));
+  appendCitationLinks(card, rowCitationGroups(row, data), "ข้อมูลรายวิชา");
+  return card;
+}
+
+function renderComparisonTable(rows, data) {
+  const table = createElement("table", "result-table comparison-table");
   const head = createElement("thead");
   const headings = createElement("tr");
-  columns.forEach((key) => {
-    const header = createElement("th", "", labels[key] || key);
-    header.scope = "col";
-    headings.append(header);
-  });
-  head.append(headings);
-  table.append(head);
+  const label = createElement("th", "", "ข้อมูลที่เปรียบเทียบ"); label.scope = "col";
+  headings.append(label);
+  for (const row of rows) {
+    const cell = createElement("th"); cell.scope = "col";
+    cell.append(createElement("strong", "", row.program), createElement("span", "comparison-scope", [row.edition_label || data.edition_label, trackLabel(row.track)].filter(Boolean).join(" · ")));
+    headings.append(cell);
+  }
+  head.append(headings); table.append(head);
   const body = createElement("tbody");
-  const pageSize = 20;
+  for (const key of resultColumns(rows).filter(key => !["program", "track", "edition", "edition_label"].includes(key))) {
+    const record = createElement("tr");
+    const label = createElement("th", "", resultLabel(key, data)); label.scope = "row";
+    record.append(label);
+    for (const row of rows) {
+      const cell = createElement("td"); cell.append(valueNode(key, row[key], data));
+      appendCitationLinks(cell, rowCitationGroups(row, data, [key]));
+      record.append(cell);
+    }
+    body.append(record);
+  }
+  table.append(body);
+  return table;
+}
+
+function relationshipNode(row) {
+  const node = createElement("div", "relationship");
+  const source = row.requires || row.source_code;
+  const target = row.code || row.target_code;
+  node.append(createElement("span", "", [source, row.required_name || row.source_name].filter(Boolean).join(" · ")));
+  const arrow = createElement("span", "relationship-arrow", row.kind === "co" ? "↔" : "→");
+  arrow.setAttribute("aria-label", row.kind === "co" ? "เรียนควบกับ" : "ต้องผ่านก่อนเรียน");
+  node.append(arrow, createElement("span", "", [target, row.name_th || row.course_name || row.target_name].filter(Boolean).join(" · ")));
+  return node;
+}
+
+function renderDraftTerms(rows, data) {
+  const terms = new Map();
+  for (const row of rows) {
+    const key = `${row.year}/${row.semester}`;
+    if (!terms.has(key)) terms.set(key, []);
+    terms.get(key).push(row);
+  }
+  const container = createElement("div", "term-cards");
+  for (const items of terms.values()) {
+    const card = createElement("article", "term-card");
+    card.append(createElement("h4", "", `ปี ${items[0].year} เทอม ${items[0].semester}`));
+    const known = items.filter(row => typeof row.credits === "number" && Number.isFinite(row.credits));
+    const amount = known.reduce((sum, row) => sum + row.credits, 0);
+    card.append(createElement("p", "term-total", `หน่วยกิตของรายการที่แสดง: ${numberFormat.format(amount)}${known.length !== items.length ? " (บางรายการไม่มีข้อมูลหน่วยกิต)" : ""}`));
+    const list = createElement("ul", "term-course-list");
+    for (const row of items) {
+      const item = createElement("li");
+      item.append(createElement("span", "course-code", row.code), createElement("span", "", row.name_th || "ยังไม่มีชื่อวิชา"), createElement("span", "credit-badge", `${resultValue("credits", row.credits)}${row.credits != null ? " หน่วยกิต" : ""}`));
+      appendCitationLinks(item, rowCitationGroups(row, data));
+      list.append(item);
+    }
+    card.append(list); container.append(card);
+  }
+  return container;
+}
+
+function renderRows(rows, extraLabels = {}, data = {}) {
+  const container = document.getElementById("rows-table");
+  container.replaceChildren();
+  container.classList.remove("card-results");
+  if (!rows.length) return;
+  const comparisons = comparisonRows(rows);
+  if (comparisons) {
+    container.append(renderComparisonTable(comparisons, data));
+    return;
+  }
+  if (data.analysis?.kind === "study_draft" && rows.every(row => Number.isInteger(row.year) && Number.isInteger(row.semester))) {
+    container.classList.add("card-results");
+    container.append(renderDraftTerms(rows, data));
+    return;
+  }
+  const cards = rows.every(row => Object.hasOwn(row, "description_th") && (row.code || row.course_code));
+  const graph = rows.every(row => (row.requires && row.code) || (row.source_code && row.target_code));
+  const columns = resultColumns(rows).filter(key => !graph || !["code", "requires", "required_name", "name_th", "source_code", "source_name", "target_code", "target_name"].includes(key));
+  const pageSize = Number.isInteger(data.page) ? rows.length : 20;
   let page = 0;
   const pager = createElement("nav", "table-pager");
-  pager.setAttribute("aria-label", "หน้าของรายการข้อมูล");
+  pager.setAttribute("aria-label", "หน้ารายการที่โหลดแล้ว");
   const previous = createElement("button", "", "ก่อนหน้า"); previous.type = "button";
   const next = createElement("button", "", "ถัดไป"); next.type = "button";
-  const status = createElement("span", ""); status.setAttribute("aria-live", "polite");
+  const status = createElement("span"); status.setAttribute("aria-live", "polite");
+  const body = createElement(cards ? "div" : "tbody", cards ? "course-cards" : "");
   const draw = () => {
     body.replaceChildren();
     const start = page * pageSize;
-    rows.slice(start, start + pageSize).forEach((row) => {
-    const record = createElement("tr");
-    columns.forEach((key) => {
-      let value = row[key];
-      if (key === "difference") value = {coop_only: "มีเฉพาะ coop", nocoop_only: "มีเฉพาะ nocoop"}[value] || value;
-      if (key === "requirements" && typeof value === "string") {
-        try {
-          const requirements = JSON.parse(value);
-          if (Array.isArray(requirements)) {
-            value = requirements.map((item) => `${item.code} ${item.name || "ไม่ระบุชื่อ"} (${item.kind === "pre" ? "บังคับก่อน" : "เรียนควบ"})`).join("; ");
-          }
-        } catch { /* ใช้ข้อความจาก API ตามเดิมเมื่อไม่ใช่ JSON; createElement ใส่เป็น text เท่านั้น. */ }
+    for (const row of rows.slice(start, start + pageSize)) {
+      if (cards) { body.append(courseCard(row, data)); continue; }
+      const record = createElement("tr");
+      if (graph) { const cell = createElement("td"); cell.append(relationshipNode(row)); record.append(cell); }
+      for (const key of columns) {
+        const cell = createElement("td"); cell.append(valueNode(key, row[key], data));
+        if (key === "status") cell.dataset.status = row.status;
+        record.append(cell);
       }
-      const cell = createElement("td"); cell.append(valueNode(value));
-      record.append(cell);
-    });
-    body.append(record);
-    });
+      const references = createElement("td", "row-references");
+      const matches = rowCitationGroups(row, data);
+      appendCitationLinks(references, matches, graph && matches.every(group => group.citation.evidence_source !== "prerequisite") ? "ข้อมูลวิชา" : null);
+      if (!matches.length) references.append(createElement("span", "table-missing", "—"));
+      record.append(references); body.append(record);
+    }
     previous.disabled = page === 0;
     next.disabled = start + pageSize >= rows.length;
-    status.textContent = `รายการ ${numberFormat.format(start + 1)}–${numberFormat.format(Math.min(start + pageSize, rows.length))} จาก ${numberFormat.format(rows.length)}`;
+    status.textContent = `รายการ ${numberFormat.format(start + 1)}–${numberFormat.format(Math.min(start + pageSize, rows.length))} จาก ${numberFormat.format(rows.length)} รายการที่โหลดแล้ว`;
   };
   previous.addEventListener("click", () => { page -= 1; draw(); });
   next.addEventListener("click", () => { page += 1; draw(); });
   pager.append(previous, status, next);
   draw();
-  table.append(body);
-  container.append(table);
+  if (cards) {
+    container.classList.add("card-results"); container.append(body);
+  } else {
+    const table = createElement("table", "result-table");
+    table.append(createElement("caption", "visually-hidden", "ข้อมูลจากฐานหลักสูตรที่ใช้ตอบ พร้อมหลักฐานที่จับคู่ได้"));
+    const head = createElement("thead"); const headings = createElement("tr");
+    for (const key of [...(graph ? ["relationship"] : []), ...columns, "references"]) {
+      const cell = createElement("th", "", key === "relationship" ? "วิชาก่อน/วิชาควบ → รายวิชา" : key === "references" ? "หลักฐาน" : extraLabels[key] || resultLabel(key, data));
+      cell.scope = "col"; headings.append(cell);
+    }
+    head.append(headings); table.append(head, body); container.append(table);
+  }
   if (rows.length > pageSize) container.prepend(pager);
   container.tabIndex = 0;
   container.setAttribute("role", "region");
-  container.setAttribute("aria-label", "ตารางข้อมูลประกอบคำตอบ เลื่อนเพื่อดูคอลัมน์เพิ่มเติม");
+  container.setAttribute("aria-label", cards ? "รายละเอียดรายวิชา" : "ตารางรายวิชา เลื่อนเพื่อดูคอลัมน์เพิ่มเติม");
+}
+
+function readableResult(data) {
+  return data.rows.length > 0 && (comparisonRows(data.rows) || data.analysis?.kind === "study_draft"
+    || data.rows.every(row => row.code || row.course_code || row.source_code && row.target_code));
+}
+
+function answerLead(data) {
+  const first = data.answer.split(/\r?\n/).find(line => line.trim())?.trim() || "";
+  return /^(?:รหัส|code|ชื่อไทย|name_th|คำอธิบาย):/.test(first)
+    ? "รายวิชาที่ตรงเงื่อนไขอยู่ด้านล่าง" : first;
+}
+
+function renderMainAnswer(data) {
+  if (!readableResult(data)) {
+    renderAnswer(data.answer);
+    if (data.rows.length === 1 && answerBody.firstElementChild) appendCitationLinks(answerBody.firstElementChild, rowCitationGroups(data.rows[0], data));
+    return;
+  }
+  const lead = createElement("p", "answer-lead"); appendAnswerText(lead, answerLead(data));
+  answerBody.replaceChildren(lead);
+  if (data.rows.length === 1) appendCitationLinks(lead, rowCitationGroups(data.rows[0], data));
+  const full = createElement("details", "full-answer source-answer");
+  full.append(createElement("summary", "", "อ่านข้อความคำตอบฉบับเต็ม"), createElement("p", "source-answer-text", data.answer));
+  document.getElementById("performance-details").append(full);
+}
+
+function renderNotices(data) {
+  answerNotices.replaceChildren();
+  const analysis = data.analysis || {};
+  const notes = [...(analysis.limitations || []), ...(analysis.missing_data || [])].filter(value => typeof value === "string" && value.trim());
+  if (analysis.complete === false || analysis.result?.complete === false || analysis.result?.ranking_complete === false) notes.unshift("ผลนี้มีข้อมูลไม่ครบ จึงยังสรุปค่าเต็มชุดหรืออันดับทั้งหมดไม่ได้");
+  if (analysis.kind === "study_draft") notes.unshift("ร่างภายใต้ข้อสมมติ ยังไม่ยืนยันการเปิดสอนหรือการจบจริง");
+  if (analysis.kind === "student_check") notes.unshift("ตรวจเบื้องต้นตามข้อมูลที่ให้มา ยังไม่ยืนยันครบเงื่อนไขจบทั้งหมด");
+  for (const note of new Set(notes)) answerNotices.append(createElement("p", "answer-note", note));
+  answerNotices.hidden = !answerNotices.childElementCount;
 }
 
 const evidenceNames = {course: "ข้อมูลรายวิชา", plan_item: "แผนการเรียน", program: "ข้อมูลหลักสูตร",
@@ -368,7 +604,8 @@ function renderCitations(data) {
   let more = null;
   groups.forEach(({citation, references}, index) => {
     const card = createElement("article", "citation-card");
-    card.id = /^ref-[a-f0-9]{16}$/.test(citation.citation_id || "") ? citation.citation_id : `citation-${index + 1}`;
+    card.id = `citation-${index + 1}`;
+    card.tabIndex = -1;
     const actual = data.scope?.targets?.length === 1 ? data.scope.targets[0] : null;
     const scope = [citation.program || actual?.program,
       citation.edition_label || data.edition_label, trackLabel(citation.track || actual?.track)];
@@ -418,7 +655,7 @@ function renderCitations(data) {
   });
   answerCitations.hidden = groups.length === 0 && data.rows.length === 0 && data.sql.trim() === "";
   document.getElementById("citations-description").textContent = groups.length
-    ? "หน้า PDF นับจากหน้าแรกของไฟล์ รวมปกและคำนำที่มี ส่วนเลขหน้าในเล่มคือเลขที่พิมพ์บนกระดาษ ไฟล์เฉพาะส่วนอาจมีเลขหน้า PDF ต่างจากเลขหน้าเดิมในข้อมูล สถานะข้อมูลที่สกัดยังไม่ใช่การตรวจเนื้อหา PDF"
+    ? "กด [หมายเลข] ข้างรายการเพื่อดูหลักฐาน · หน้า PDF คือลำดับหน้าในไฟล์ ส่วนเลขหน้าในเล่มแสดงเมื่อมีข้อมูลยืนยัน"
     : "ข้อมูลคำตอบนี้ยังไม่มีเลขหน้าอ้างอิงที่บันทึกไว้";
 }
 
@@ -426,11 +663,11 @@ function renderTiming(elapsedMs, serverMs) {
   // เวลาผู้ใช้รอรวม fetch, อ่าน JSON และแสดงคำตอบ; แยกจากเวลาประมวลผลฝั่ง API.
   const formatMs = value => value < 1000 ? `${Math.round(value)} มิลลิวินาที`
     : `${(value / 1000).toLocaleString("th-TH", {minimumFractionDigits: 2, maximumFractionDigits: 2})} วินาที`;
-  responseTime.textContent = `เวลาที่รอ ${formatMs(elapsedMs)}`;
+  responseTime.textContent = `เวลาตอบรวม ${formatMs(elapsedMs)}`;
   answerTiming.hidden = false;
   const hasServerTime = typeof serverMs === "number" && Number.isFinite(serverMs) && serverMs >= 0;
   processingTime.hidden = !hasServerTime;
-  processingTime.textContent = hasServerTime ? `ประมวลผล ${formatMs(serverMs)}` : "";
+  processingTime.textContent = hasServerTime ? `ฝั่ง API ${formatMs(serverMs)}` : "";
 }
 
 function renderAnalysis(analysis) {
@@ -441,13 +678,7 @@ function renderAnalysis(analysis) {
     prerequisite_graph: "ความสัมพันธ์วิชาก่อนที่บันทึกไว้", dependent_terms: "ตัวต่อพร้อมปี/เทอม",
     conditional_prerequisites: "เงื่อนไขเมื่อยังไม่ผ่านวิชา"};
   answerAnalysis.append(createElement("h3", "", labels[analysis.kind] || "ข้อมูลประกอบ"));
-  if (analysis.kind === "data_query") {
-    answerAnalysis.append(createElement("p", "", analysis.complete
-      ? `คำนวณจากข้อมูลครบตามเงื่อนไข · ส่งผล ${numberFormat.format(analysis.total_rows)} แถว โดยอ่านรายการได้ทุกหน้าของตาราง`
-      : "ข้อมูลผลลัพธ์ยังไม่ครบตามเงื่อนไข"));
-    if (analysis.evidence_status === "no_stored_pages") answerAnalysis.append(createElement("p", "", "ฐานข้อมูลไม่ได้บันทึกหน้าอ้างอิงสำหรับผลนี้"));
-  }
-  for (const [key, title] of [["assumptions", "ข้อสมมติ"], ["missing_data", "ข้อมูลที่ยังขาด"], ["limitations", "ข้อจำกัดของข้อมูลที่ใช้ตอบ"]]) {
+  for (const [key, title] of [["assumptions", "ข้อสมมติ"]]) {
     if (!Array.isArray(analysis[key]) || !analysis[key].length) continue;
     answerAnalysis.append(createElement("strong", "", title));
     const list = createElement("ul");
@@ -466,6 +697,8 @@ function renderAnalysis(analysis) {
     for (const item of analysis.elective_slots) list.append(createElement("li", "", `แผนเดิม ${item.year}/${item.semester}: ${item.codes.join(" / ")} (${item.credits ?? "ไม่ทราบ"} หน่วยกิต)`));
     answerAnalysis.append(list);
   }
+  // Main limitations are placed next to the conclusion, without a second copy here.
+  answerAnalysis.hidden = answerAnalysis.childElementCount <= 1;
 }
 
 function renderPagination(data) {
@@ -481,24 +714,29 @@ function renderPagination(data) {
     button.addEventListener("click", async () => {
       if (uiState === "loading") return;
       const payload = { ...lastAskPayload, page };
+      const started = performance.now();
       setState("loading", "กำลังอ่านรายการ…");
       try {
         const response = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         const next = await response.json();
         if (!response.ok || typeof next?.answer !== "string" || !Array.isArray(next?.rows)) throw new Error(typeof next?.detail === "string" ? next.detail : "อ่านหน้าผลค้นไม่สำเร็จ");
         renderResponse(next);
+        renderTiming(performance.now() - started, next.processing_ms);
         setState("success", "ตอบคำถามสำเร็จ");
       } catch (error) { setState("error", error.message || "อ่านหน้าผลค้นไม่สำเร็จ"); }
     });
     controls.append(button);
   }
-  document.getElementById("rows-table").append(controls);
+  controls.append(createElement("span", "pagination-position", `หน้า ${numberFormat.format(data.page)}`));
+  answerResults.append(controls);
 }
 
 function renderResponse(data) {
   lastResponse = data;
   copyButton.disabled = false;
-  copyButton.textContent = "คัดลอกคำตอบ";
+  copyButton.textContent = data.has_more || data.page > 1 ? "คัดลอกหน้านี้" : "คัดลอกคำตอบ";
+  copyFallback.hidden = true;
+  document.getElementById("performance-details").replaceChildren();
   answerContext.hidden = false;
   // summary มาจากชุดรหัสเต็ม จึงระบุสองแผนได้แม้ rows ว่าง/ถูกจำกัด/มาจาก cache.
   const diff = data.comparison && typeof data.comparison.program === "string"
@@ -510,7 +748,8 @@ function renderResponse(data) {
   const actual = data.scope?.targets?.[0];
   document.getElementById("answer-program").textContent = diff ? diff.program : targets
     ? targets.map(row => row.program).join(" ↔ ") : actual?.program || lastAskPayload?.program || programSelect.value;
-  document.getElementById("answer-edition").textContent = data.edition_label || "ไม่ระบุปี";
+  document.getElementById("answer-edition").textContent = data.edition_label || "";
+  document.getElementById("answer-edition").hidden = !data.edition_label;
   document.getElementById("answer-track").textContent = diff ? diff.tracks.map(trackLabel).join(" ↔ ") : targets
     ? new Set(targets.map(row => row.track)).size === 1 ? trackLabel(targets[0].track)
       : targets.map(row => `${row.program}: ${trackLabel(row.track)}`).join(" · ")
@@ -520,17 +759,32 @@ function renderResponse(data) {
     ? "เปรียบเทียบข้อมูลจากหลักสูตรและแผนการเรียนที่ใช้ตอบจริง"
     : "ข้อมูลจากหลักสูตร ฉบับ และแผนที่ใช้ตอบ";
   document.getElementById("answer-question").textContent = typeof data.question === "string" ? data.question : question.value.trim();
-  renderHighlights(data.rows);
-  renderAnswer(data.answer);
-  renderRows(data.rows, data.analysis?.labels || {});
+  renderHighlights(data.rows, data);
+  renderMainAnswer(data);
+  renderNotices(data);
+  renderRows(data.rows, data.analysis?.labels || {}, data);
   renderAnalysis(data.analysis);
   renderCitations(data);
-  document.getElementById("row-count").textContent = Number.isInteger(data.total_count)
-    ? `แสดง ${numberFormat.format(data.rows.length)} จากทั้งหมด ${numberFormat.format(data.total_count)} รายการ`
-    : `${numberFormat.format(data.rows.length)} แถว`;
+  answerResults.hidden = !data.rows.length;
+  document.getElementById("result-count").textContent = countText(data);
+  document.getElementById("results-heading").textContent = comparisonRows(data.rows) ? "เปรียบเทียบหลักสูตร / แผน"
+    : data.analysis?.kind === "study_draft" ? "รายวิชาตามร่างแผน"
+    : data.rows.some(row => row.requires || row.source_code && row.target_code) ? "ความสัมพันธ์ที่บันทึกไว้"
+    : data.rows.some(row => Object.hasOwn(row, "description_th")) ? "คำอธิบายรายวิชา"
+    : data.rows.some(row => row.code) ? "รายวิชาที่ตรงเงื่อนไข" : "รายละเอียดผลลัพธ์";
+  document.getElementById("row-count").textContent = `${numberFormat.format(data.rows.length)} รายการ`;
   renderPagination(data);
   document.getElementById("rows").textContent = JSON.stringify(data.rows, null, 2);
   document.getElementById("sql").textContent = data.sql;
+  const times = data.performance?.stages_ms || {};
+  if (Object.keys(times).length) {
+    const timing = createElement("dl", "performance-breakdown");
+    const labels = {cache: "ตรวจ cache", planning: "เตรียมการค้น", qwen: "ประมวลผลโมเดล", query: "อ่านฐานข้อมูล", reasoning: "คำนวณ", citations: "รวบรวมหลักฐาน", render: "สร้างคำตอบ"};
+    for (const [key, label] of Object.entries(labels)) {
+      if (typeof times[key] === "number" && times[key] > 0) timing.append(createElement("dt", "", label), createElement("dd", "", `${numberFormat.format(times[key])} มิลลิวินาที`));
+    }
+    document.getElementById("performance-details").append(timing);
+  }
   responseDetails.hidden = data.rows.length === 0 && data.sql.trim() === "";
 }
 
@@ -539,16 +793,15 @@ function formatAnswerForCopy(data) {
   const targets = data.scope?.targets || [];
   const context = targets.map(target => [target.program,
     target.edition_label || data.edition_label, trackLabel(target.track)].filter(Boolean).join(" · "));
-  const parts = [`คำถาม: ${data.question}`, context.join("\n"), data.answer];
+  const parts = [`คำถาม: ${data.question}`, context.join("\n"), readableResult(data) ? answerLead(data) : data.answer];
   if (data.rows?.length) {
-    const columns = [...new Set(data.rows.flatMap(row => Object.keys(row)))];
-    const labels = {code: "รหัสวิชา", name_th: "ชื่อภาษาไทย", name_en: "ชื่อภาษาอังกฤษ",
-      credits: "หน่วยกิต", program: "หลักสูตร", track: "แผน", year: "ชั้นปี", semester: "เทอม", pages: "เลขหน้าที่แนบกับข้อมูล"};
+    const columns = resultColumns(data.rows);
     const text = value => (value == null ? "ไม่ระบุ" : typeof value === "object"
       ? JSON.stringify(value) : String(value)).replace(/[\t\r\n]+/g, " ");
-    parts.push(`ข้อมูลประกอบ (${data.rows.length} แถวที่ API คืน):`,
-      [columns.map(key => data.analysis?.labels?.[key] || labels[key] || key).join("\t"),
-        ...data.rows.map(row => columns.map(key => text(row[key])).join("\t"))].join("\n"));
+    parts.push(`รายละเอียดรายการที่แสดง: ${countText(data)}`,
+      [columns.map(key => resultLabel(key, data)).concat("หลักฐาน").join("\t"),
+        ...data.rows.map(row => columns.map(key => text(resultValue(key, row[key])))
+          .concat(rowCitationGroups(row, data).map(group => `[${group.number}]`).join(" ")).join("\t"))].join("\n"));
   }
   for (const key of ["assumptions", "missing_data", "limitations", "unresolved", "elective_slots"]) {
     const values = data.analysis?.[key];

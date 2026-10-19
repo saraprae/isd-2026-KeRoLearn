@@ -62,3 +62,86 @@
 
 /* Complete results: accessible controls work with keyboard and small screens. */
 .pagination-controls{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;margin:1rem 0}.pagination-controls button{padding:.5rem 1rem;border:1px solid #cbd5e1;border-radius:.5rem;background:white;color:#0f172a;cursor:pointer}.pagination-controls button:disabled{opacity:.5;cursor:default}.pagination-controls button:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+
+/* Readable answers: conclusion, relevant records, evidence, then optional diagnostics. */
+.answer-context { background: transparent; border: 0; margin: 16px 0 20px; padding: 0; }
+.answer-scope { margin-bottom: 10px; }
+.answer-question-label { display: none; }
+.answer-question { color: #64748b; font-size: 14px; }
+.answer-intro { font-size: 12px; }
+.answer-notices { display: grid; gap: 8px; margin: 16px 0; }
+.answer-notices .answer-note { margin: 0; font-size: 13px; }
+.answer-results { margin-top: 24px; min-width: 0; }
+.results-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.results-header h3 { font-size: 16px; font-weight: 600; color: #334155; margin: 0; }
+.result-count { margin: 0; color: #64748b; font-size: 12px; line-height: 1.8; }
+.answer-results .table-scroll { max-height: none; }
+.answer-results .card-results { overflow: visible; border: 0; border-radius: 0; }
+.result-table td { min-width: 72px; }
+.result-table .row-references { min-width: 90px; }
+.result-table td[data-status="fail"] { color: #be123c; font-weight: 600; }
+.result-table td[data-status="pass"] { color: #166534; }
+.result-table td[data-status="conditional"], .result-table td[data-status="unknown"] { color: #92400e; }
+.course-cards, .term-cards { display: grid; gap: 14px; }
+.course-card, .term-card { padding: 18px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; min-width: 0; }
+.course-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.course-card-header > div { flex: 1 1 180px; min-width: 0; }
+.course-code { font-variant-numeric: tabular-nums; color: #7e355f; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.course-title { color: #1e293b; font-size: 16px; font-weight: 600; margin: 4px 0; line-height: 1.7; overflow-wrap: anywhere; }
+.course-english { color: #64748b; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.credit-badge { display: inline-flex; flex-shrink: 0; align-items: center; padding: 4px 10px; border: 1px solid #f3d6e6; border-radius: 999px; color: #7e355f; background: #fff7fb; font-size: 12px; line-height: 1.7; }
+.course-fields { display: grid; grid-template-columns: minmax(90px, .4fr) minmax(0, 1fr); gap: 6px 12px; margin: 14px 0; font-size: 13px; line-height: 1.8; }
+.course-fields dt { color: #64748b; }
+.course-fields dd { color: #334155; overflow-wrap: anywhere; }
+.description-preview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 12px 0 8px; font-size: 14px; line-height: 1.9; color: #475569; overflow-wrap: anywhere; }
+.course-description { margin-top: 10px; }
+.course-description > summary { color: #7e355f; cursor: pointer; font-size: 13px; line-height: 1.8; padding: 6px 0; }
+.course-description > p { color: #334155; line-height: 1.95; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 10px 0; }
+.inline-citations { display: inline-flex; gap: 5px; align-items: center; flex-wrap: wrap; vertical-align: middle; }
+.course-card > .inline-citations { margin-top: 14px; display: flex; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+.inline-citation-label { color: #64748b; font-size: 11px; margin-right: 3px; }
+.inline-reference { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; min-height: 28px; padding: 2px 6px; border: 1px solid #ead7e4; border-radius: 7px; background: #fff7fb; color: #8e3572; font-size: 12px; text-decoration: none; line-height: 1.8; }
+.answer-lead > .inline-citations { margin-left: 8px; }
+.inline-reference:hover { background: #fce7f3; }
+.inline-reference:focus-visible, .course-description summary:focus-visible, .citation-card:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+.citation-card:focus { background: #fff7fb; border-color: #b86c9e; }
+.citation-card { scroll-margin-top: 24px; }
+.comparison-table { min-width: 460px; }
+.comparison-table th[scope="row"] { background: #f8fafc; font-size: 13px; font-weight: 500; position: static; }
+.comparison-scope { display: block; font-size: 12px; font-weight: 400; margin-top: 4px; white-space: normal; }
+.comparison-table td { font-variant-numeric: tabular-nums; font-size: 15px; }
+.comparison-table .inline-citations { display: flex; margin-top: 6px; }
+.relationship { display: flex; align-items: center; gap: 8px; min-width: 240px; font-size: 13px; }
+.relationship > span:not(.relationship-arrow) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.relationship-arrow { color: #8e3572; font-size: 20px; font-weight: 600; }
+.term-card h4 { font-size: 16px; color: #334155; font-weight: 600; }
+.term-total { font-size: 12px; color: #64748b; margin-top: 5px; line-height: 1.8; }
+.term-course-list { list-style: none; margin-top: 12px; padding: 0; }
+.term-course-list li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; padding: 10px 0; border-top: 1px solid #f1f5f9; font-size: 13px; color: #334155; }
+.term-course-list li > span:nth-child(2) { flex: 1 1 140px; overflow-wrap: anywhere; }
+.performance-breakdown { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 12px; color: #64748b; margin: 12px 0; }
+.performance-breakdown dd { text-align: right; font-variant-numeric: tabular-nums; }
+.source-answer { margin: 10px 0; }
+.source-answer-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.9; color: #475569; margin: 12px 0; }
+/* Total time includes the API round trip and rendering; API time stays separate. */
+.answer-timing { border-top: 0; margin: 12px 0 6px; padding-top: 0; gap: 8px 12px; }
+.timing-pill { color: #7e355f; background: #fff7fb; border: 1px solid #f3d6e6; padding: 5px 10px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.timing-detail { color: #64748b; font-size: 12px; font-variant-numeric: tabular-nums; }
+.pagination-position { color: #64748b; font-size: 12px; }
+#answer-panel button:not(:disabled):hover { transform: none; box-shadow: none; }
+@media (min-width: 1000px) {
+  body { grid-template-columns: minmax(290px, .75fr) minmax(0, 1.5fr); }
+  #ask-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #ask-form > label[for="track"] { grid-area: 4 / 1 / 5 / -1; }
+  #ask-form > #track { grid-area: 5 / 1 / 6 / -1; }
+  #ask-form > button { grid-area: 6 / 1; }
+  #ask-form > #ui-status { grid-area: 6 / 2; }
+}
+@media (max-width: 639px) {
+  .course-card, .term-card { padding: 14px; }
+  .course-fields { grid-template-columns: minmax(80px, .4fr) minmax(0, 1fr); }
+  .inline-reference { min-height: 32px; min-width: 32px; }
+  .result-count { width: 100%; }
+  .performance-breakdown { grid-template-columns: minmax(0, 1fr); }
+  .performance-breakdown dd { text-align: left; }
+}

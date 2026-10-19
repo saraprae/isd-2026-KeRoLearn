@@ -1,0 +1,202 @@
+{
+  "version": "verified-curriculum-rules-v1",
+  "documents": {
+    "IT:default": {
+      "pdf_path": "data/input/IT.pdf",
+      "sha256": "aca97dc8b57308b30355e74e384c042d27d005310c6b4a9b72ecf79514543afa",
+      "requirements": [
+        {
+          "category": "general_education",
+          "credits": 30,
+          "pages": [
+            20,
+            21
+          ],
+          "label": "หมวดวิชาศึกษาทั่วไป"
+        },
+        {
+          "category": "specialized",
+          "credits": 93,
+          "pages": [
+            20,
+            21
+          ],
+          "label": "หมวดวิชาเฉพาะ"
+        },
+        {
+          "category": "free_elective",
+          "credits": 6,
+          "pages": [
+            30
+          ],
+          "label": "หมวดวิชาเลือกเสรี"
+        }
+      ],
+      "free_elective_scope": "รายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง",
+      "free_elective_pages": [
+        30
+      ],
+      "limitations": [
+        "ยังไม่มีเกณฑ์จบทุกข้อ/เกณฑ์กลุ่มย่อย/ข้อยกเว้นและการอนุมัติส่วนบุคคลครบ",
+        "ไม่ยืนยันการเปิดสอนจริงหรือสิทธิ์ลงทะเบียน"
+      ]
+    },
+    "DSBA:default": {
+      "pdf_path": "data/input/DSBA.pdf",
+      "sha256": "01ead4c636b04ce072064e5789332b89b678d12b9863f52a72d35a9d15b500a1",
+      "requirements": [
+        {
+          "category": "general_education",
+          "credits": 30,
+          "pages": [
+            15
+          ],
+          "label": "หมวดวิชาศึกษาทั่วไป"
+        },
+        {
+          "category": "specialized",
+          "credits": 96,
+          "pages": [
+            15
+          ],
+          "label": "หมวดวิชาเฉพาะ"
+        },
+        {
+          "category": "free_elective",
+          "credits": 6,
+          "pages": [
+            22
+          ],
+          "label": "หมวดวิชาเลือกเสรี"
+        }
+      ],
+      "free_elective_scope": "รายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง",
+      "free_elective_pages": [
+        22
+      ],
+      "limitations": [
+        "ยังไม่มีเกณฑ์จบทุกข้อ/เกณฑ์กลุ่มย่อย/ข้อยกเว้นและการอนุมัติส่วนบุคคลครบ",
+        "ไม่ยืนยันการเปิดสอนจริงหรือสิทธิ์ลงทะเบียน"
+      ]
+    },
+    "BIT:default": {
+      "pdf_path": "data/input/BIT.pdf",
+      "sha256": "f7f8fba36276f772c757762a1e48879af8b54c3fe8ab3325e8f96996268891bc",
+      "requirements": [
+        {
+          "category": "general_education",
+          "credits": 30,
+          "pages": [
+            18,
+            19
+          ],
+          "label": "หมวดวิชาศึกษาทั่วไป"
+        },
+        {
+          "category": "specialized",
+          "credits": 90,
+          "pages": [
+            18,
+            19
+          ],
+          "label": "หมวดวิชาเฉพาะ"
+        },
+        {
+          "category": "free_elective",
+          "credits": 6,
+          "pages": [
+            25
+          ],
+          "label": "หมวดวิชาเลือกเสรี"
+        }
+      ],
+      "free_elective_scope": "รายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง",
+      "free_elective_pages": [
+        25
+      ],
+      "limitations": [
+        "ยังไม่มีเกณฑ์จบทุกข้อ/เกณฑ์กลุ่มย่อย/ข้อยกเว้นและการอนุมัติส่วนบุคคลครบ",
+        "ไม่ยืนยันการเปิดสอนจริงหรือสิทธิ์ลงทะเบียน"
+      ]
+    },
+    "AIT:default": {
+      "pdf_path": "data/input/AIT.pdf",
+      "sha256": "268065523712db993eec9699b106cc84c283898cd720b70ed56fe73afe80561f",
+      "requirements": [
+        {
+          "category": "general_education",
+          "credits": 24,
+          "pages": [
+            18
+          ],
+          "label": "หมวดวิชาศึกษาทั่วไป"
+        },
+        {
+          "category": "specialized",
+          "credits": 90,
+          "pages": [
+            18
+          ],
+          "label": "หมวดวิชาเฉพาะ"
+        },
+        {
+          "category": "free_elective",
+          "credits": 6,
+          "pages": [
+            22
+          ],
+          "label": "หมวดวิชาเลือกเสรี"
+        },
+        {
+          "category": "specialized",
+          "course_type": "elective",
+          "credits": 12,
+          "pages": [
+            18
+          ],
+          "label": "กลุ่มวิชาเลือกปัญญาประดิษฐ์เฉพาะทาง"
+        }
+      ],
+      "free_elective_scope": "รายวิชาที่เปิดสอนในสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง",
+      "free_elective_pages": [
+        22
+      ],
+      "limitations": [
+        "ยังไม่มีเกณฑ์จบทุกข้อ/เกณฑ์กลุ่มย่อย/ข้อยกเว้นและการอนุมัติส่วนบุคคลครบ",
+        "ไม่ยืนยันการเปิดสอนจริงหรือสิทธิ์ลงทะเบียน"
+      ]
+    },
+    "GENED:default": {
+      "pdf_path": "data\\input\\GENED.pdf",
+      "sha256": "6de055315f6fcdaf8d1f43d82eb88b10e80db5a4ed0677d2d823ebf8790040db",
+      "prerequisites": {
+        "90641005": {
+          "any_of": [
+            {
+              "course": "90641004"
+            },
+            {
+              "approved_equivalent_of": "90641004"
+            }
+          ],
+          "pages": [
+            39
+          ]
+        },
+        "90641006": {
+          "any_of": [
+            {
+              "course": "90641005"
+            },
+            {
+              "approved_equivalent_of": "90641005"
+            }
+          ],
+          "pages": [
+            39
+          ]
+        }
+      }
+    }
+  }
+}

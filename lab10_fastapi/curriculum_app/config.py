@@ -97,7 +97,7 @@ PROGRAM_ALIASES = {
     "DSBA": ("ดีเอสบีเอ",),
     "BIT": ("บีไอที",),
     "AIT": ("เอไอที",),
-    "GENED": ("เจนเอ็ด", "ศึกษาทั่วไป", "หมวดศึกษาทั่วไป"),
+    "GENED": ("เจนเอ็ด", "เจนเอด", "gen ed", "general education", "ศึกษาทั่วไป", "หมวดศึกษาทั่วไป"),
 }
 
 
@@ -153,6 +153,11 @@ class Settings:
     ollama_warmup: bool = field(default_factory=lambda: _env_bool("CURRICULUM_OLLAMA_WARMUP"))
     planner_example_limit: int = field(default_factory=lambda: int(os.getenv("CURRICULUM_PLANNER_EXAMPLE_LIMIT", "6")))
     planner_reuse_verified_search: bool = field(default_factory=lambda: _env_bool("CURRICULUM_PLANNER_REUSE_VERIFIED_SEARCH", True))
+    # SQL fallback supplements verified code paths; no Lab 8 ask()/DB writes.
+    sql_planner_enabled: bool = field(default_factory=lambda: _env_bool("CURRICULUM_SQL_PLANNER_ENABLED", True))
+    sql_output_tokens: int = field(default_factory=lambda: int(os.getenv("CURRICULUM_SQL_OUTPUT_TOKENS", "256")))
+    sql_complex_output_tokens: int = field(default_factory=lambda: int(os.getenv("CURRICULUM_SQL_COMPLEX_OUTPUT_TOKENS", "512")))
+    sql_retry_output_tokens: int = field(default_factory=lambda: int(os.getenv("CURRICULUM_SQL_RETRY_OUTPUT_TOKENS", "768")))
     classifier_mode: str = field(default_factory=lambda: os.getenv("CURRICULUM_CLASSIFIER_MODE", "shadow").strip().lower())
     classifier_path: Path = field(default_factory=lambda: _project_path(os.getenv(
         "CURRICULUM_CLASSIFIER_PATH", "lab10_fastapi/curriculum_app/intent_classifier.json")))
@@ -195,6 +200,8 @@ class Settings:
             raise ValueError("CURRICULUM_PLANNER_EXAMPLE_LIMIT must be between 2 and 6")
         if not 64 <= self.ollama_output_tokens <= self.ollama_output_retry_tokens <= 1024:
             raise ValueError("Ollama output budgets must satisfy 64 <= initial <= retry <= 1024")
+        if not 128 <= self.sql_output_tokens <= self.sql_complex_output_tokens <= self.sql_retry_output_tokens <= 2048:
+            raise ValueError("SQL output budgets must satisfy 128 <= simple <= complex <= retry <= 2048")
         # เก็บเฉพาะรหัสที่ระบบมีจริง; alias ที่ชนกันให้ catalog คืนความกำกวมแทนการเดา.
         programs = {str(code).strip().upper() for code in self.db_paths}
         aliases = {}

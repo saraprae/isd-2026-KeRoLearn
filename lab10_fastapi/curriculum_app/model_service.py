@@ -1,8 +1,8 @@
-"""Lab 10: นำ planner/prompt ของ Model 2 มาใช้กับ API และ SQLite เดิม.
+"""Lab 10: verified code paths plus grounded single-database SQL fallback.
 
-กฎ/cache ตอบก่อน; Qwen เลือก intent/คำค้นเมื่อจำเป็น; compiler และ renderer
-รับผิดชอบ SQL และข้อเท็จจริง โดยคง QwenTextToSQL.ask() และฟิลด์หลักเดิม
-พร้อมเลขหน้าอ้างอิงจากข้อมูลที่ใช้ตอบจริง.
+Cache/rules answer complete requests first. Unresolved wording can reach Qwen's
+SQL planner directly; code validates queries, tools and evidence.
+The legacy intent planner remains available when the SQL feature is disabled.
 """
 
 import hashlib
@@ -15,7 +15,7 @@ from collections import OrderedDict, deque, defaultdict, Counter
 import math
 from functools import lru_cache
 from copy import deepcopy
-from dataclasses import is_dataclass, replace
+from dataclasses import dataclass, is_dataclass, replace
 from pathlib import Path
 from threading import Lock, RLock, local
 from types import ModuleType
@@ -24,19 +24,25 @@ from typing import Annotated, Any, Literal
 import requests
 from pydantic import BaseModel, ConfigDict, Field
 
+from .verified_rules import rules_revision, document_rules, rule_citation, evaluate_requirement, requirement_result, eligibility_result
 from .config import Settings
+from .sql_planner import (
+    SQLProposal, SQLPlanError, SQL_SCHEMA, SQL_PROMPT, SQL_PLANNER_VERSION, EXAMPLES as SQL_EXAMPLES,
+    hard_issue as sql_hard_issue, select_examples as sql_examples,
+    validate_sql, render_sql_result, stored_pages,
+)
 from .database import (
     CurriculumDatabase, UnsupportedGenedMetadata, remaining_seconds, request_budget,
     current_trace, measure_stage, profile_request, record_ollama_durations,
     record_qwen_call, record_qwen_retry, timed_stage, ProgramCatalog, database_revision,
     CurriculumLexicon, curriculum_category, edition_paths, edition_metadata,
-    CitationDocumentCatalog,
+    CitationDocumentCatalog, resolve_edition,
 )
 
 log = logging.getLogger(__name__)
 observation_log = logging.getLogger(__name__ + ".observations")
 performance_log = logging.getLogger(__name__ + ".performance")
-ANSWER_CACHE_VERSION = "typed-plan-v24-meaning-and-complete-results"
+ANSWER_CACHE_VERSION = "hybrid-query-v32.1-grounded-composition"
 _THAI_DIGITS = str.maketrans("๐๑๒๓๔๕๖๗๘๙", "0123456789")
 _PROGRAM_RE = re.compile(r"(?:หลักสูตร|สาขา)\s*(IT|DSBA|BIT|AIT|GENED)(?![A-Za-z0-9_])", re.I)
 _QUOTED_RE = re.compile(r'"([^"]+)"|“([^”]+)”|\'([^\']+)\'')
@@ -50,7 +56,7 @@ _WORD_NUMBERS = {"ศูนย์": "0", "ยี่สิบ": "20", "สิบ�
 
 # แปลงเฉพาะวลีที่ชัดเจน; ไม่แทน ไร/ภาค/คอร์ส ทั่วประโยคและไม่เดาว่า กี่ตัว นับอะไร.
 # เปลี่ยนตารางต้องเปลี่ยนรุ่นด้วย: cache ของข้อความ/แผน/คำตอบต้องไม่ข้ามกฎคนละรุ่น.
-QUESTION_WORDING_VERSION = "thai-wording-v1"
+QUESTION_WORDING_VERSION = "thai-wording-v2"
 QUESTION_WORDING_RULES = (
     {"id": "learn_what", "pattern": r"เรียน\s*ไรบ้าง", "replacement": "เรียนอะไรบ้าง"},
     {"id": "course_what", "pattern": r"(?P<head>(?:ราย)?วิชา)\s*ไรบ้าง", "replacement": r"\g<head>อะไรบ้าง"},
@@ -58,7 +64,7 @@ QUESTION_WORDING_RULES = (
     {"id": "credit_question", "pattern": r"กี่\s*เครดิต", "replacement": "กี่หน่วยกิต"},
     # รวมคำลงท้ายที่ซ้อนกับ ไหมอ่ะ ใน match เดียว เพื่อไม่เหลือ ครับ/ค่ะ หลังแปลงครั้งแรก.
     {"id": "question_particle", "pattern": r"ไหมอ่ะ(?:\s*(?:ครับ|ค่ะ|อ่ะ))*(?=\s*[?？.!]*\s*$)|ไหมอ่ะ|มั้ย", "replacement": "ไหม"},
-    {"id": "polite_suffix", "pattern": r"(?:\s*(?:ครับ|ค่ะ|อ่ะ))+(?=\s*[?？.!]*\s*$)", "replacement": ""},
+    {"id": "polite_suffix", "pattern": r"(?:\s*(?:ครับ|ค่ะ|อ่ะ|งับ|ค้าบ|ฮะ))+(?=\s*[?？.!]*\s*$)", "replacement": ""},
 )
 _WORDING_PATTERNS = tuple((rule, re.compile(rule["pattern"])) for rule in QUESTION_WORDING_RULES)
 _WORDING_TRIGGER = re.compile("|".join(
@@ -127,7 +133,7 @@ class NumericPredicate(BaseModel):
     """เงื่อนไขตัวเลขจากข้อความจริง; ไม่ใช้ NULL แทน 0 และไม่ให้ AI ตั้ง operator."""
     model_config = ConfigDict(extra="forbid", strict=True)
     field: Literal["credits", "lecture_h", "lab_h", "self_h"]
-    operator: Literal["eq", "gt", "ge", "lt", "le"]
+    operator: Literal["eq", "ne", "gt", "ge", "lt", "le"]
     value: float
 
 
@@ -157,7 +163,8 @@ class DataQuery(BaseModel):
         "edge_sets", "prerequisite_diff", "graph_comparison", "diff_chains",
         "dataset_sizes", "unresolved_comparison", "evidence_comparison", "lab_ranking",
         "record_summary", "ranked_plan", "average_credits", "registration_conditions",
-        "program_tracks", "track_comparison", "proposed_term",
+        "program_tracks", "track_comparison", "proposed_term", "category_requirements", "elective_eligibility",
+        "program_metadata", "plan_comparison", "course_membership", "top_courses", "plan_total_audit",
     ]
     source: Literal["course", "plan", "elective"] = "course"
     # OUTPUT ใช้ฟิลด์นี้ ส่วน category/course_type ด้านล่างใช้กรองแถวเท่านั้น.
@@ -198,6 +205,8 @@ class DataQuery(BaseModel):
     registration_mode: Literal["prerequisites", "dependents", "pair"] = "prerequisites"
     unpassed_code: CourseCode | None = None
     registration_target: CourseCode | None = None
+    limit: int | None = Field(default=None, ge=1, le=100)
+    with_ties: bool = False
 
 
 class QueryPlan(BaseModel):
@@ -209,7 +218,7 @@ class QueryPlan(BaseModel):
         "semester_summary", "year_summary", "compare_terms", "compare_programs", "compare_tracks", "diff_tracks",
         "plan_counts", "prerequisites", "reverse_prerequisites", "course_progression",
         "prerequisite_chain", "dependent_terms", "conditional_prerequisites", "check_student_plan", "draft_study_plan",
-        "data_query",
+        "data_query", "sql_query",
         "unsupported", "clarify",
     ]
     years: list[Year] = Field(default_factory=list, max_length=8)
@@ -249,6 +258,19 @@ class QueryPlan(BaseModel):
     issue: str | None = None
     diagnostics: dict[str, Any] = Field(default_factory=dict)
     data_query: DataQuery | None = None
+    sql_proposal: dict[str, Any] | None = None
+
+
+@dataclass(frozen=True)
+class _DataRuleCheck:
+    """Request-local parser result; plan=None means checked with no matching operation.
+
+    Reuse requires the same question/scope and catalog signature, which includes
+    configured DB paths, DB/WAL revisions and aliases. Never share across requests.
+    """
+    context: tuple
+    catalog_revision: tuple | None
+    plan: QueryPlan | None
 
 ### |- CHOICE_SCHEMA :
 PLAN_SCHEMA = QueryPlan.model_json_schema()
@@ -262,6 +284,7 @@ CHOICE_SCHEMA = {
 # DataQuery มี filters/operation ครบที่ parser พิสูจน์แล้วเท่านั้น; Qwen ไม่สร้างแผนนี้เอง.
 CHOICE_SCHEMA["properties"]["intent"] = deepcopy(CHOICE_SCHEMA["properties"]["intent"])
 CHOICE_SCHEMA["properties"]["intent"]["enum"].remove("data_query")
+CHOICE_SCHEMA["properties"]["intent"]["enum"].remove("sql_query")
 # แยก scope/result/filter/operation/evidence; สิ่งที่ขอให้แสดงไม่ใช่เงื่อนไขค้นหา.
 # ตัวอย่างจากผลทดสอบครอบคลุมหลายหลักสูตร: กี่หน่วยกิตไม่ใช่กี่วิชา/COUNT.
 # ยังส่ง JSON เพียง 3 ฟิลด์; parser/validator เป็นผู้ประกอบและตรวจเงื่อนไขจริง.
@@ -324,6 +347,8 @@ SEARCH
 Copy verified_hints.term literally; never translate, prepend วิชา, or turn unsupported filters into name terms.
 With code and no name filter use null.
 Keep literal named courses, including เสรี/coop/GENED. Free elective is not every elective.
+A GENED category inside a named home curriculum is not a second database.
+Credit recognition, curriculum requirements and planned slot totals are distinct operations.
 Parser/coverage share DB-verified name candidates; ambiguous names need a code, never pick the first or guess.
 Use name_en/name_th for explicit language, name_any otherwise, description_th for a teaching-topic filter.
 Source year belongs to the prerequisite; target year to the dependent. Pre is not co; direct is not whole-chain.
@@ -398,8 +423,6 @@ PLAN_EXAMPLES = {
         ("วิชา 06026215 เป็นวิชาบังคับหรือวิชาเลือก", "course_details", "name_any", None),
         ("ขอเฉพาะวิชาบังคับของปี 2", "course_list", "name_any", None),
         ("วิชาเสรีมีกี่หน่วยกิต", "clarify", "name_any", None),
-        ("หมวดวิชาเลือกเสรีต้องเก็บกี่หน่วยกิต", "unsupported", "name_any", None),
-        ("รวมหน่วยกิตช่องวิชาเลือกเสรีตามแผนปี 1", "unsupported", "name_any", None),
         ("ปี 1 มีวิชาเลือกเสรีอะไรบ้าง", "course_list", "name_any", None),
         ("วิชาเลือกเสรีของ IT เลือกจาก GENED ได้ไหมและนับกี่หน่วยกิต", "clarify", "name_any", None),
         ("วิชา GENED รหัส 90641004 นับเป็นเลือกเสรีของ IT ได้ไหม", "unsupported", "name_any", None),
@@ -518,10 +541,39 @@ def _named_course_term(question: str) -> str | None:
     return name
 
 
+_COREQUISITE_REQUEST_RE = re.compile(
+    r"วิชาควบ|เรียนควบ|ต้องเรียน.*ควบ|(?:ต้อง)?เรียน(?:วิชา)?พร้อมกัน|co[ -]?requisite", re.I)
+
+
+def _relationship_kind(text: str) -> str:
+    """Only command text: callers mask course names and literal searches first."""
+    co = bool(_COREQUISITE_REQUEST_RE.search(text))
+    pre = bool(re.search(r"วิชา(?:บังคับ)?ก่อน|ต้องผ่าน|ต้องเรียน.*ก่อน|prerequisite", text, re.I))
+    return "both" if co and pre else "co" if co else "pre"
+
+
+from .query_roles import scalar_course_operand as _scalar_course_operand, registration_course_operand as _registration_course_operand, course_candidates as _course_candidates
+
+
 def _name_request_span(question: str) -> dict | None:
     """A bounded course operand, including a name absent from the selected DB."""
     if re.search(r"คำว่า|ที่ชื่อ",question):return None
     if re.match(r"ชื่อ(?:ภาษา)?(?:ไทย|อังกฤษ)|ชื่อเต็ม",question) and "วิชา" not in question:return None
+    # Bounded detail/collection requests still keep names absent from the DB.
+    # Two or more spaces may represent a scope span masked by the caller.
+    bounded = [
+        (r"\s*[:：]?\s*รูปแบบหน่วยกิตของ\s*(?P<name>.+?)(?:(?:ใน|ของ)\s{2,})?\s*เป็นอย่างไร\s*[?？]?", False),
+        (r"\s*[:：]?\s*(?:วิชา)?(?P<name>.+?)\s*(?:ชื่อ)?ภาษาอังกฤษ(?:เรียกว่า|เรียก|ว่า)?อะไร(?:\s*(?:ใน|ของ)\s{2,})?\s*[?？]?", False),
+        (r"\s*[:：]?\s*(?:ขอ)?(?:รายชื่อ|รายการ)(?:ราย)?วิชาใน(?:ราย)?วิชา\s*(?P<name>.+?)\s*[?？]?", True),
+    ]
+    if not _QUOTED_RE.search(question):
+        for pattern, collection in bounded:
+            match = re.fullmatch(pattern, question)
+            if not match:continue
+            name = match["name"].strip()
+            if not 3<=len(name)<=120 or _STUDY_RE.search(name) or re.search(r"คำว่า|ที่ชื่อ|ยกเว้น|ไม่รวม|พร้อม",name):continue
+            start = match.start("name") + len(match["name"]) - len(match["name"].lstrip())
+            return dict(start=start,end=start+len(name),text=name,collection=collection)
     endings = r"ในหลักสูตร|หลักสูตร|ของ\s*(?:IT|BIT|AIT|DSBA|GENED)\b|(?:มี|ต้องเรียน)?กี่หน่วยกิต|เป็นวิชา(?:บังคับ|เลือก)|อยู่(?:ใน)?หมวด|ชื่อ(?:ภาษา)?(?:ไทย|อังกฤษ)|คืออะไร|ใช้รหัสอะไร|รหัสอะไร|ต้องผ่าน|เป็นอย่างไร"
     patterns = [
         rf"^\s*[:：]?\s*(?:ช่วย|ขอ|บอก)?\s*(?:(?:รหัส|ชื่อ)(?:ราย)?วิชา|(?:ราย)?วิชา)?\s*(?P<name>.+?)(?=\s*(?:{endings}))",
@@ -533,6 +585,8 @@ def _name_request_span(question: str) -> dict | None:
         match = re.search(pattern, question, re.I)
         if not match:continue
         raw = match['name']; name = re.sub(r"\s+(?:ของ|ใน)$","",raw.strip()).rstrip()
+        # Interrogatives are output roles, never an unquoted course operand.
+        if re.fullmatch(r"(?:ใด|อะไร|ไหน)(?:บ้าง)?", name):continue
         if not 3 <= len(name) <= 120 or _CODE_RE.search(name) or _STUDY_RE.search(name):continue
         if re.search(r"คำว่า|ที่ชื่อ|ชื่อมี|เกี่ยวกับ|ยกเว้น|ไม่|หรือ|เฉพาะ|ทั้งหมด|รูปแบบหน่วยกิต|ปี|เทอม|หลักสูตร|หน่วยกิต|เครดิต|ข้อมูล|เกณฑ์|(?:^|\s)(?:ชื่อ|ขอ|มี|วิชา)(?:$|\s)", name):continue
         if re.match(r"ที่|ราย$|(?:ชื่อ)?เต็มของ|ชื่อภาษา|บอก$|รบกวน|(?:ต้อง|เรียน|เก็บ|ลง|อยาก|ขอทราบ|ช่วย|สรุป)",name) or re.search(r"ถึงจะจบ|เพื่อจบ|จำนวน|ระยะเวลา|แผน|รวม|ที่$",name):continue
@@ -545,15 +599,17 @@ def _name_request_span(question: str) -> dict | None:
 def _requested_field_hints(question: str) -> list[dict]:
     """Claim complete output phrases only; these spans are shared by coverage."""
     patterns = {
-        "name_en": r"ชื่อ(?:ภาษา)?อังกฤษ(?:\s*(?:เรียกว่า|เรียก|ว่า)?\s*(?:อะไร|อย่างไร|ว่าอะไร))?",
+        "name_en": r"ชื่อ(?:ภาษา)?อังกฤษ(?:\s*(?:เรียกว่า|เรียก|ว่า)?\s*(?:อะไร|อย่างไร|ว่าอะไร))?|ภาษาอังกฤษ(?:เรียกว่า|เรียก|ว่า)?(?:อะไร|อย่างไร)",
         "name_th": r"ชื่อ(?:ภาษา)?ไทย(?:\s*(?:เรียกว่า|เรียก|ว่า)?\s*(?:อะไร|อย่างไร|ว่าอะไร))?",
         "positions": r"(?:เรียน|อยู่|ลง)?\s*ปีไหน\s*เทอมไหน|(?:เรียน|อยู่|ลง)?\s*ปีใด\s*เทอมใด",
         "lecture_h": r"ชั่วโมง(?:ภาค)?(?:ทฤษฎี|บรรยาย)|บรรยายกี่ชั่วโมง",
         "lab_h": r"ชั่วโมง(?:ภาค)?ปฏิบัติ|ปฏิบัติกี่ชั่วโมง",
         "self_h": r"ชั่วโมง(?:ศึกษาเอง|ศึกษาด้วยตนเอง)|ศึกษาเองกี่ชั่วโมง",
         "credits": r"รูปแบบหน่วยกิต|(?:มี|ต้องเรียน)?กี่หน่วยกิต",
+        "description_th": r"เรียนเกี่ยวกับอะไร",
     }
     combined=r"(?:มี)?ชั่วโมง(?:บรรยาย|ทฤษฎี)\s*[/–—-]?\s*ปฏิบัติ\s*[/–—-]?\s*(?:ศึกษาเอง|ศึกษาด้วยตนเอง)(?:อย่างละ)?(?:กี่ชั่วโมง|เท่าไร)?"
+    combined += r"|(?:ใช้เวลาเรียน)?(?:ทฤษฎี|บรรยาย)\s*[,/]?\s*ปฏิบัติ\s*(?:และ|[,/])?\s*(?:ศึกษาเอง|ศึกษาด้วยตนเอง)\s*อย่างละกี่ชั่วโมง"
     for field in ("lecture_h","lab_h","self_h"):patterns[field]+="|"+combined
     return [dict(start=m.start(),end=m.end(),text=m[0],owner="requested_field",field=field)
             for field,pattern in patterns.items() for m in re.finditer(pattern,question)]
@@ -585,13 +641,11 @@ def _lexicon_mentions(question: str, lexicon: dict | None) -> list[dict]:
         if codes:matches.append(dict(start=match.start(), end=match.end(), text=name, codes=sorted(codes)))
     # รองรับวลีชื่อสั้นที่มีขอบเขตชัดจากคำขอ scalar เช่น 'รหัสวิชาเครือข่าย...คืออะไร'.
     # เป็น substring ที่มีอยู่จริง ไม่ใช้ fuzzy score; เก็บทุก candidate และไม่กลบคำสั่ง.
-    root = _name_request_span(text)
-    if root:
+    roots = [_name_request_span(text), _scalar_course_operand(text), _registration_course_operand(text)]
+    for root in roots:
+        if not root or root.get("collection"):continue
         name=root['text']
-        exact={code for stored,values in lexicon.get("names",{}).items()
-               if name.casefold()==stored.casefold() for code in values}
-        codes=exact or {code for stored,values in lexicon.get("names",{}).items()
-                       if name.casefold() in stored.casefold() for code in values}
+        codes=_course_candidates(name,lexicon)
         if codes:matches.append({**root,"codes":sorted(codes)})
     selected = []
     for hit in sorted(matches, key=lambda h: (-(h["end"]-h["start"]),h["start"])):
@@ -609,6 +663,12 @@ def _mask_spans(text: str, spans: list[dict]) -> str:
     for hit in spans:
         chars[hit["start"]:hit["end"]] = " " * (hit["end"]-hit["start"])
     return "".join(chars)
+
+
+def _negated_requirement_spans(q):
+    pattern = r"ไม่(?:ใช่|เอา|ต้องการ)\s*(?:เกณฑ์(?:ขั้นต่ำ)?|ขั้นต่ำ|ข้อกำหนด)(?:\s*(?:ของ)?หมวด(?:วิชา)?)?"
+    return [dict(start=m.start(), end=m.end(), text=m[0], owner="negated_requirement")
+            for m in re.finditer(pattern, _outside_quotes(q))]
 
 
 def _category_hints(q: str) -> dict:
@@ -640,17 +700,20 @@ def _category_hints(q: str) -> dict:
         spans.append(dict(start=match.start(), end=match.end(), text=match[0], owner="elective_source"))
     q = _mask_spans(q, spans)
     patterns = {
-        "free_elective": r"(?:หมวด(?:วิชา)?|รายวิชา|วิชา)?(?:เลือก)?เสรี",
-        "general_education": r"หมวด(?:วิชา)?ศึกษาทั่วไป|วิชาศึกษาทั่วไป",
-        "specialized": r"(?:หมวด|กลุ่ม)(?:วิชา)?เฉพาะ(?:ด้าน)?|(?:ราย)?วิชาเฉพาะ(?:ด้าน)?",
+        "free_elective": r"(?:หมวด(?:วิชา)?|กลุ่ม(?:วิชา)?|รายวิชา|วิชา)?(?:เลือก)?เสรี|(?<![A-Za-z])free[ -]+elective(?![A-Za-z])",
+        "general_education": r"(?:หมวด(?:วิชา)?|กลุ่ม(?:วิชา)?)\s*(?:ศึกษาทั่วไป|gen\s*ed|general\s+education|เจน(?:เอ็ด|เอด))|(?:ราย)?วิชาศึกษาทั่วไป",
+        "specialized": r"(?:หมวด|กลุ่ม)?(?:ราย)?วิชาเลือกเฉพาะ(?:ด้าน)?|(?:หมวด|กลุ่ม)(?:วิชา)?เฉพาะ(?:ด้าน)?|(?:ราย)?วิชาเฉพาะ(?:ด้าน)?",
     }
     categories = []
     for key, pattern in patterns.items():
-        for match in re.finditer(pattern, q):
+        for match in re.finditer(pattern, q, re.I):
             spans.append(dict(start=match.start(),end=match.end(),text=match[0],owner="category"))
             categories.append(key)
     remaining = _mask_spans(q,spans)
     types = []
+    for hit in spans:
+        if hit["owner"] == "category" and re.search(r"วิชาเลือกเฉพาะ", hit["text"]):
+            types.append("elective")
     for hit in list(spans):
         if hit["owner"] != "category":continue
         match=re.match(r"เลือก|บังคับ(?!ก่อน)",q[hit["end"]:])
@@ -720,6 +783,8 @@ def coverage_check(question: str, plan: QueryPlan, hints: dict) -> dict:
         if hints.get("term") and hints["term"] in match[0]:
             spans.append(dict(start=match.start(),end=match.end(),text=match[0],owner="literal"))
     spans.extend(hints.get("category_spans",[]))
+    if plan.intent in {"year_summary", "semester_summary"} and hints.get("years"):
+        spans.extend(dict(start=m.start(),end=m.end(),owner="year_scope") for m in re.finditer(r"ทั้งปี",_outside_quotes(question)))
     working = _mask_spans(q,spans)
     for pattern, owner in [(_STUDY_RE.pattern,"study_scope"),(_CODE_RE.pattern,"course_code"),
                            (_CREDIT_BEFORE_RE.pattern,"credit_filter"),(_CREDIT_AFTER_RE.pattern,"credit_filter"),
@@ -785,7 +850,8 @@ def coverage_check(question: str, plan: QueryPlan, hints: dict) -> dict:
                   "รวม", "ทั้งหมด", "ทั้งหลักสูตร", "ใช้", "ถึงจะจบ", "เพื่อจบ", "จบ", "เท่าไร", "เท่าไหร่",
                   "ถ้าจะวางแผนเรียน", "ตามเกณฑ์จบ", "สำหรับจบ", "อยากสอบถาม", "สอบถาม",
                   "ข้อมูลยอดเครดิต", "ยอดเครดิต", "จำนวนเครดิต", "เกณฑ์สำเร็จการศึกษา", "ระบุไว้", "เท่าใด",
-                  "ถึงจะสำเร็จการศึกษา", "คือ"]
+                  "ถึงจะสำเร็จการศึกษา", "คือ", "ตามแผนปกติ",
+                  "ระยะเวลาการศึกษา", "เป็นอย่างไร"]
         if hints.get("program_name_requested"):
             words += ["ชื่อเต็ม", "เต็ม", "ชื่อหลักสูตร", "ว่า"]
     if plan.intent in {"prerequisites", "reverse_prerequisites"}:
@@ -849,6 +915,10 @@ def _structured_rule(h: dict) -> QueryPlan | None:
                 or h["credits"] is not None or h["credits_any_of"] or h["term"] or h["sort_by"] or h["missing_credits"]):
             return QueryPlan(intent="unsupported",issue="ตัวต่อข้ามปีรองรับปีต้นทางและปีปลายทางก่อน ยังไม่รองรับตัวกรองอื่นร่วมกัน")
         return QueryPlan(intent="course_progression",source_year=h["source_year"],target_year=h["target_year"])
+    if h.get("plan_credit_total_requested"):
+        return QueryPlan(intent="semester_summary" if h["semesters"] or h.get("plan_summary_group")=="semester" else "year_summary",
+                         years=h["years"], semesters=h["semesters"],
+                         terms=[Term(year=y, semester=sem) for y, sem in h["terms"]])
     if h["relation_requested"] and (h["years"] or h["semesters"]):
         return QueryPlan(intent="unsupported",issue="ความสัมพันธ์วิชาก่อนตามปีต้องระบุปีต้นทางและปีปลายทาง; การกรองความสัมพันธ์ด้วยปีร่วมกับรหัสยังไม่รองรับ")
     if h["category"] or h["course_type"]:
@@ -870,11 +940,12 @@ def _structured_rule(h: dict) -> QueryPlan | None:
         hit=h["name_mentions"][0]
         if len(set(hit["codes"]))>1:
             return QueryPlan(intent="clarify",issue="ชื่อวิชานี้ตรงกับหลายรหัส กรุณาระบุรหัสวิชาที่ต้องการ")
-        return QueryPlan(intent="course_details",search_field=h["field"] or "name_any",search_term=h["term"])
+        return QueryPlan(intent="course_details", course_codes=h["codes"],
+                         search_field=h["field"] or "name_any", search_term=h["term"])
     # คำพ้องในรายงานใช้ยอดแผนเดิมได้ ไม่ต้องรอ Qwen; เงื่อนไขที่เหลือยังต้อง
     # ผ่าน coverage/validator และไม่ทิ้ง predicate ชื่อ รหัส หมวด หรือหน่วยกิต.
     if ((h["years"] or h["semesters"]) and re.search(r"กี่หน่วยกิต", h.get("body", ""))
-            and re.search(r"ตลอดปี|ต้องลงทะเบียน", h.get("body", ""))
+            and re.search(r"ตลอดปี|ทั้งปี|ต้องลงทะเบียน", h.get("body", ""))
             and not (h["term"] or h["field"] or h["codes"] or h["category"] or h["course_type"]
                      or h["relation_requested"] or h["count_requested"] or h["credits"] is not None
                      or h["credits_any_of"] or h["missing_credits"] or h["sort_by"])):
@@ -1360,6 +1431,25 @@ def preflight(question: str, program: str | None, track: str | None = None,
     return None
 
 
+def _gened_dataset_spans(text, program):
+    if not program or program.strip().upper() != "GENED":return []
+    text = _outside_quotes(text)
+    # Explicit comparison targets take precedence over the selected form's GENED.
+    if re.search(r"(?<![A-Za-z0-9_])(?:IT|DSBA|BIT|AIT)(?![A-Za-z0-9_])", text, re.I):return []
+    spans = [{**span,"owner":"dataset_scope"} for span in _category_hints(text)["category_spans"]
+             if span["owner"] == "category" and re.search(r"ศึกษาทั่วไป|gen\s*ed|general\s+education|เจน(?:เอ็ด|เอด)",span["text"],re.I)]
+    # Keep the list noun: mask 'ศึกษาทั่วไป', not the whole 'รายวิชา'.
+    for span in spans:
+        noun = re.match(r"(?:ราย)?วิชา(?=ศึกษาทั่วไป)", span["text"])
+        if noun:
+            span["start"] += noun.end()
+            span["text"] = text[span["start"]:span["end"]]
+    for match in re.finditer(r"(?<!หมวด)(?:ราย)?วิชาศึกษาทั่วไป", text):
+        if re.search(r"คำว่า|ชื่อว่า|กล่าวถึง|เกี่ยวกับ|เรื่อง",text[:match.start()]):continue
+        spans.append(dict(start=match.end()-len("ศึกษาทั่วไป"),end=match.end(),text="ศึกษาทั่วไป",owner="dataset_scope"))
+    return spans
+
+
 def _scope_hints(question: str, catalog, program, track, lexicon, name_mentions) -> dict:
     """ตรวจ scope ที่ใช้จริงและเก็บ spans; literal/ชื่อวิชาไม่ถูกอ่านเป็นชื่อหลักสูตร.
 
@@ -1367,9 +1457,11 @@ def _scope_hints(question: str, catalog, program, track, lexicon, name_mentions)
     ผลชุดนี้ส่งต่อให้ rules/coverage/validator ไม่ใช้การลบคำว่า 'หลักสูตร' ทั่วข้อความ.
     """
     text = _mask_spans(_outside_quotes(question), name_mentions)
+    text = _mask_spans(text, _category_hints(text)["category_spans"])
     configured = getattr(getattr(catalog, "config", None), "db_paths", {})
     candidates = catalog.match_mentions(text) if configured else []
     hits, spans = [], []
+    spans.extend(_gened_dataset_spans(_mask_spans(_outside_quotes(question),name_mentions),program))
     for hit in candidates:
         prefix = re.search(r"(?:(?:ใน|ของ|สำหรับ)\s*(?:หลักสูตร|สาขา|หมวด)?|หลักสูตร|สาขา|หมวด)\s*$", text[:hit["start"]])
         # ชื่อหมวด/ชื่อวิชาอาจซ้ำ metadata หลักสูตร เช่น 'วิชาศึกษาทั่วไป'.
@@ -1419,14 +1511,19 @@ def _scope_hints(question: str, catalog, program, track, lexicon, name_mentions)
         issue, reason = f"ไม่พบหลักสูตร {', '.join(unknown_programs)} ในรายการที่ตั้งค่าไว้ กรุณาตรวจชื่อหลักสูตร", "unknown_program"
     elif any(hit["program"] is None for hit in hits):
         issue, reason = "ชื่อหลักสูตรตรงกับหลายรายการ กรุณาระบุรหัสหลักสูตร", "ambiguous_program"
-    elif selected and len(programs) > 1 and "GENED" in programs and re.search(
-            r"นับเป็นหมวด|เทียบโอน|ใช้เป็นหมวด|เลือกจาก|(?:เลือกเสรี|หมวด).*(?:นับ|ใช้|ได้ไหม)|นับ.*หน่วยกิต", text):
+    elif selected and len(programs) > 1 and "GENED" in programs and re.search(r"เสรี|นับเป็นหมวด|ใช้เป็นหมวด|เลือกจาก", _outside_quotes(question)) and re.search(
+            r"นับ(?:เป็น|เข้า)?|เทียบโอน|ใช้เป็น|ลงเป็น|เอามา(?:เป็น|นับ)|เลือกจาก|(?:เลือกเสรี|เสรี|หมวด).*(?:นับ|ใช้|ได้ไหม)", text):
         reason = "missing_gened_mapping"
         if _CODE_RE.search(text):
             intent = "unsupported"
             issue = "ยังไม่มีข้อมูลข้อกำหนดการเลือกวิชา GENED และการนับหน่วยกิตเป็นหมวดของหลักสูตรเป้าหมาย จึงยืนยันสิทธิ์หรือยอดที่นับได้ไม่ได้"
         else:
             issue = "กรุณาระบุรหัสวิชา GENED และหลักสูตร/แผนที่ต้องการตรวจ ยังไม่มีข้อกำหนดการเลือกวิชาและข้อมูลเทียบโอนที่ยืนยันการนับหน่วยกิตเป็นหมวดหรือเลือกเสรีได้"
+    elif selected and selected != "GENED" and programs == ["GENED"] and re.search(r"เสรี", _outside_quotes(question)):
+        if re.search(r"นับ|ใช้เป็น|ลงเป็น|เอามา(?:เป็น|นับ)|เลือกจาก", _outside_quotes(question)):
+            issue, intent, reason = "ต้องตรวจเกณฑ์การนับวิชา GENED เป็นเลือกเสรีของหลักสูตรที่เลือก", "unsupported", "missing_gened_mapping"
+        else:
+            issue, reason = "ต้องการดูรายวิชา GENED หรือเช็กว่านับเป็นเลือกเสรีของหลักสูตรที่เลือกได้ไหม?", "ambiguous_elective_usage"
     elif selected and len(programs) > 1:
         issue, intent, reason = "คำถามนี้ระบุหลายหลักสูตร กรุณาระบุหัวข้อเปรียบเทียบที่รองรับ", "unsupported", "multiple_program_scope"
     elif selected and programs and programs != [selected]:
@@ -1442,7 +1539,7 @@ def _scope_hints(question: str, catalog, program, track, lexicon, name_mentions)
             issue, reason = f"คำถามระบุแผน {', '.join(requested_tracks)} แต่ขณะนี้เลือก {selected_track} กรุณาเลือกแผนให้ตรงกับคำถาม", "track_mismatch"
     # GENED คือชุดข้อมูล course; 'รายวิชาศึกษาทั่วไป' ไม่ได้ขอแผนรายปีโดยตัวมันเอง.
     if selected == "GENED":
-        working = _mask_spans(text, spans)
+        working = _mask_spans(_outside_quotes(question), spans + name_mentions)
         for match in re.finditer(r"(?<!หมวด)(?:ราย)?วิชาศึกษาทั่วไป", working):
             if re.search(r"คำว่า|ชื่อว่า|กล่าวถึง|เกี่ยวกับ|เรื่อง", working[:match.start()]):
                 continue
@@ -1462,9 +1559,17 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
     name_mentions = _lexicon_mentions(normalized,lexicon)
     scope = _scope_hints(normalized, catalog, program, track, lexicon, name_mentions)
     body = _mask_spans(normalized, scope["scope_spans"])
+    scoped_names = _lexicon_mentions(body, lexicon)
+    name_mentions = scoped_names or [hit for hit in name_mentions
+                                    if not any(hit["start"] < span["end"] and span["start"] < hit["end"]
+                                               for span in scope["scope_spans"])]
     q = _mask_spans(q, scope["scope_spans"])
     q = _mask_spans(q,name_mentions)
-    study, credit, sort = _study_hints(q), _credit_hints(q), _sort_hints(q)
+    study = _study_hints(q)
+    # The semester in "เทอม 1 หน่วยกิตรวมเท่าไร" is not a one-credit filter.
+    # Mask only claimed study positions; keep offsets and all other numbers.
+    credit_text = _STUDY_RE.sub(lambda match: " " * len(match[0]), q)
+    credit, sort = _credit_hints(credit_text), _sort_hints(q)
     # แยกคำขอเรียงชื่อออกจากคำขอค้นชื่อ มิฉะนั้น sort จะกลายเป็น search filter
     search_q = q[:sort["sort_start"]] if sort["sort_start"] is not None else q
     search_text = body[:sort["sort_start"]] if sort["sort_start"] is not None else body
@@ -1506,8 +1611,8 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
     progression = _progression_hints(q)
     draft = _draft_hints(q)
     relation_text = category_text  # ชื่อ/คำค้นจริงที่มีคำว่า 'ก่อน' ไม่ใช่คำสั่ง relationship.
-    relation_requested = bool(progression["progression"] or re.search(
-        r"ต้องผ่าน|ต้องเรียน.*ก่อน|วิชา(?:บังคับ)?ก่อน|เป็นวิชา(?:บังคับ)?ก่อน|วิชาควบ|เรียนควบ|ต้องเรียน.*ควบ",
+    relation_requested = bool(progression["progression"] or _COREQUISITE_REQUEST_RE.search(relation_text) or re.search(
+        r"ต้องผ่าน|ต้องเรียน.*ก่อน|ต้องลงวิชา.*ไว้ก่อน.*เพื่อ(?:ให้)?เรียน|วิชา(?:บังคับ)?ก่อน|เป็นวิชา(?:บังคับ)?ก่อน|วิชาควบ|เรียนควบ|ต้องเรียน.*ควบ",
         relation_text))
     category_defaults = {"free_elective":["หมวดวิชาเลือกเสรี","หมวดวิชาเสรี"],
                          "general_education":["หมวดวิชาศึกษาทั่วไป"],"specialized":["หมวดวิชาเฉพาะ"]}
@@ -1516,7 +1621,8 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
                   {"required":["บังคับ"],"elective":["เลือก"]}.get(categories["course_type"],[]))
     count_requested = bool(re.search(r"กี่(?:ราย)?วิชา|จำนวน(?:ราย)?วิชา|กี่รายการ",q))
     details_requested = bool(re.search(r"กี่หน่วยกิต|ชื่อ(?:ภาษา)?(?:อังกฤษ|ไทย)(?:ว่า|คือ|อะไร)|ชื่ออะไร|"
-                                      r"พร้อมคำอธิบาย|ขอคำอธิบาย|คำอธิบาย(?:เต็ม|ทั้งหมด|ว่าอะไร)|รายละเอียด|ชั่วโมง",q)
+                                      r"พร้อมคำอธิบาย|ขอคำอธิบาย|คำอธิบาย(?:เต็ม|ทั้งหมด|ว่าอะไร)|รายละเอียด|ชั่วโมง|"
+                                      r"(?:จำนวน)?หน่วยกิตของ|ใช้รหัส|รหัสอะไร",q)
                              or categories["requested_fields"])
     rank_text = search_q  # "เรียงหน่วยกิตมากที่สุดก่อน" เป็น sort ไม่ใช่ MAX ของเทอม/ปี
     # requested metrics เป็น output contract ไม่ใช่ credit predicate ของรายวิชา.
@@ -1539,16 +1645,38 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
                                 and not term and not _CODE_RE.search(q) and "แต่ละ" not in q
                                 and credit["credits"] is None and not credit["credits_any_of"])
     category_credit_scope = None
+    requirement_text = _mask_spans(q, _negated_requirement_spans(q))
     if category_requirement:
-        if re.search(r"เกณฑ์|กำหนด|ขั้นต่ำ|ต้องเก็บ", q):
+        if re.search(r"เกณฑ์|กำหนด|ขั้นต่ำ|ต้องเก็บ", requirement_text):
             category_credit_scope = "official_requirement"
         elif study["years"] or study["semesters"] or re.search(r"ตามแผน|ในแผน|ช่อง", q):
             category_credit_scope = "study_plan_total"
         else:
             category_credit_scope = "official_requirement" if "หมวด" in q else "ambiguous"
+    codes = list(dict.fromkeys(_CODE_RE.findall(q)))
+    # Resolve a single exact DB name for a detail request; collection searches
+    # keep all candidates and never inherit an identity filter from this branch.
+    if (not codes and details_requested and len(name_mentions) == 1
+            and len(set(name_mentions[0]["codes"])) == 1
+            and any(name.casefold() == name_mentions[0]["text"].casefold()
+                    for name in (lexicon or {}).get("names", {}))
+            and not re.search(r"คำว่า|ที่ชื่อ|ชื่อมี|รายชื่อ|รายการ|อะไรบ้าง|ไหนบ้าง|ทั้งหมด", q)
+            and not (study["years"] or study["semesters"] or categories["category"] or categories["course_type"])):
+        codes = list(name_mentions[0]["codes"])
+    plan_summary_group = ("semester" if re.search(r"แต่ละเทอม|ทุกเทอม|รายเทอม", q) else
+                          "year" if re.search(r"แต่ละปี|ทุกปี|รายปี", q) else None)
+    plan_credit_total_requested = bool(
+        ((study["years"] or study["semesters"])
+         and re.search(r"(?:จำนวน)?หน่วยกิต(?:รวม)?ของ\s*(?:ปี|เทอม|ภาคเรียน)|หน่วยกิตรวม(?:ทั้งปี)?\s*(?:เท่าไร|เท่าไหร่)", q)
+         or plan_summary_group and re.search(r"(?:รวม|ยอด|สรุป).*หน่วยกิต|หน่วยกิตรวม", q))
+        and not (term or codes or categories["category"] or categories["course_type"]
+                 or relation_requested or count_requested or credit["credits"] is not None
+                 or credit["credits_any_of"] or _MISSING_CREDITS_RE.search(q) or sort["sort_by"]))
     return dict(
         **study, **credit,
-        codes=list(dict.fromkeys(_CODE_RE.findall(q))),
+        codes=codes,
+        plan_credit_total_requested=plan_credit_total_requested, plan_summary_group=plan_summary_group,
+        elective_catalog_requested=bool(re.search(r"บัญชีวิชาเลือก|รายการวิชาเลือก|allowed_terms", q)),
         missing_credits=bool(_MISSING_CREDITS_RE.search(q)),
         field=field, term=term, named_course=bool(named_course), name_mentions=name_mentions,
         **categories, **progression, **draft, relation_requested=relation_requested,
@@ -1572,7 +1700,7 @@ def question_hints(question: str, *, catalog: ProgramCatalog | None = None,
         program_name_requested=program_name_requested,
         program_credit_requested=bool(metadata_scope and not (term or _CODE_RE.search(q) or study["years"] or study["semesters"])
                                       and re.search(r"ยอดเครดิต|จำนวนเครดิต", q)),
-        relation_kind="both" if "ก่อน" in relation_text and "ควบ" in relation_text else "co" if "ควบ" in relation_text else "pre",
+        relation_kind=_relationship_kind(relation_text),
     )
 
 
@@ -1965,7 +2093,7 @@ def _walk_prerequisites(root: str, before: dict) -> tuple[list[dict], list[list[
     return sorted(result.values(), key=lambda e: (e["depth"], e["code"], e["requires"])), cycles
 
 
-def check_student_plan(plan: QueryPlan, snapshot: dict, student: dict) -> tuple[list[dict], dict, str]:
+def check_student_plan(plan: QueryPlan, snapshot: dict, student: dict, *, rules=None) -> tuple[list[dict], dict, str]:
     """ตรวจข้อมูลผู้ใช้กับ DB เบื้องต้น ไม่ประกาศว่าครบเกณฑ์จบหรือมีสิทธิ์ทะเบียน.
 
     วิชาในเทอมก่อนเป็นเพียงแผน: prerequisite ที่พึ่งวิชาเหล่านั้นเป็น conditional
@@ -1995,7 +2123,22 @@ def check_student_plan(plan: QueryPlan, snapshot: dict, student: dict) -> tuple[
                 problems.append("ไม่ทราบหน่วยกิต")
             elif code not in seen:
                 total += value
+            expression = (rules or {}).get("prerequisites", {}).get(code)
+            if expression:
+                kwargs = {"equivalents":student.get("approved_equivalences", []),"grades":student.get("completed_grades", {})}
+                verified = evaluate_requirement(expression, completed, **kwargs)
+                possible = evaluate_requirement(expression, completed | planned, **kwargs)
+                if verified is None:
+                    if status == "pass":status = "unknown"
+                    problems.append("ต้องตรวจผลเทียบเคียงหรือเกรดตามเงื่อนไขทางเลือกในเล่ม")
+                elif verified is False and possible is True:
+                    if status == "pass":status = "conditional"
+                    problems.append("ต้องผ่านวิชาที่วางไว้ในเทอมก่อนให้ได้จริง")
+                elif verified is False:
+                    status = "fail"
+                    problems.append("ยังไม่ผ่านเงื่อนไขวิชาก่อนที่ตรวจได้")
             for edge in before.get(code, []):
+                if expression and edge["kind"] == "pre":continue
                 required = edge["requires"]
                 if required in completed:
                     continue
@@ -2021,6 +2164,34 @@ def check_student_plan(plan: QueryPlan, snapshot: dict, student: dict) -> tuple[
                "missing_data": ["เกณฑ์จบรายหมวดและข้อยกเว้นทางทะเบียน", "ตารางเปิดสอนจริง"],
                "unknown_completed": unknown_completed, "known_credits": sum(t["known_credits"] for t in totals.values()),
                "missing_credits": sum(t["missing_credits"] for t in totals.values())}
+    summary["graduation_verified"] = False
+    if rules:
+        positions = defaultdict(set)
+        required = set()
+        for item in snapshot["plan"]:
+            category = curriculum_category(item.get("category"))
+            if category:positions[item["code"]].add(category)
+            if item.get("type") == "บังคับ" and not item.get("alt_group") and re.fullmatch(r"[0-9]{8}",item["code"]):
+                required.add(item["code"])
+        totals_by_category = defaultdict(float)
+        allocation_unknown = []
+        allocations = student.get("category_allocations", {})
+        for code in completed | seen:
+            categories = positions.get(code,set())
+            chosen = allocations.get(code)
+            if chosen and chosen not in categories:
+                allocation_unknown.append(code);continue
+            if chosen is None and len(categories) == 1:chosen = next(iter(categories))
+            value = (courses.get(code) or {}).get("credits")
+            if chosen and isinstance(value,(int,float)):totals_by_category[chosen] += value
+            else:allocation_unknown.append(code)
+        summary["category_checks"] = [{"category":r["category"],"minimum_credits":r["credits"],
+            "known_credits":totals_by_category[r["category"]],
+            "status":"unknown" if allocation_unknown else "met" if totals_by_category[r["category"]]>=r["credits"] else "not_met",
+            "pages":r["pages"]} for r in rules.get("requirements",[]) if not r.get("course_type")]
+        summary["unverified_allocations"] = sorted(allocation_unknown)
+        summary["missing_required_plan_codes"] = sorted(required - completed - seen)
+        summary["missing_data"].append("ตรวจยอดหมวดตามตำแหน่งในแผนเท่านั้น; การนับวิชาแทน/เทียบโอนต้องมีเกณฑ์และผลอนุมัติ")
     completed_values = [courses[c].get("credits") for c in completed if c in courses]
     summary["completed_known_credits"] = sum(v for v in completed_values if isinstance(v, (int, float)))
     summary["official_total_credits"] = _comparison_value(snapshot.get("total_credits"))
@@ -2040,82 +2211,109 @@ def check_student_plan(plan: QueryPlan, snapshot: dict, student: dict) -> tuple[
     answer += f"\nหน่วยกิตที่ผ่านแล้วและทราบค่า {summary['completed_known_credits']}; หน่วยกิตในแผนที่ทราบค่า {summary['known_credits']}"
     if summary["official_total_credits"] is not None:
         answer += f"; ยอดหลักสูตรตาม metadata {summary['official_total_credits']} หน่วยกิต (ยอดถึงเกณฑ์อย่างเดียวไม่ยืนยันว่าจบ)"
+    for check in summary.get("category_checks", []):
+        answer += f"\nหมวด {check['category']}: ยอดที่ตรวจจากแผน {check['known_credits']:g} / เกณฑ์ {check['minimum_credits']} หน่วยกิต ({check['status']})"
     answer += "\nวิชาที่วางไว้ยังไม่ถือว่าผ่านจริง; ผลนี้ไม่ยืนยันสิทธิ์ลงทะเบียนหรือครบเกณฑ์จบ"
     return rows, summary, answer
 
 
-def draft_study_plan(plan: QueryPlan, snapshot: dict, student: dict) -> tuple[list[dict], dict, str]:
-    """จัดร่างเทอมปกติด้วย dependency และเพดานที่สมมติ ตรวจ graph ครบก่อนแสดง.
-
-    ไม่เดาตารางเปิดสอน ไม่เลือกวิชาแทนช่อง placeholder/ทางเลือก และไม่ประกาศจบได้จริง.
-    ถ้าจัดไม่ลงภายในงบเทอมจะคืน unresolved แทนกล่าวว่าหลักสูตรเป็นไปไม่ได้.
-    """
-    courses, before, _, _ = _graph_data(snapshot)
+def draft_study_plan(plan: QueryPlan, snapshot: dict, student: dict, *, rules=None) -> tuple[list[dict], dict, str]:
+    """Schedule a balanced structural draft, retaining slots and checking the result."""
+    courses, before, after, _ = _graph_data(snapshot)
     cap = student.get("max_credits_per_term", 30)
-    done = set(student.get("completed_courses", []))
-    slots, groups = [], {}
-    for item in snapshot["plan"]:
-        key = (item["year"], item["semester"], item["alt_group"] or f"row:{item['id']}")
-        groups.setdefault(key, []).append(item)
-    pending, unresolved = {}, []
-    for items in groups.values():
-        codes = set(i["code"] for i in items)
-        if codes & done:
-            continue
-        values = {i["credits"] for i in items}
-        if len(codes)!=1 or not re.fullmatch(r"[0-9]{8}", next(iter(codes))) or len(values)!=1 or None in values:
-            slots.append({"codes": sorted(codes), "credits": next(iter(values)) if len(values)==1 else None,
-                          "year": items[0]["year"], "semester": items[0]["semester"]})
-            continue
-        code = next(iter(codes))
-        if code in pending:
-            # ไม่รวมวิชาซ้ำเป็นหน่วยกิตเพิ่ม; แจ้งเพื่อให้เจ้าของข้อมูลตรวจ.
-            unresolved.append({"code": code, "reason": "รหัสปรากฏหลายช่องในแผน"})
-            continue
-        pending[code] = {**items[0], "name_th": courses.get(code, {}).get("name_th")}
-    rows=[]
+    completed = set(student.get("completed_courses", []))
+    done = set(completed)
     terms = int(plan.graduation_years * 2)
+    groups = {}
+    for item in snapshot["plan"]:
+        key = (item["year"],item["semester"],item["alt_group"] or f"row:{item['id']}")
+        groups.setdefault(key,[]).append(item)
+    pending, slots, unresolved = {}, [], []
+    for index,items in enumerate(groups.values()):
+        codes = {x["code"] for x in items}
+        if codes & done:continue
+        values = {x["credits"] for x in items}
+        if len(codes)!=1 or not re.fullmatch(r"[0-9]{8}",next(iter(codes))) or len(values)!=1 or None in values:
+            slots.append({"slot_id":f"slot:{index}","codes":sorted(codes),
+                "credits":next(iter(values)) if len(values)==1 else None,
+                "original_year":items[0]["year"],"original_semester":items[0]["semester"],
+                "category":items[0].get("category"),"requires_selection":True})
+        else:
+            code=next(iter(codes))
+            if code in pending:
+                unresolved.append({"code":code,"reason":"รหัสปรากฏหลายช่องในแผน"});continue
+            pending[code]={**items[0],"name_th":courses.get(code,{}).get("name_th")}
+    original_terms=max((2*(x["year"]-1)+x["semester"] for x in snapshot["plan"]),default=terms)
+    baseline=terms>=original_terms and not completed
+    reserved=[0]*terms
+    slot_rows=[]
+    for slot in slots:
+        original=2*(slot["original_year"]-1)+slot["original_semester"]-1
+        desired=min(terms-1,original if baseline else int(original*terms/max(original_terms,1)))
+        value=slot["credits"]
+        candidates=sorted(range(terms),key=lambda i:(abs(i-desired),i))
+        chosen=next((i for i in candidates if value is None or reserved[i]+value<=cap),None)
+        if chosen is None:
+            unresolved.append({"slot_id":slot["slot_id"],"reason":"จัดช่องลงเทอมภายใต้เพดานนี้ไม่ได้"});continue
+        slot.update(year=chosen//2+1,semester=chosen%2+1,status="pending_selection")
+        if value is not None:reserved[chosen]+=value
+        slot_rows.append({"year":slot["year"],"semester":slot["semester"],"code":"",
+            "name_th":"ช่อง"+(slot["category"] or "เลือกวิชา"),"credits":value,
+            "status":"pending_selection","kind":"elective_slot","slot_id":slot["slot_id"],
+            "option_codes":slot["codes"],"requires_selection":True})
+    rows=[]
     for term in range(terms):
         remaining_seconds()
-        chosen, load = set(), 0
-        # วิชาต้นแผนก่อน; co ที่ยังไม่ผ่านต้องถูกจัดในเทอมเดียวกันเป็นกลุ่ม.
-        for code in sorted(pending, key=lambda c: (pending[c]["year"], pending[c]["semester"], c)):
-            if code in chosen: continue
-            bundle, todo = {code}, [code]
+        chosen=set();load=reserved[term]
+        remaining_total=sum(x["credits"] for x in pending.values())+sum(reserved[term:])
+        target=min(cap,remaining_total/max(terms-term,1))
+        for code in sorted(pending,key=lambda c:(pending[c]["year"],pending[c]["semester"],-len(after.get(c,[])),c)):
+            if code in chosen:continue
+            bundle,todo={code},[code]
             while todo:
-                remaining_seconds()
-                node=todo.pop()
-                for edge in before.get(node, []):
-                    if edge["kind"]=="co" and edge["requires"] not in done | chosen | bundle:
-                        bundle.add(edge["requires"]); todo.append(edge["requires"])
-            if not bundle <= set(pending): continue
-            if any(e["requires"] not in done for c in bundle for e in before.get(c, []) if e["kind"]=="pre"):
-                continue
-            extra = bundle - chosen
-            credits = sum(pending[c]["credits"] for c in extra)
-            if load + credits > cap: continue
-            chosen.update(extra); load += credits
+                remaining_seconds();node=todo.pop()
+                for edge in before.get(node,[]):
+                    if edge["kind"]=="co" and edge["requires"] not in done|chosen|bundle:
+                        bundle.add(edge["requires"]);todo.append(edge["requires"])
+            if not bundle<=set(pending):continue
+            if baseline and any(2*(pending[c]["year"]-1)+pending[c]["semester"]-1!=term for c in bundle):continue
+            if any(e["requires"] not in done for c in bundle for e in before.get(c,[]) if e["kind"]=="pre"):continue
+            extra=bundle-chosen;credits=sum(pending[c]["credits"] for c in extra)
+            if load+credits>cap:continue
+            must_fill=remaining_total-(load+credits)>(terms-term-1)*cap
+            if not baseline and chosen and load+credits>target and not must_fill:continue
+            chosen.update(extra);load+=credits
         for code in sorted(chosen):
             item=pending.pop(code)
-            rows.append({"year": term//2+1, "semester": term%2+1, "code": code,
-                         "name_th": item["name_th"], "credits": item["credits"], "status": "draft"})
+            rows.append({"year":term//2+1,"semester":term%2+1,"code":code,
+                "name_th":item["name_th"],"credits":item["credits"],"status":"draft","kind":"course"})
         done.update(chosen)
-    for code in sorted(pending):
-        unresolved.append({"code": code, "reason": "จัดไม่ลงในร่างนี้ภายใต้จำนวนเทอม/เพดาน/เงื่อนไขที่บันทึก ไม่ใช่ข้อพิสูจน์ว่าเรียนไม่ได้"})
-    summary={"kind": "study_draft", "status": "incomplete" if slots or unresolved else "draft",
-             "terms": terms, "max_credits_per_term": cap, "unresolved": unresolved, "elective_slots": slots,
-             "assumptions": [f"ใช้ {terms} เทอมปกติ ไม่รวมฤดูร้อน; สมมติเปิดทุกวิชาในเทอมที่จัด",
-                             f"เพดาน {cap} หน่วยกิตต่อเทอมเป็นข้อสมมติ; สมมติผ่านวิชาที่จัดทุกเทอม",
-                             "ใช้ pre ทุกแถวเป็นเงื่อนไขร่วมกัน และจัด co พร้อมกันตาม DB"],
-             "missing_data": ["การเปิดสอนจริง/เกณฑ์จบรายหมวด/ข้อกำหนดสหกิจและข้อยกเว้น",
-                              "ต้องเลือกวิชาจริงแทนช่องเลือกและตรวจเงื่อนไขของตัวเลือก"]}
+    for code in sorted(pending):unresolved.append({"code":code,"reason":"จัดไม่ลงในร่างนี้ ไม่ใช่ข้อพิสูจน์ว่าเรียนไม่ได้"})
+    concrete=defaultdict(list)
+    for row in rows:concrete[(row["year"],row["semester"])].append(row["code"])
+    _,validation,_=check_student_plan(plan,snapshot,{**student,"student_plan":[{"year":y,"semester":s,"course_codes":codes} for (y,s),codes in sorted(concrete.items())]},rules=rules)
+    rows+=slot_rows
+    rows.sort(key=lambda r:(r["year"],r["semester"],r.get("code") or r.get("slot_id", "")))
+    term_loads=[sum(r["credits"] for r in rows if r["year"]==i//2+1 and r["semester"]==i%2+1 and isinstance(r["credits"],(int,float))) for i in range(terms)]
+    structural_complete=not unresolved and all(s.get("year") and s["credits"] is not None for s in slots) and validation["status"]!="fail"
+    summary={"kind":"study_draft","status":"pending_selection" if structural_complete and slots else "incomplete" if unresolved else "draft",
+        "answer_completeness":"partial" if slots or unresolved else "draft","graduation_verified":False,
+        "structural_complete":structural_complete,"terms":terms,"term_loads":term_loads,
+        "max_credits_per_term":cap,"unresolved":unresolved,"elective_slots":slots,"validation":validation,
+        "assumptions":[f"ใช้ {terms} เทอมปกติ ไม่รวมฤดูร้อน; สมมติเปิดทุกวิชาในเทอมที่จัด",
+                       f"เพดาน {cap} หน่วยกิตต่อเทอมเป็นข้อสมมติ ไม่ใช่ระเบียบทางการ",
+                       "วิชาที่วางในเทอมก่อนต้องผ่านจริง; ช่องเลือกยังไม่ถือว่าเลือกหรือผ่านวิชาแล้ว",
+                       "ความสัมพันธ์ pre ที่ยังไม่มีนิพจน์ตรวจจากเล่ม ใช้เส้นทางที่ผ่านทุกรหัสที่บันทึกไว้ ไม่รับรองว่าครบทางเลือก/เทียบเคียง"],
+        "missing_data":["เกณฑ์จบทุกข้อ/ข้อกำหนดสหกิจและข้อยกเว้น/การเปิดสอนจริง",
+                        "ต้องเลือกวิชาจริงแทนช่องและตรวจเงื่อนไขของวิชาที่เลือก"]}
     answer=f"ร่างแผน {plan.graduation_years:g} ปี ({terms} เทอมปกติ) ภายใต้ข้อสมมติ ไม่ยืนยันว่าจบได้จริง"
-    for term in range(terms):
-        items=[r for r in rows if r["year"]==term//2+1 and r["semester"]==term%2+1]
-        answer += f"\nปี {term//2+1} เทอม {term%2+1}: " + (", ".join(f"{r['code']} {r['name_th'] or ''}" for r in items) or "ยังไม่มีวิชาที่จัดได้")
-        answer += f" — รวมที่จัด {sum(r['credits'] for r in items)} หน่วยกิต"
-    answer += f"\nช่องเลือก/ข้อมูลไม่ครบที่ยังไม่จัด {len(slots)} ช่อง; วิชาที่ยังจัดไม่ลงหรือมีข้อมูลซ้ำ {len(unresolved)} รายการ"
-    return rows, summary, answer
+    answer+="\nสถานะ: ร่างยังไม่ครบรายวิชาจริง — โครงสร้างร่างครบ แต่ยังต้องเลือกวิชา" if structural_complete and slots else "\nสถานะ: ร่างยังไม่ครบ" if unresolved or slots else "\nสถานะ: ร่างรายวิชาตามข้อมูลที่ตรวจ"
+    for i in range(terms):
+        items=[r for r in rows if r["year"]==i//2+1 and r["semester"]==i%2+1]
+        answer+=f"\nปี {i//2+1} เทอม {i%2+1}: "+(", ".join((r["code"]+" "+(r["name_th"] or "")).strip() for r in items) or "ยังไม่มีรายการที่จัดได้")
+        answer+=f" — รวมหน่วยกิตที่ทราบ {term_loads[i]}"
+    answer+=f"\nช่องที่ยังต้องเลือกวิชาจริง {len(slots)} ช่อง; รายการที่ยังจัดไม่ลง {len(unresolved)} รายการ"
+    return rows,summary,answer
 
 
 def _conversational_rule_plan(question: str, *, hints: dict | None = None) -> QueryPlan | None:
@@ -2415,6 +2613,11 @@ def validate_plan(plan: QueryPlan, question: str, *, catalog: ProgramCatalog | N
         raise ValueError("Resolved category/type values must come from the selected database")
     if h["unknown_category"] or h["ambiguous_category"]:
         raise ValueError("Category or type is not representable")
+    if h.get("plan_credit_total_requested") and plan.intent not in {"semester_summary", "year_summary"}:
+        raise ValueError("Recorded term/year credit totals need slot-aware plan summaries, not course rows")
+    if h.get("plan_credit_total_requested") and h.get("plan_summary_group"):
+        expected = "semester_summary" if h["plan_summary_group"]=="semester" else "year_summary"
+        if plan.intent != expected:raise ValueError("Preserve the requested term/year grouping")
     if h["relation_requested"] and plan.intent not in {"prerequisites", "reverse_prerequisites", "course_progression"}:
         raise ValueError("A prerequisite relationship cannot become a plain course result")
     if h["progression"]:
@@ -3095,7 +3298,8 @@ def render_answer(plan: QueryPlan, rows: list[dict[str, Any]], max_rows: int) ->
         if plan.search_mode == "word":
             answer += f"\nค้นคำเต็มภาษาอังกฤษ: {plan.search_term!r}"
         else:
-            answer += f"\nค้นข้อความย่อย: {plan.search_term!r} จึงอาจตรงกับคำที่ยาวกว่า"
+            if not plan.course_codes:
+                answer += f"\nค้นข้อความย่อย: {plan.search_term!r} จึงอาจตรงกับคำที่ยาวกว่า"
         if plan.ignore_spaces:
             answer += "\nค้นโดยข้ามช่องว่าง ข้อความต้นฉบับแสดงตามฐานข้อมูล"
         if plan.search_field == "description_th":
@@ -3120,7 +3324,7 @@ def _data_targets(question, catalog, program, track):
     classification_spans = _category_hints(text)["category_spans"]
     hits = catalog.match_mentions(_mask_spans(text, classification_spans))
     configured = getattr(catalog.config, "db_paths", {})
-    spans, targets = [], []
+    spans, targets = _gened_dataset_spans(text, program), []
     for hit in hits:
         if hit["program"] is None:
             raise ValueError("ชื่อหลักสูตรกำกวม กรุณาระบุรหัสหลักสูตร")
@@ -3130,9 +3334,12 @@ def _data_targets(question, catalog, program, track):
     for match in re.finditer(r"(?:หลักสูตร|สาขา)\s*([A-Za-z][A-Za-z0-9_-]*)", text):
         if not any(hit["start"] <= match.start(1) < hit["end"] for hit in hits):
             raise ValueError(f"ไม่พบหลักสูตร {match[1]} ใน catalog")
-    tracks = list(re.finditer(r"(?:แผน(?:การเรียน)?\s*)?(" + _TRACK_WORD + r")", text, re.I))
+    track_words = "|".join(re.escape(value) for value in sorted({"coop","nocoop"} | {value for paths in configured.values() for value in paths},key=len,reverse=True))
+    track_pattern = r"(?<![A-Za-z0-9_])(?:" + track_words + r")(?![A-Za-z0-9_])"
+    tracks = list(re.finditer(r"(?:แผน(?:การเรียน)?\s*)?(" + track_pattern + r")", text, re.I))
     spans.extend(dict(start=m.start(), end=m.end(), owner="scope") for m in tracks)
     programs = list(dict.fromkeys(hit["program"] for hit in hits))
+    explicit_membership = bool(_CODE_RE.search(text) and re.search(r"มีใน.*(?:ด้วยไหม|ด้วยหรือไม่)",text))
     if len(programs) > 3:
         raise ValueError("รองรับข้อมูลครั้งละไม่เกิน 3 หลักสูตร")
     if len(programs) <= 1 and {m[1].lower() for m in tracks} == {"coop", "nocoop"}:
@@ -3148,13 +3355,19 @@ def _data_targets(question, catalog, program, track):
         selected = str(selected or "").upper()
         available = configured.get(selected,{})
         if not available: raise ValueError(f"ไม่พบหลักสูตร {selected} ใน catalog")
+        if explicit_membership and explicit is None:
+            for value in available:
+                target=ComparisonTarget(program=selected,track=value)
+                if target not in targets:targets.append(target)
+            continue
         chosen = explicit or (track if track in available else None)
         if chosen is None and len(available)==1: chosen=next(iter(available))
         if chosen not in available:
             raise ValueError(f"หลักสูตร {selected} ไม่มีแผน {chosen or 'ที่เลือกได้ชัดเจน'}; แผนที่มี: {', '.join(available)}")
         target = ComparisonTarget(program=selected,track=chosen)
         if target not in targets: targets.append(target)
-    if len(targets)==1 and program and targets[0].program!=program.upper():
+    explicit_membership = bool(_CODE_RE.search(text) and re.search(r"มีใน.*(?:ด้วยไหม|ด้วยหรือไม่)",text))
+    if len(targets)==1 and program and targets[0].program!=program.upper() and not explicit_membership:
         raise ValueError("ชื่อหลักสูตรในคำถามต่างจากฟอร์ม กรุณาเลือกหลักสูตรให้ตรง")
     if len(targets)==1 and track and targets[0].track!=track and len(configured[targets[0].program])>1:
         raise ValueError("แผนในคำถามต่างจากฟอร์ม กรุณาเลือกแผนให้ตรง")
@@ -3174,7 +3387,10 @@ def _composed_data_hints(text):
             result["spans"].append(dict(start=match.start(), end=match.end(), owner="composed_operation"))
     ranked = (bool(re.search(r"(?:ปี|เทอม)(?:ที่|ไหน|ใด).*?(?:มากที่สุด|มากสุด|สูงสุด|น้อยที่สุด|น้อยสุด|ต่ำสุด|หนักที่สุด|เบาที่สุด)", text))
               and bool(re.search(r"มี(?:ราย)?วิชา|มีกี่(?:ราย)?วิชา|มีอะไรบ้าง|เรียนอะไร|รายชื่อ|รายวิชา|หนักที่สุด.*เบาที่สุด|เบาที่สุด.*หนักที่สุด", text)))
-    if re.search(r"เฉลี่ย.*(?:หน่วยกิต|เครดิต)|(?:หน่วยกิต|เครดิต).*เฉลี่ย|(?:ต้อง)?ลงเทอมละกี่หน่วยกิต|(?:ต้อง)?เรียนเทอมละกี่หน่วยกิต", text):
+    if re.fullmatch(r"\s*หน่วยกิตรวมในแผนทุกเทอมตรงกับหน่วยกิตตามเกณฑ์จบหรือไม่\s*[?？]?\s*",text):
+        result["operation"]="plan_total_audit"
+        claim(r"หน่วยกิตรวมในแผนทุกเทอมตรงกับหน่วยกิตตามเกณฑ์จบหรือไม่")
+    elif re.search(r"เฉลี่ย.*(?:หน่วยกิต|เครดิต)|(?:หน่วยกิต|เครดิต).*เฉลี่ย|(?:ต้อง)?ลงเทอมละกี่หน่วยกิต|(?:ต้อง)?เรียนเทอมละกี่หน่วยกิต", text):
         result["operation"] = "average_credits"
         result["average_source"] = "plan" if re.search(r"ตามแผน|จากแผน|ในแผน|ปี\s*[0-9]+|เทอม\s*[0-9]+", text) else "program"
         duration = re.search(r"([0-9]+(?:[.][0-9]+)?)\s*ปี", text)
@@ -3194,12 +3410,12 @@ def _composed_data_hints(text):
         low = bool(re.search(r"น้อยที่สุด|น้อยสุด|ต่ำสุด|เบาที่สุด", text))
         result["ranking"] = "both" if high and low else "max" if high else "min"
         claim(r"(?:ปี|เทอม)(?:ที่|ไหน|ใด)?(?:มี)?(?:หน่วยกิต)?(?:รวม)?(?:มากที่สุด|มากสุด|สูงสุด|น้อยที่สุด|น้อยสุด|ต่ำสุด|หนักที่สุด|เบาที่สุด)")
-        claim(r"ต่างจาก|ต่างกัน|กี่หน่วยกิต")
-    elif (re.search(r"(?:ยัง)?ไม่ผ่าน|ต้องผ่าน.*(?:ลง|เรียน)|วิชาก่อน.*(?:ลง|เรียน)", text)
-          and re.search(r"ลง(?:ทะเบียน|เรียน)?(?:วิชา|ได้)|ลงได้|กระทบ", text)):
+        claim(r"ต่างจาก|ต่างกัน|มากกว่า|กี่หน่วยกิต")
+    elif (re.search(r"(?:ยัง)?ไม่ผ่าน|ไม่เรียน.*ก่อน|ต้องผ่าน.*(?:ลง|เรียน)|วิชาก่อน.*(?:ลง|เรียน)", text)
+          and re.search(r"ลง(?:ทะเบียน|เรียน)?\s*(?:วิชา|(?=[0-9]{8})|ได้)|ลงได้|กระทบ", text)):
         result["operation"] = "registration_conditions"
         result["registration_mode"] = "dependents" if re.search(r"วิชาถัดไป|วิชาที่.*เป็นวิชา(?:บังคับ)?ก่อน|มีผลกับ|กระทบ", text) else "prerequisites"
-        claim(r"ถ้า(?:ผม|ฉัน)?(?:ยัง)?ไม่ผ่าน|ถ้า(?:ยัง)?ไม่ผ่าน|(?:ยัง)?ไม่ผ่าน|ถ้า")
+        claim(r"โดยไม่เรียน|ถ้า(?:ผม|ฉัน)?(?:ยัง)?ไม่ผ่าน|ถ้า(?:ยัง)?ไม่ผ่าน|(?:ยัง)?ไม่ผ่าน|ถ้า")
         claim(r"ต้องผ่าน(?:วิชา)?(?:อะไร|ไหน)?(?:ก่อน)?(?:บ้าง)?|วิชา(?:บังคับ)?ก่อน|ก่อน")
         claim(r"(?:จะ|สามารถ)?ลง(?:ทะเบียน|เรียน)?(?:วิชา)?(?:ถัดไป|ที่(?:มัน|วิชานี้)?เป็นวิชา(?:บังคับ)?ก่อน)?(?:ได้)?(?:ไหม|มั้ย|หรือไม่)|ลงได้(?:ไหม|มั้ย)|มีผลกับ|กระทบ")
         claim(r"(?:จะ|สามารถ)?ลง(?:ทะเบียน|เรียน)?\s*(?:วิชา)?|ได้(?:ไหม|มั้ย|หรือไม่)")
@@ -3208,7 +3424,7 @@ def _composed_data_hints(text):
 
 def _data_operation(text, *, multi, codes, study):
     """จำแนก operation ปิดจากบทบาทข้อมูล ไม่ใช้ ID/ตัวอย่าง/เฉลยทดสอบ."""
-    relation = bool(re.search(r"ต้องผ่าน|วิชาก่อน|ตัวต่อ|ต่อจาก|วิชาปลายทาง|ความสัมพันธ์|สายวิชา|prerequisite",text,re.I))
+    relation = bool(_COREQUISITE_REQUEST_RE.search(text) or re.search(r"ต้องผ่าน|วิชาก่อน|ตัวต่อ|ต่อจาก|วิชาปลายทาง|ความสัมพันธ์|สายวิชา|prerequisite",text,re.I))
     elective = bool(re.search(r"บัญชีวิชาเลือก|รายการวิชาเลือก|ช่วงเทอม|ช่วงปี|allowed_terms",text))
     planned = bool(study["years"] or study["semesters"] or re.search(r"ในแผน|ตามแผน|ตลอดแผน|แผนปี|ช่องปี|ช่องเรียน|จำนวนช่อง|กี่ช่อง|ช่องทางเลือก|ช่องประเภท|จากช่อง",text))
     source = "elective" if elective else "plan" if planned else "course"
@@ -3228,7 +3444,7 @@ def _data_operation(text, *, multi, codes, study):
             ("lab_ranking",r"จัดอันดับ.*ชั่วโมง|ค่าเฉลี่ย.*ชั่วโมง"),
             ("catalog_plan_diff",r"รายการรายวิชา.*ส่วนต่าง.*แผน|ส่วนต่างรหัสในรายการ.*แผน"),
             ("unresolved_comparison",r"ยังมีช่อง|ยังไม่เลือก|หน่วยกิตสรุปแน่นอนไม่ได้"),
-            ("course_sets",r"ร่วม|รหัสเดียวกัน|เฉพาะ(?!บังคับ)|ในทั้งแผน|ส่วนต่าง|ไม่มีใน|ไม่อยู่ใน"),
+            ("course_sets",r"ร่วม|รหัสเดียวกัน|เฉพาะ(?!บังคับ)|ในทั้งแผน|อยู่ในทั้ง|ส่วนต่าง|ไม่มีใน|ไม่อยู่ใน|(?:วิชา|รหัส).*ต่างกัน"),
             ("program_summary",r"ช่อง|แต่ละหมวด|ชั่วโมงปฏิบัติ"),
         ]
     else:
@@ -3240,7 +3456,7 @@ def _data_operation(text, *, multi, codes, study):
             ("graph_cycles",r"(?:สายวิชา|วิชาก่อน|ความสัมพันธ์).*วงจร|วงจร.*(?:สายวิชา|วิชาก่อน|ความสัมพันธ์)"),
             ("graph_depth",r"(?:สายวิชา|วิชาก่อน).*ยาวที่สุด|สายวิชาก่อน.*ยาวสุด"),
             ("graph_degree",r"(?:วิชาก่อน|ตัวต่อ).*?(?:มากที่สุด|มากสุด)"),
-            ("earlier_year_relations",r"วิชาก่อน.*(?:ปีที่ต่ำกว่า|ปีอื่น|ปีที่ผ่านมา)"),
+            ("earlier_year_relations",r"วิชาก่อน.*(?:ปี(?:ที่)?ต่ำกว่า|ปีอื่น|ปีที่ผ่านมา)"),
             ("same_year_relations",r"วิชาก่อน.*(?:ปีเดียวกัน|ภายในปี)"),
             ("credit_audit",r"หน่วยกิตต่างจาก|หน่วยกิต.*ต่าง.*รายการรายวิชา"),
             ("term_audit",r"วิชาเลือก.*(?:ตรงกับช่วง|ตำแหน่งที่ต่าง)|ช่วง.*เทียบ.*แผน"),
@@ -3258,6 +3474,7 @@ def _data_operation(text, *, multi, codes, study):
             ("pages",r"หน้าอ้างอิง|เลขหน้า|หน้าที่บันทึก"),
         ]
         if relation and codes:
+            if _COREQUISITE_REQUEST_RE.search(text) and _relationship_kind(text)=="co":return "relations",source
             if len(codes)==1 and re.search(r"กี่หน่วยกิต",text) and re.search(r"ต้องผ่าน",text) and not re.search(r"ทั้งสาย|ตัวต่อ|ทุกทอด|ทางอ้อม",text):return "lookup",source
             if re.search(r"รวมหน่วยกิต|หน่วยกิตรวม",text): return "graph_credits",source
             if re.search(r"ทั้งสาย|ไล่สาย|วิชาก่อนทั้งหมด|สายวิชาก่อน|ทางอ้อม|ทุกทอด|ตัวต่อทั้งหมด",text): return "graph_walk",source
@@ -3278,8 +3495,12 @@ def _data_operation(text, *, multi, codes, study):
                 source="course"  # ขออ่านค่าในรายวิชาและตำแหน่งประกอบ ไม่ใช่กรองแผน.
             break
     if operation is None and not multi:
-        if codes and re.search(r"หมวดอะไร|หมวดใด|ประเภทใด|บังคับหรือวิชาเลือก|อยู่ปี.*เทอม|ปีไหน.*เทอมไหน|เรียนปี.*เทอม",text): operation="lookup" if elective else "positions"
-        elif elective or re.search(r"ที่ชื่อมี(?!คำว่า)|รหัสจริง|รายชื่อ|พร้อมจำนวน|จำนวนรวม|ไม่มีคำว่า|แต่ไม่เกิน|ชั่วโมงปฏิบัติ.*(?:มากกว่า|สูงกว่า|อย่างน้อย)|(?:ราย)?วิชา.*ทั้งหมด",text) or (planned and re.search(r"รายการ|แยกตามเทอม",text)): operation="lookup"
+        if re.search(r"\btop\s*[0-9]+\s*วิชา",text,re.I) and re.search(r"หน่วยกิต.*(?:มากที่สุด|น้อยที่สุด)",text):operation="top_courses"
+        elif re.search(r"ไม่เอา(?:ราย)?วิชาที่มี\s*[0-9]+\s*หน่วยกิต",text):operation="lookup"
+        elif planned and not relation and (re.search(r"ชื่อ(?:ภาษา)?อังกฤษ|คำอธิบาย", text) or re.search(r"เลือกวิชา.*หน่วยกิต", text)):
+            operation="lookup"
+        elif codes and re.search(r"หมวดอะไร|หมวดใด|ประเภทใด|บังคับหรือวิชาเลือก|อยู่ปี.*เทอม|ปีไหน.*เทอมไหน|เรียนปี.*เทอม",text): operation="lookup" if elective else "positions"
+        elif elective or re.search(r"ที่ชื่อมี(?!คำว่า)|รหัสจริง|รายชื่อ|พร้อมจำนวน|จำนวนรวม|ไม่มีคำว่า|แต่ไม่เกิน|ชั่วโมงปฏิบัติ.*(?:มากกว่า|สูงกว่า|อย่างน้อย)|(?:ราย)?วิชา.*ทั้งหมด",text) or (planned and re.search(r"รายการ|แยกตามเทอม|วิชาเลือก(?:อะไร|ไหน).*ให้เลือกบ้าง",text)): operation="lookup"
     return operation,source
 
 
@@ -3335,6 +3556,120 @@ def _catalog_tracks_plan(question, catalog, program, track):
                      'requested_tracks':list(dict.fromkeys(m[0].lower() for m in re.finditer(_TRACK_WORD,text,re.I)))})
 
 
+def _description_course_operand(body):
+    """Bound a single description request after verified scope has been masked.
+
+    Empty parentheses belong to masked scope, not the course name. Collection
+    searches and extra predicates must not be silently converted to one course.
+    """
+    match = re.fullmatch(
+        r"\s*[:：]?\s*(?:ขอทราบ|ช่วยบอก)?\s*(?:ราย)?วิชา\s*"
+        r"(?P<name>.+?)\s*(?:\(\s*\)\s*)?เรียนเกี่ยวกับอะไร\s*[?？]?\s*", body)
+    if match is None:return None
+    raw = match["name"]; name = raw.strip()
+    quoted = _QUOTED_RE.fullmatch(name)
+    if quoted:name = next(value for value in quoted.groups() if value is not None)
+    if not 3 <= len(name) <= 120:return None
+    if not quoted and re.search(r"ที่ชื่อ|คำว่า|มีอะไร|ไหนบ้าง|ทั้งหมด|ยกเว้น|ไม่รวม", name):return None
+    start = match.start("name") + len(raw)-len(raw.lstrip()) + bool(quoted)
+    return dict(start=start, end=start+len(name), text=name)
+
+
+def _prerequisite_course_operand(body):
+    """A direct prerequisite request without a proposed study term."""
+    match=re.fullmatch(
+        r"\s*[:：]?\s*ต้องลงวิชา(?:อะไร|ไหน)ไว้ก่อนเพื่อ(?:ให้)?เรียน\s*(?:วิชา\s*)?"
+        r"(?P<name>.+?)(?:ได้)?\s*[?？]?\s*",body)
+    if match is None:
+        match = re.fullmatch(r"\s*(?:วิชา\s*)?(?P<name>.+?)\s*(?:ต้องผ่าน|ต้องเรียน|มีวิชาบังคับก่อน)(?:วิชา)?(?:อะไร|ไหน|ใด)(?:มา)?ก่อน(?:บ้าง)?\s*(?:ครับ|ค่ะ|หน่อย)?[?？]?\s*", body)
+    if match is None:return None
+    raw=match["name"];name=raw.strip()
+    quoted=_QUOTED_RE.fullmatch(name)
+    if quoted:name=next(value for value in quoted.groups() if value is not None)
+    if not 3<=len(name)<=120:return None
+    # A term or extra constraint must use the appropriate operation, not vanish.
+    if not quoted and (_STUDY_RE.search(name) or re.search(r"ยกเว้น|ไม่รวม|ทั้งสาย|ทุกทอด",name)):return None
+    start=match.start("name")+len(raw)-len(raw.lstrip())+bool(quoted)
+    return dict(start=start,end=start+len(name),text=name)
+
+
+def _proposed_course_operand(body):
+    """Read one proposed course and term without treating that term as a list filter.
+
+    Full-match the supported request so extra exclusions/depth constraints are
+    not silently discarded. Course names remain DB data, including quoted names.
+    """
+    match = re.fullmatch(
+        r"\s*[:：]?\s*(?:ถ้า)?(?:(?:อยาก|จะ|ต้องการ)เรียน|"
+        r"(?:จะ|อยาก|ต้องการ)ลง(?:ทะเบียน|เรียน)?)\s*(?:วิชา\s*)?"
+        r"(?P<name>.+?)\s*ในปี\s*(?P<year>[0-9]+)\s*เทอม\s*(?P<semester>[0-9]+)\s*"
+        r"(?:ต้องผ่าน(?:วิชา)?(?:อะไร|ไหน)(?:มา)?ก่อน(?:บ้าง)?|"
+        r"(?:ได้)?ต้องเตรียมวิชา(?:อะไร|ไหน))\s*[?？]?\s*", body)
+    if match is None:
+        match = re.fullmatch(
+            r"\s*[:：]?\s*ต้องลงวิชา(?:อะไร|ไหน)ไว้ก่อนเพื่อ(?:ให้)?เรียน\s*(?:วิชา\s*)?"
+            r"(?P<name>.+?)(?:ได้)?\s*ในปี(?:ที่)?\s*(?P<year>[0-9]+)\s*"
+            r"(?:เทอม|ภาคเรียน)(?:ที่)?\s*(?P<semester>[0-9]+)\s*[?？]?\s*", body)
+    if match is None:
+        return None
+    raw = match["name"]
+    name = raw.strip()
+    quoted = _QUOTED_RE.fullmatch(name)
+    if quoted:
+        name = next(value for value in quoted.groups() if value is not None)
+    if not 3 <= len(name) <= 120:
+        return None
+    start = match.start("name") + len(raw) - len(raw.lstrip())
+    if quoted:
+        start += 1
+    return dict(start=start, end=start+len(name), text=name,
+                year=int(match["year"]), semester=int(match["semester"]))
+
+
+def _policy_question_plan(question, catalog, program, track):
+    if not re.search(r"เสรี|หมวด|วิชาเฉพาะ|วิชาเลือก|ศึกษาทั่วไป|gen\s*ed", _outside_quotes(question), re.I):
+        return None
+    h = question_hints(question, catalog=catalog, program=program, track=track)
+    if program == "GENED" and re.fullmatch(r"(?:ราย)?วิชาศึกษาทั่วไป(?:มี)?(?:กี่หน่วยกิตรวม|หน่วยกิตรวมเท่า(?:ไร|ไหร่))[?？]?", re.sub(r"\s+","",question)):
+        return QueryPlan(intent="clarify", issue="หมายถึงรวมหน่วยกิตรายวิชาในบัญชี GENED หรือเกณฑ์หมวดศึกษาทั่วไปของหลักสูตรใด กรุณาระบุขอบเขต", diagnostics={"reason_code":"ambiguous_gened_credit_total"})
+    usage = h.get("scope_reason") == "missing_gened_mapping" and h.get("category") == "free_elective"
+    official = h.get("category_credit_scope") == "official_requirement"
+    if not (usage or official):
+        return None
+    if official and (h["years"] or h["semesters"] or h["codes"] or h["term"]):
+        return None
+    if official and not h["category"]:
+        return QueryPlan(intent="clarify", issue="หมายถึงเกณฑ์เลือกเสรีหรือกลุ่มวิชาเฉพาะเลือก กรุณาระบุหมวด", diagnostics={"reason_code":"ambiguous_policy_category"})
+    try:
+        targets, body, spans = _data_targets(question, catalog, program, track)
+    except ValueError:
+        if usage and h.get("programs_mentioned") == ["GENED"] and program and program != "GENED":
+            try:
+                home, _, _ = _data_targets("", catalog, program, track)
+                candidates, _, _ = _data_targets("GENED", catalog, "GENED", None)
+                targets, body = home + candidates, question
+                spans = []
+                for hit in catalog.match_mentions(_outside_quotes(question)):
+                    spans.append(dict(start=hit["start"],end=hit["end"],owner="policy_dataset"))
+            except ValueError:return None
+        else:return None
+    if usage:
+        targets.sort(key=lambda target: target.program != str(program).upper())
+    if not usage and len(targets) != 1:
+        return None
+    spec = DataQuery(operation="elective_eligibility" if usage else "category_requirements",
+                     category="free_elective" if usage else h["category"], course_type=None if usage else h["course_type"],
+                     codes=h["codes"], requested_fields=["code", "credits"] if usage else ["category", "credits", "pages"])
+    spans += _category_hints(_outside_quotes(body))["category_spans"]
+    for m in re.finditer(r"ต้องเก็บ|เกณฑ์ขั้นต่ำ|เกณฑ์|ขั้นต่ำ|อย่างน้อย|กำหนด|ต้องเรียน|นับ(?:เป็น|เข้า)?|ใช้เป็น|ลงเป็น|เอามา(?:เป็น|นับ)|ได้ไหม|ไหม|หรือไม่|หรือเปล่า", _outside_quotes(body)):
+        spans.append(dict(start=m.start(),end=m.end(),owner="policy_operation"))
+    unknown = _data_coverage(body, spans, spec)
+    if unknown:
+        return QueryPlan(intent="clarify", issue="ยังตีความเงื่อนไข '" + " / ".join(unknown) + "' ไม่ครบ", diagnostics={"reason_code":"uncovered_policy_condition", "uncovered":unknown})
+    return QueryPlan(intent="data_query", targets=targets, data_query=spec,
+                     diagnostics={"operation":spec.operation,"reason_code":"parsed_verified_policy","complete":True,"uncovered":[]})
+
+
 def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=None):
     """ประกอบแผนที่ตรวจ operation/source/filters/output ครบก่อน query.
 
@@ -3342,38 +3677,91 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     จาก parser นี้เท่านั้น สำนวนที่ไม่มีเจ้าของยังถามกลับตรงส่วนที่ขาด.
     """
     q = normalize_question(question)
+    policy = _policy_question_plan(q, catalog, program, track)
+    if policy is not None:return policy
     catalog_plan=_catalog_tracks_plan(q,catalog,program,track)
     if catalog_plan is not None:return catalog_plan
     preliminary = _composed_data_hints(_outside_quotes(q))
+    policy_text = _mask_spans(q, _negated_requirement_spans(q))
     if re.search(r"ยืนยัน(?!จากข้อมูล)|ได้แน่นอน|สิทธิ์|เทียบโอน|หลักสูตรเก่า|หลักสูตรใหม่|ฉบับ|เวอร์ชัน|"
-                 r"เวลาเปิดสอน|เกณฑ์ขั้นต่ำ|ต้องเก็บ|จบใน|ร่างแผน|ตรวจแผน",q):
-        if "ไม่ใช่เกณฑ์ขั้นต่ำ" not in q and preliminary["operation"]!="average_credits": return None
-        if re.search(r"ยืนยัน|ได้แน่นอน|สิทธิ์|เทียบโอน|ฉบับ|เวอร์ชัน|เปิดสอน|เกณฑ์|ต้องเก็บ|ร่างแผน|ตรวจแผน", q):return None
+                 r"เวลาเปิดสอน|เกณฑ์ขั้นต่ำ|ต้องเก็บ|จบใน|ร่างแผน|ตรวจแผน",policy_text):
+        if "ไม่ใช่เกณฑ์ขั้นต่ำ" not in q and preliminary["operation"] not in {"average_credits","plan_total_audit"}: return None
+        if re.search(r"ยืนยัน|ได้แน่นอน|สิทธิ์|เทียบโอน|ฉบับ|เวอร์ชัน|เปิดสอน|เกณฑ์|ต้องเก็บ|ร่างแผน|ตรวจแผน", q) and preliminary["operation"]!="plan_total_audit":return None
     try:
         targets,body,spans = _data_targets(q,catalog,program,track)
     except ValueError:
         return None
     text = _outside_quotes(body)
+    membership = re.fullmatch(r"\s*(?:วิชา\s*)?(?P<code>[0-9]{8})\s*มี(?:ใน)?\s*(?:ด้วยไหม|ด้วยหรือไม่)\s*[?？]?\s*",body)
+    if membership and targets and len({x.program for x in targets})==1:
+        return QueryPlan(intent="data_query",targets=targets,data_query=DataQuery(operation="course_membership",codes=[membership["code"]]),
+                         diagnostics={"reason_code":"explicit_course_membership","operation":"course_membership","complete":True})
+    spans.extend(_negated_requirement_spans(body))
     snapshots, name_mentions = [], []
     if lexicon_provider is not None and len(targets)==1:
         snapshots = [lexicon_provider(catalog.resolve(targets[0].program, targets[0].track))]
         name_mentions = _classification_mentions(body, snapshots[0])
         text = _mask_spans(text, name_mentions)
+    proposed_operand = _proposed_course_operand(body) if snapshots else None
+    description_operand = _description_course_operand(body) if snapshots else None
+    prerequisite_operand = _prerequisite_course_operand(body) if snapshots and not proposed_operand else None
+    registration_operand = _registration_course_operand(body) if snapshots else None
+    scalar_operand = _scalar_course_operand(body) if snapshots else None
+    course_operand = proposed_operand or prerequisite_operand or description_operand or registration_operand or scalar_operand
+    if course_operand:
+        name = course_operand["text"]
+        names = snapshots[0].get("names", {})
+        candidates = _course_candidates(name,snapshots[0])
+        if _CODE_RE.fullmatch(name):
+            candidates = {name} if name in snapshots[0].get("codes", set()) else set()
+        if len(candidates) != 1:
+            reason = "ambiguous_course_name" if candidates else "course_name_not_found"
+            choices_by_code = {}
+            for stored, values in names.items():
+                for code in values:
+                    if code in candidates and (code not in choices_by_code or
+                            (re.search(r"[ก-๙]", stored) and not re.search(r"[ก-๙]", choices_by_code[code]))):
+                        choices_by_code[code] = stored
+            choices = [f"{code} · {choices_by_code[code]}" for code in sorted(choices_by_code)]
+            issue = (f"ชื่อ '{name}' ตรงกับหลายวิชา กรุณาเลือกรหัส: " + "; ".join(dict.fromkeys(choices))
+                     if candidates else f"ไม่พบชื่อวิชา '{name}' ในหลักสูตร/ฉบับ/แผนที่เลือก กรุณาตรวจชื่อหรือระบุรหัสวิชา")
+            return QueryPlan(intent="clarify", issue=issue, diagnostics={
+                "failure_stage":"input", "reason_code":reason, "operation":"proposed_term" if proposed_operand else "relations" if prerequisite_operand else "lookup",
+                "course_term":name, "candidate_codes":sorted(candidates),
+                **({"proposed_term":{k:proposed_operand[k] for k in ("year", "semester")}} if proposed_operand else {}),
+                "scope":{"targets":[target.model_dump() for target in targets]}})
+        name_mentions = [{k:course_operand[k] for k in ("start", "end", "text")} | {"codes":sorted(candidates)}]
+        text = _mask_spans(_outside_quotes(body), name_mentions)
     categories = _category_hints(_mask_spans(text, spans))
+    if course_operand:spans.extend(course_operand.get("request_spans", []))
     classification_output = bool(categories["requested_fields"])
     classification_fields = categories["requested_fields"]
     codes = list(dict.fromkeys(_CODE_RE.findall(text)))
     study = _study_hints(text)
+    if (study["years"] and study["semesters"] and not name_mentions and not codes
+            and not categories["category"] and not categories["course_type"]
+            and re.search(r"เลือกเรียนวิชา(?:อะไร|ไหน|ใด)(?:ได้)?บ้าง",text)):
+        return QueryPlan(intent="clarify",issue="ต้องการรายวิชาทั้งหมดตามแผนในเทอมนี้ หรือเฉพาะช่องวิชาเลือกครับ",diagnostics={
+            "failure_stage":"roles","reason_code":"ambiguous_plan_collection","complete":False})
     operation_codes=codes or list({code for hit in name_mentions for code in hit["codes"]})
     operation,source = _data_operation(text,multi=len(targets)>1,codes=operation_codes,study=study)
+    if len(targets)==2 and re.search(r"หน่วยกิต|จำนวนปี|ระยะเวลา|กี่ปี",text) and not re.search(r"ชั่วโมง|วิชาก่อน|คำอธิบาย|ชื่อ.*หน่วยกิต|ช่อง|แต่ละหมวด|วิชาร่วม|เรียนร่วม|รายชื่อ|มีวิชา|วิชา(?:ที่)?ต่าง|รหัส",text):
+        if study["years"] or study["semesters"] or re.search(r"ปีไหน.*ปีเดียวกัน|ปีใด.*ปีเดียวกัน",text):operation,source="plan_comparison","plan"
+        elif len({x.track for x in targets})>1:operation,source="program_metadata","course"
+    if operation=="course_sets" and (diff_tracks_requested(q) or re.search(r"วิชาที่ต่างกันระหว่าง",q)) and re.search(r"แผน",q):source="plan"
     operand=_name_request_span(body)
     if operation is None and len(targets)==1 and operand and not codes and not re.search(r"ตัวต่อ|ทั้งสาย|ต้องผ่าน|วิชาก่อน",text):operation="lookup"
     compound=(len(targets)==2 and len({t.program for t in targets})==1
               and bool(re.search(r"(?:กี่|รวม).*หน่วยกิต|หน่วยกิต.*ต่าง",text))
               and bool(re.search(r"ต่าง.*(?:วิชา|รายวิชา)|วิชา.*ต่าง",text)))
     if compound:operation,source="track_comparison","plan"
-    proposed=bool(len(operation_codes)==1 and re.search(r"(?:สลับ|ย้าย).*เรียน|(?:อยาก|จะ|ต้องการ)เรียน",text)
-                  and study["terms"] and re.search(r"วิชาก่อน|ต้องผ่าน",text))
+    proposed=bool(proposed_operand or (len(operation_codes)==1
+                  and re.search(r"(?:สลับ|ย้าย).*เรียน|(?:อยาก|จะ|ต้องการ)เรียน",text)
+                  and study["terms"] and re.search(r"วิชาก่อน|ต้องผ่าน",text)))
+    if scalar_operand:operation,source=scalar_operand["operation"],"course"
+    if registration_operand:operation,source="registration_conditions","course"
+    if prerequisite_operand:operation,source="relations","course"
+    if description_operand:operation,source="lookup","course"
     if proposed:operation,source="proposed_term","course"
     if proposed and any(not 1<=year<=20 or not 1<=semester<=3 for year,semester in study["terms"]):
         return QueryPlan(intent="clarify",diagnostics={"layer":"input","reason_code":"invalid_proposed_term","message":"ปีต้องอยู่ในช่วง 1–20 และเทอม 1–3"})
@@ -3381,14 +3769,25 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     if composed["operation"] and len(targets)==1 and not proposed:
         operation = composed["operation"]
         spans.extend(composed["spans"])
-        if operation=="ranked_plan" or (operation=="average_credits" and composed["average_source"]=="plan"):
+        if operation in {"ranked_plan","plan_total_audit"} or (operation=="average_credits" and composed["average_source"]=="plan"):
             source="plan"
         if operation=="registration_conditions" and len(codes)==1:
             existing,message=advanced_rule(body)
             if existing is not None and existing.intent=="conditional_prerequisites" and not message:
                 return None  # ใช้ executor ตัวต่อเดิมที่รองรับแล้ว รักษา rows/intent ของ API.
     if operation is None and name_mentions and re.search(r"ชื่อ|รหัส|หน่วยกิต|คำอธิบาย|ชั่วโมง", text):operation="lookup"
+    # An entire recorded plan includes unassigned electives and alternative slots.
+    # Reuse the existing slot-aware executor instead of qa_plan's real-code subset.
+    plan_list = bool(re.search(r"(?:อะไร|ใด|ไหน|ไร)บ้าง|รายชื่อ|รายการ|ทั้งสองภาคเรียน", text))
+    if (len(targets)==1 and operation in {None, "lookup"} and plan_list
+            and (study["years"] or study["semesters"] or categories["category"] or categories["course_type"])
+            and snapshots and snapshots[0].get("plans")
+            and not re.search(r"ต้องผ่าน|ต้องเรียน.*ก่อน|วิชา(?:บังคับ)?ก่อน|ตัวต่อ|ต่อจาก|สายวิชา|ความสัมพันธ์|prerequisite",text,re.I)
+            and not _COREQUISITE_REQUEST_RE.search(text)
+            and not re.search(r"บัญชีวิชาเลือก|รายการวิชาเลือก|allowed_terms", text)):
+        operation, source = "lookup", "plan"
     if (name_mentions and not classification_output and operation=="lookup" and composed["operation"] is None
+            and (scalar_operand is None or "หน่วยกิต" in body)
             and "กำหนดให้" not in body and "รูปแบบหน่วยกิต" not in body
             and not any(h["field"]!="credits" for h in _requested_field_hints(body))
             and snapshots and all(len(set(hit["codes"]))==1 and any(stored.casefold()==hit["text"].casefold()
@@ -3449,6 +3848,11 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
                 if pred not in numeric:numeric.append(pred)
     for m in claim(rf"แต่\s*(?P<op>{_CREDIT_PREFIX})\s*(?P<value>{number})(?![0-9])","numeric_filter"):
         numeric.append(NumericPredicate(field="credits",operator=_CREDIT_OPERATORS[m["op"]],value=float(m["value"])))
+    for m in re.finditer(r"(?:ไม่เอา|ไม่รวม|ยกเว้น)\s*(?:ราย)?วิชา(?:ที่)?(?:มี)?\s*(?P<n>[0-9]+(?:[.][0-9]+)?)\s*หน่วยกิต",text):
+        value=float(m["n"])
+        numeric=[p for p in numeric if not (p.field=="credits" and p.value==value)]
+        numeric.append(NumericPredicate(field="credits",operator="ne",value=value))
+        spans.append(dict(start=m.start(),end=m.end(),owner="numeric_exclusion"))
     texts=[]
     for m in _QUOTED_RE.finditer(body):
         if any(s["owner"]=="course_name" and s["start"]<=m.start() and m.end()<=s["end"] for s in spans):continue
@@ -3492,7 +3896,8 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
         if (span["owner"]=="category" and category) or (span["owner"]=="course_type" and course_type):
             spans.append(span)
     if source=="elective":
-        claim(r"บัญชีวิชาเลือก|รายการวิชาเลือก|ช่วงเทอม|ช่วงปี|allowed_terms", "elective_source")
+        claim(r"บัญชีวิชาเลือก|รายการวิชาเลือก|allowed_terms", "elective_source")
+        claim(r"ช่วง(?=\s*(?:เทอม|ปี))", "allowed_term_scope")
     if operation=="zero_missing" and all(p.field=="credits" and p.operator=="eq" and p.value==0 for p in numeric):
         numeric=[]  # ‘0 หน่วยกิต’ เป็นชื่อผลย่อยที่ executor แยกจาก NULL แล้ว.
     requested=["code","name_th","credits"] + categories["requested_fields"]
@@ -3506,6 +3911,9 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     if "ประเภทบังคับ/เลือก" in text:group_by.append("type")
     if operation=="slot_summary" and re.search(r"ปีไหน|ทุกปี|แต่ละปี",text):group_by=["year"]+group_by
     if operation=="ranked_plan":group_by=composed["group_by"]
+    if operation=="plan_comparison" and re.search(r"ปีไหน|ปีใด|แต่ละปี",text):group_by=["year"]
+    if operation=="plan_comparison" and len(study["terms"])>1:group_by=["year","semester"]
+    if operation=="course_sets" and re.search(r"แต่ละปี",text):group_by=["year"]
     if operation=="program_summary" and re.search(r"แต่ละเทอม|รายเทอม",text):group_by=["semester"]
     if len(targets)>1 and operation in {"course_sets","prerequisite_diff","diff_chains","evidence_comparison"}:
         source="elective" if "บัญชีวิชาเลือก" in text else "course" if re.search(r"รายการรายวิชา|รายวิชาทั้งหมด|ทั้งสามฐาน",text) and not study["years"] else "plan"
@@ -3532,7 +3940,7 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
         operands.sort()
         for start,end,code in operands:
             prefix=body[:start]
-            if re.search(r"ไม่ผ่าน\s*(?:วิชา\s*)?$",prefix):unpassed_code=code
+            if re.search(r"(?:ไม่ผ่าน|ไม่เรียน)\s*(?:วิชา\s*)?$",prefix):unpassed_code=code
             if re.search(r"ลง(?:ทะเบียน|เรียน)?\s*(?:วิชา\s*)?$",prefix):registration_target=code
             if re.match(r"\s*ต้องผ่าน",body[end:]):registration_target=code
         if len(codes)==2 and (not unpassed_code or not registration_target):
@@ -3543,26 +3951,36 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
             return reject("roles","missing_registration_target","ต้องการลงวิชาเดิมซ้ำ หรือตรวจตัวต่อของวิชาที่ยังไม่ผ่าน กรุณาระบุวิชาที่ต้องการลง")
     if operation=="average_credits" and composed["average_years"] is not None and not 0.5<=composed["average_years"]<=8:
         return reject("input","invalid_average_duration","กรุณาระบุระยะเวลา 0.5–8 ปีสำหรับค่าเฉลี่ยสมมติ")
+    if operation in {"program_metadata","plan_comparison"} and len(targets)!=2:
+        return reject("input","comparison_target_count","งานเปรียบเทียบนี้ต้องระบุสองเป้าหมายให้ชัดเจน")
+    top_match=re.search(r"\btop\s*([0-9]+)",text,re.I) if operation=="top_courses" else None
+    if top_match and not 1<=int(top_match[1])<=100:
+        return reject("input","invalid_ranking_limit","กรุณาระบุอันดับจำนวน 1–100 รายวิชา")
+    registration_term = Term(year=study["terms"][0][0],semester=study["terms"][0][1]) if operation=="registration_conditions" and len(codes)==2 and len(study["terms"])==1 and re.search(r"ไม่เรียน.*ก่อน",text) else None
     spec=DataQuery(operation=operation,source=source,requested_fields=list(dict.fromkeys(requested)),numeric=numeric,text=texts,codes=codes,slot_codes=slot_codes,
-        years=[] if proposed else study["years"],semesters=[] if proposed else study["semesters"],terms=[] if proposed else [Term(year=y,semester=s) for y,s in study["terms"]],
+        years=[] if proposed or registration_term else study["years"],semesters=[] if proposed or registration_term else study["semesters"],terms=[] if proposed or registration_term else [Term(year=y,semester=s) for y,s in study["terms"]],
         category=category,course_type=course_type,group_by=group_by,
         include_placeholders=(source=="plan" or bool(re.search(r"รวมช่องเลือก|รวมช่อง",text))) and "รหัสจริง" not in text,
         include_count=bool(re.search(r"กี่(?:วิชา|รหัส)|จำนวน(?:วิชา|รวม|รหัส)|ทั้งหมดกี่",text)),
         sort_by=sort_fields,descending=sort["sort_direction"]=="desc",
         direction="after" if re.search(r"ตัวต่อ|ต่อจาก|วิชาปลายทาง|เป็นวิชาก่อน.*ของวิชา",text) and not re.search(r"สายวิชาก่อน|วิชาก่อนทั้งหมด",text) else "before",
         recursive=bool(re.search(r"ทั้งสาย|สายวิชาก่อน|ไล่สาย|ทุกทอด|ทางอ้อม|ตัวต่อทั้งหมด|วิชาก่อนทั้งหมด",text)),
-        relation_kind="both" if operation in {"registration_conditions","proposed_term"} or "วิชาควบ" in text and "วิชาก่อน" in text else "co" if "วิชาควบ" in text else "pre",
-        set_mode="membership" if "พอดีสอง" in text else "unique" if "เฉพาะหลักสูตรเดียว" in text else "difference" if re.search(r"เฉพาะ|ส่วนต่าง|ไม่มีใน|ไม่อยู่ใน",text) else "intersection",
+        relation_kind="both" if operation in {"registration_conditions","proposed_term"} else _relationship_kind(text),
+        set_mode="membership" if "พอดีสอง" in text else "unique" if "เฉพาะหลักสูตรเดียว" in text else "difference" if re.search(r"เฉพาะ|ส่วนต่าง|ไม่มีใน|ไม่อยู่ใน|ต่างกัน|รหัสต่าง",text) else "intersection",
         set_direction="first_only" if re.search(r"(?:ที่|แต่)?ไม่มี(?:อยู่)?ใน|ไม่อยู่ใน",text) and not re.search(r"ทั้งสอง|ทั้งสองฝั่ง|สองทิศ",text) else "both",
         source_year=_progression_hints(text)["source_year"],target_year=_progression_hints(text)["target_year"],
         missing_fields=missing,ranking=composed["ranking"] if operation=="ranked_plan" else "both" if operation=="course_extrema" else "max" if re.search(r"มากที่สุด|มากสุด|สูงสุด",text) else "min" if re.search(r"น้อยที่สุด|ต่ำสุด",text) else "none",
         aggregation_unit="slots" if source=="plan" and (operation in {"ranked_plan","average_credits"} or not re.search(r"รหัส(?:วิชา)?(?:ไม่ซ้ำ|จริง)?|นับรหัส",text)) else "courses",
         ranking_measure=composed["ranking_measure"],
-        proposed_term=Term(year=study["terms"][0][0],semester=study["terms"][0][1]) if proposed else None,
-        comparison_metrics=["total_credits"] if compound else [],
+        proposed_term=Term(year=study["terms"][0][0],semester=study["terms"][0][1]) if proposed else registration_term,
+        comparison_metrics=([metric for metric,pattern in [("total_credits",r"หน่วยกิต"),("years",r"จำนวนปี|กี่ปี|ระยะเวลา")] if re.search(pattern,text)] if operation in {"program_metadata","plan_comparison"} else ["total_credits"] if compound else []),
+        limit=int(re.search(r"\btop\s*([0-9]+)",text,re.I)[1]) if operation=="top_courses" else None,
+        with_ties=bool(re.search(r"ทุกวิชาที่เสมอ|รวม.*เสมอ",text)) if operation=="top_courses" else False,
         average_source=composed["average_source"], average_years=composed["average_years"],
         registration_mode="pair" if operation=="registration_conditions" and len(codes)==2 else composed["registration_mode"],
         unpassed_code=unpassed_code, registration_target=registration_target)
+    if scalar_operand and scalar_operand["operation"]=="relations":
+        spec=spec.model_copy(update={field:scalar_operand[field] for field in ("direction","relation_kind") if field in scalar_operand})
     if operation=="average_credits":
         if not re.search(r"ต่อเทอม|ต่อภาคเรียน|แต่ละเทอม|เทอมละ",text):
             return reject("roles","missing_average_basis","ต้องการเฉลี่ยหน่วยกิตต่อเทอมจากยอดหลักสูตร หรือจากเทอมที่มีในแผน กรุณาระบุฐานการเฉลี่ย")
@@ -3590,7 +4008,7 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
     if spec.codes and operation not in {"proposed_term","lookup","positions","pages","options","course_compare","graph_walk","graph_credits","relations","record_summary","registration_conditions"}:
         return reject("capability","unsupported_code_combination","ยังใช้ตัวกรองรหัสกับการดำเนินการนี้ไม่ได้ครบ", "unsupported")
     if spec.years or spec.semesters or spec.terms:
-        scope_operations={"track_comparison","lookup","positions","pages","options","missing_fields","zero_missing","slot_summary","term_ranking","course_extrema","duplicates","elective_in_plan","elective_not_in_plan","unselected_slots","hour_totals","year_sets","progression","earlier_year_relations","same_year_relations","plan_relations","program_summary","course_sets","catalog_plan_diff","diff_chains","unresolved_comparison","evidence_comparison","lab_ranking","record_summary","ranked_plan","average_credits"}
+        scope_operations={"plan_comparison","top_courses","track_comparison","lookup","positions","pages","options","missing_fields","zero_missing","slot_summary","term_ranking","course_extrema","duplicates","elective_in_plan","elective_not_in_plan","unselected_slots","hour_totals","year_sets","progression","earlier_year_relations","same_year_relations","plan_relations","program_summary","course_sets","catalog_plan_diff","diff_chains","unresolved_comparison","evidence_comparison","lab_ranking","record_summary","ranked_plan","average_credits"}
         if operation in {"graph_walk","graph_credits","relations"}:
             explicit_node_scope = bool(re.search(r"(?:ตัวต่อ|วิชาปลายทาง)(?:ที่อยู่|ใน|อยู่)?\s*ปี|วิชา(?:ในแผน)?ปี\s*[0-9]+.*(?:ต่อจาก|ตัวต่อ|ปลายทาง)|วิชาก่อน(?:ที่|ซึ่ง)?(?:อยู่|ใน)\s*ปี",text))
             if not explicit_node_scope:
@@ -3598,10 +4016,10 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
         elif operation not in scope_operations:
             return reject("capability","unsupported_study_scope","ยังใช้ตัวกรองปี/เทอมกับการดำเนินการนี้ไม่ได้ครบ", "unsupported")
     # ฟิลด์ใน schema ต้องมี executor ใช้จริงกับ operation นั้น ห้ามเพียงจับคำครบ.
-    predicate_operations={"track_comparison","lookup","course_extrema","course_sets","plan_relations","program_summary","lab_ranking","graph_walk","relations","elective_in_plan","elective_not_in_plan","record_summary","ranked_plan","average_credits"}
+    predicate_operations={"top_courses","track_comparison","lookup","course_extrema","course_sets","plan_relations","program_summary","lab_ranking","graph_walk","relations","elective_in_plan","elective_not_in_plan","record_summary","ranked_plan","average_credits"}
     if (spec.numeric or spec.text) and operation not in predicate_operations:
         return reject("capability","unsupported_predicate_combination","ยังใช้ตัวกรองหน่วยกิต/ชั่วโมง/ข้อความกับการดำเนินการนี้ไม่ได้ครบ", "unsupported")
-    if (spec.category or spec.course_type) and operation not in {"track_comparison","lookup","positions","slot_summary","course_sets","program_summary","plan_relations","unselected_slots","lab_ranking","elective_in_plan","elective_not_in_plan","earlier_year_relations","same_year_relations","unresolved_comparison","record_summary","ranked_plan","average_credits"}:
+    if (spec.category or spec.course_type) and operation not in {"top_courses","track_comparison","lookup","positions","slot_summary","course_sets","program_summary","plan_relations","unselected_slots","lab_ranking","elective_in_plan","elective_not_in_plan","earlier_year_relations","same_year_relations","unresolved_comparison","record_summary","ranked_plan","average_credits"}:
         return reject("capability","unsupported_category_combination","ยังกรองหมวดหรือประเภทกับการดำเนินการนี้ไม่ได้ครบ", "unsupported")
     if snapshots:
         for target, snapshot in zip(targets, snapshots):
@@ -3620,8 +4038,10 @@ def data_rule(question, catalog, *, program=None, track=None, lexicon_provider=N
                        for field in categories["requested_fields"]):
                     return reject("capability", "missing_classification_output", f"ฐาน {target.program}/{target.track} ไม่ได้เก็บหมวดหรือประเภทที่ขอแสดง", "unsupported")
     if compound and (spec.years or spec.semesters or spec.terms):return reject("roles","compound_metadata_scope","ต้องการเทียบยอดหลักสูตร หรือยอดแผนปี/เทอมที่ระบุ กรุณาแยกความหมาย")
+    if proposed_operand or prerequisite_operand:
+        spans.append(dict(start=0,end=len(body),owner="validated_prerequisite_request"))
     if proposed:
-        for m in re.finditer(r"ถ้า|สลับ|ย้าย|ไปเรียน|อยากเรียน|ต้องการเรียน|จะผิดเงื่อนไข|เงื่อนไขวิชาก่อน|ไหม|ต้องผ่านอะไรก่อนบ้าง",body):spans.append(dict(start=m.start(),end=m.end(),owner="proposed_term_condition"))
+        for m in re.finditer(r"ถ้า|สลับ|ย้าย|ไปเรียน|อยากเรียน|ต้องการเรียน|จะเรียน|จะลง(?:ทะเบียน|เรียน)?|จะผิดเงื่อนไข|เงื่อนไขวิชาก่อน|ไหม|ต้องผ่าน(?:วิชา)?(?:อะไร|ไหน)(?:มา)?ก่อน(?:บ้าง)?|(?:ได้)?ต้องเตรียมวิชา(?:อะไร|ไหน)",body):spans.append(dict(start=m.start(),end=m.end(),owner="proposed_term_condition"))
     unknown=_data_coverage(body,spans,spec)
     if unknown:
         return reject("coverage","uncovered_condition",f"ยังตีความส่วน '{' / '.join(unknown[:8])}' ไม่ครบ กรุณาอธิบายส่วนนี้เพิ่มเติม",uncovered=unknown[:8])
@@ -3638,6 +4058,7 @@ def _data_coverage(body, spans, spec):
     # เงื่อนไขเชิงปฏิเสธแต่ละชนิดต้องมี operation รองรับ ไม่ลบคำว่า ‘ไม่’ ทั่วไป.
     conditions={
         "lookup":r"ไม่มีคำว่า|ยกเว้นคำว่า|ไม่นับช่อง(?:วิชา)?เลือกที่ยังไม่ระบุรหัส",
+        "earlier_year_relations":r"ปี(?:ที่)?ต่ำกว่า",
         "graph_integrity":r"ไม่พบในรายการรายวิชา|ไม่พบในรายละเอียด",
         "relations":r"ถ้าไม่อยู่ในแผนให้แยกบอก|ไม่อยู่ในแผน",
         "zero_missing":r"0\s*หน่วยกิต|ไม่ระบุหน่วยกิต|หน่วยกิต.*NULL",
@@ -3651,6 +4072,11 @@ def _data_coverage(body, spans, spec):
     if spec.operation in conditions:
         for match in re.finditer(conditions[spec.operation],body,re.I):
             spans.append(dict(start=match.start(),end=match.end(),owner="implemented_negative_condition"))
+    if spec.source=="plan" and spec.years and not spec.semesters:
+        patterns.append(r"ทั้งสองภาคเรียน|ทั้งสองเทอม")
+    if spec.operation=="relations" and spec.relation_kind in {"co", "both"}:
+        patterns.extend([_COREQUISITE_REQUEST_RE.pattern, r"(?:มี)?วิชาที่|หรือไม่|ไหม|หรือเปล่า"])
+    if spec.operation=="lookup" and "description_th" in spec.requested_fields:patterns.append(r"เรียนเกี่ยวกับอะไร")
     if spec.operation=="lookup" and "credits" in spec.missing_fields:patterns.append(r"ไม่ระบุหน่วยกิต|หน่วยกิตที่ขาด")
     if spec.operation=="lookup" and "description_th" in spec.missing_fields:patterns.append(r"ไม่มีคำอธิบาย")
     if spec.operation=="graph_integrity":patterns.append(r"ต้นทางหรือปลายทาง")
@@ -3661,6 +4087,10 @@ def _data_coverage(body, spans, spec):
     if spec.operation in {"zero_missing","missing_fields"}:patterns.append(r"\bNULL\b")
     if spec.operation=="program_summary":patterns.append(r"ยังรวมแน่นอนไม่ได้")
     if spec.operation=="dataset_sizes":patterns.append(r"ว่า(?=แต่ละฐาน)")
+    if spec.operation in {"course_sets","track_comparison","program_metadata","plan_comparison"}:
+        patterns.append(r"เรียนร่วมกัน|มีร่วมกัน|วิชาร่วมกัน|อยู่ในทั้ง|ในทั้ง|ความต่าง|ระหว่าง|ของแต่ละปี|รหัสต่างกัน|ปีเดียวกัน|มากกว่าปีเดียวกัน|ด้วยไหม|คืออะไร")
+    if spec.operation=="graph_degree":patterns.append(r"เป็นวิชาก่อนของวิชาอื่น|วิชาไหน|วิชาใด")
+    if spec.operation=="top_courses":patterns.append(r"\btop\s*[0-9]+|ทุกวิชาที่เสมอ|รวม.*เสมอ")
     if spec.operation in {"course_sets","track_comparison"}:patterns.append(r"(?:ที่)?ไม่มี(?:อยู่)?ใน|ไม่อยู่ใน|หรือ(?=เฉพาะ)")
     if spec.sort_by:patterns.append(r"เรียง(?:ลำดับ)?(?:ตาม)?|มากไปน้อย|น้อยไปมาก|สูงไปต่ำ|ต่ำไปสูง|มากที่สุดก่อน|น้อยที่สุดก่อน|สูงสุดก่อน|ต่ำสุดก่อน|[AZ]\s*(?:ไป|ถึง|-|→)\s*[AZ]|\b(?:asc|desc)\b")
     # ‘หรือ’ ในคำขออ่านประเภท/ตรวจวงจรไม่ใช่ OR ของตัวกรอง.
@@ -3716,14 +4146,6 @@ def _real_code(code):
     return isinstance(code,str) and re.fullmatch(r"[0-9]{8}",code) is not None
 
 
-def _stored_pages(value):
-    """รับหน้าที่บันทึกเป็น JSON จริงเท่านั้น ไม่สร้างเลขหน้าหรือใช้ทั้งตารางแทนแถว."""
-    if isinstance(value,str):
-        try:value=json.loads(value)
-        except (ValueError,TypeError):return []
-    return sorted({p for p in value if isinstance(p,int) and not isinstance(p,bool) and p>0}) if isinstance(value,list) else []
-
-
 def _allowed_terms(value):
     return sorted({(int(y),int(s)) for y,s in re.findall(r"([0-9]+)\s*/\s*([0-9]+)",str(value or ""))})
 
@@ -3750,7 +4172,14 @@ class DataContext:
         self.evidence={}
 
     def cite(self,source,row):
-        pages=_stored_pages(row.get("pages"))
+        if source == "prerequisite":
+            record = document_rules(self.target.program, self.target.edition or "default")
+            rule = (record or {}).get("prerequisites", {}).get(row.get("code"))
+            if rule and row.get("kind") == "pre" and any(item.get("course") == row.get("requires") for item in rule.get("any_of", [])):
+                self.evidence[("verified_prerequisite", row["code"])] = rule_citation(
+                    self.target.program, self.target.track, self.target.edition, rule["pages"],
+                    ["วิชาก่อนและเงื่อนไขรายวิชาเทียบเคียงตามเล่ม"], course_code=row["code"])
+        pages=stored_pages(row.get("pages"))
         if not pages:return
         record={"source":source,"program":self.target.program,"track":self.target.track,"pages":pages,
                 "course_code":row.get("code"),"year":row.get("year"),"semester":row.get("semester"),
@@ -3767,7 +4196,7 @@ class DataContext:
         output["code"]=code
         output["course_record_found"]=code in self.courses
         if description or "description_th" in self.spec.requested_fields:output["description_th"]=course.get("description_th")
-        output["pages"]=_stored_pages(course.get("pages"))
+        output["pages"]=stored_pages(course.get("pages"))
         if "prerequisites" in self.spec.requested_fields:
             output["prerequisites"]=[dict(edge)|{"required_name":self.courses.get(edge["requires"],{}).get("name_th")} for edge in self.before.get(code,[])]
             for edge in self.before.get(code,[]):self.cite("prerequisite",edge)
@@ -3847,7 +4276,7 @@ class DataContext:
                 if source=="elective_slot" and not self._matches_elective_scope(row):continue
                 if source=="course" and not self._matches_classification(row):continue
                 item={k:row.get(k) for k in ("id", "category", "type", "year", "semester", "allowed_terms", "alt_group", "note") if k in row}
-                item.update(source=source, pages=_stored_pages(row.get("pages")))
+                item.update(source=source, pages=stored_pages(row.get("pages")))
                 output.append(item)
                 self.cite(source, row)
         return output
@@ -3894,7 +4323,7 @@ class DataContext:
             for predicate in spec.numeric:
                 value=row.get(predicate.field)
                 if not _data_number(value):return False
-                checks={"eq":value==predicate.value,"gt":value>predicate.value,"ge":value>=predicate.value,"lt":value<predicate.value,"le":value<=predicate.value}
+                checks={"eq":value==predicate.value,"gt":value>predicate.value,"ge":value>=predicate.value,"lt":value<predicate.value,"le":value<=predicate.value,"ne":value!=predicate.value}
                 if not checks[predicate.operator]:return False
         if spec.operation=="lookup":
             for field in spec.missing_fields:
@@ -4151,6 +4580,18 @@ def _execute_registration_conditions(ctx):
     if spec.registration_mode=="pair":
         result.update(unpassed_code=spec.unpassed_code,registration_target=spec.registration_target,
                       prerequisite_unmet=any(e["kind"]=="pre" for e in edges))
+    if spec.proposed_term is not None:
+        result["proposed_term"] = spec.proposed_term.model_dump()
+        result["limitations"].append("ปี/เทอมนี้คือเวลาที่เสนอจะลง ไม่ใช่ตัวกรองรายวิชาทั้งเทอม และยังไม่มีข้อมูลเปิดสอนจริง")
+    record = document_rules(ctx.target.program, ctx.target.edition or "default")
+    target_code = spec.registration_target if spec.registration_mode == "pair" else spec.codes[0]
+    condition = (record or {}).get("prerequisites",{}).get(target_code)
+    if condition:
+        result["document_condition"] = condition
+        result["condition_status"] = "unknown"
+        if spec.registration_mode == "pair" and any(e["kind"]=="pre" for e in edges):
+            result["prerequisite_unmet"] = None
+        result["limitations"].append("เล่มระบุวิชาที่กำหนดหรือรายวิชาเทียบเคียง; การไม่ผ่านรหัสเดียวไม่พิสูจน์ว่าไม่ผ่านทุกทางเลือก")
     if not edges:result["status"]="ไม่พบความสัมพันธ์ที่บันทึก จึงยังสรุปว่าลงได้จริงไม่ได้"
     return result
 
@@ -4173,6 +4614,24 @@ def execute_data_single(ctx):
         if any(r['order_status']=='conflict_with_recorded_plan' for r in result['conditions']):result['status']='conflict_with_recorded_plan'
         if code not in ctx.courses:result['status']='course_not_found'
         return result
+    if op=="plan_total_audit":
+        summary=ctx.slot_summary();program=(ctx.snapshot.get("program") or [{}])[0];ctx.cite("program",program)
+        total=summary["known_slot_credits"] if not summary["unresolved_slot_count"] else None
+        official=program.get("total_credits")
+        return {"plan_total_credits":total,"program_total_credits":official,"totals_match":total==official if _data_number(total) and _data_number(official) else None,"summary":summary,
+                "graduation_verified":False,"limitations":["เปรียบเทียบยอดหน่วยกิตเท่านั้น ไม่ใช่การตรวจเงื่อนไขจบทุกข้อ"]}
+    if op=="course_membership":
+        code=spec.codes[0]
+        return {"code":code,"program":ctx.target.program,"track":ctx.target.track,"exists":code in ctx.courses,
+                "course":ctx.brief(code) if code in ctx.courses else None,"basis":"selected_course_catalogue"}
+    if op=="top_courses":
+        candidates={r["code"]:r for r in ctx.records() if _real_code(r["code"])}
+        unknown=sum(not _data_number(r.get("credits")) for r in candidates.values())
+        records={code:r for code,r in candidates.items() if _data_number(r.get("credits"))}
+        ordered=sorted(records.values(),key=lambda r:((-r["credits"] if spec.ranking!="min" else r["credits"]),r["code"]))
+        selected=ordered[:spec.limit]
+        if spec.with_ties and selected:selected=[r for r in ordered if r["credits"]>=selected[-1]["credits"]] if spec.ranking!="min" else [r for r in ordered if r["credits"]<=selected[-1]["credits"]]
+        return {"items":[ctx.brief(r["code"]) for r in selected],"count":len(selected),"candidate_count":len(ordered),"requested_limit":spec.limit,"ranking_basis":"known_course_credits","ranking_complete":unknown==0,"unknown_credit_count":unknown,"limitations":["จัดอันดับเฉพาะวิชาที่ระบุหน่วยกิต ไม่ถือ NULL เป็นศูนย์"],"tie_policy":"include_cutoff_ties" if spec.with_ties else "credits_then_code"}
     if op=="record_summary":return _record_credit_summary(ctx,ctx.records())
     if op=="ranked_plan":return _execute_ranked_plan(ctx)
     if op=="average_credits":return _execute_average_credits(ctx)
@@ -4194,7 +4653,7 @@ def execute_data_single(ctx):
                 for edge in item["prerequisites"]:ctx.cite("prerequisite",edge)
             if spec.source=="plan":item.update({k:row.get(k) for k in ("id","year","semester","alt_group","category","type","note")})
             if spec.source=="elective":item.update({k:row.get(k) for k in ("category","type","allowed_terms","note")})
-            if "pages" in item:item["pages"]=_stored_pages(item["pages"])
+            if "pages" in item:item["pages"]=stored_pages(item["pages"])
             items.append(item)
         codes={r["code"] for r in items}
         # count เดิมยังเป็นรหัสไม่ซ้ำ; แยกรหัสจริง/placeholder/ตำแหน่ง/ช่องให้ตรวจได้.
@@ -4208,8 +4667,8 @@ def execute_data_single(ctx):
         return [ctx.brief(code) for code in spec.codes]
     if op=="pages":
         records=ctx.records()
-        return {"source":spec.source,"pages":sorted({p for r in records for p in _stored_pages(r.get("pages"))}),
-                "items":[{"code":r["code"],"year":r.get("year"),"semester":r.get("semester"),"pages":_stored_pages(r.get("pages"))} for r in records]}
+        return {"source":spec.source,"pages":sorted({p for r in records for p in stored_pages(r.get("pages"))}),
+                "items":[{"code":r["code"],"year":r.get("year"),"semester":r.get("semester"),"pages":stored_pages(r.get("pages"))} for r in records]}
     if op=="options":
         selected_codes=spec.slot_codes or spec.codes
         rows=[r for r in ctx.plan_rows() if not selected_codes or r["code"] in selected_codes]
@@ -4344,7 +4803,10 @@ def execute_data_single(ctx):
                 items.append(course)
             return items
         items=[]
-        for edge in edges:
+        edge_groups=defaultdict(list)
+        for edge in edges:edge_groups[(edge["code"],edge["requires"],edge["kind"])].append(edge)
+        for edge_group in edge_groups.values():
+            edge=edge_group[0]
             source_positions=ctx.positions.get(edge["requires"],[]);target_positions=ctx.positions.get(edge["code"],[])
             if op in {"same_year_relations","earlier_year_relations"}:
                 scoped_ids={r["id"] for r in ctx.plan_rows()}
@@ -4359,9 +4821,18 @@ def execute_data_single(ctx):
             if op=="same_year_relations":
                 pairs=[(s,t) for s,t in pairs if s["year"]==t["year"] and (not spec.years or s["year"] in spec.years)]
                 if not pairs:continue
-            ctx.cite("prerequisite",edge)
+            unique_pairs={}
+            for source_pos,target_pos in pairs:
+                key=(source_pos["year"],source_pos["semester"],target_pos["year"],target_pos["semester"])
+                if key not in unique_pairs:
+                    unique_pairs[key]=(dict(source_pos,plan_item_ids=[]),dict(target_pos,plan_item_ids=[]))
+                for position,raw in zip(unique_pairs[key],(source_pos,target_pos)):
+                    if raw.get("id") is not None and raw["id"] not in position["plan_item_ids"]:position["plan_item_ids"].append(raw["id"])
+            pairs=list(unique_pairs.values())
             item=dict(edge)|{"course_details":ctx.brief(edge["code"]),"required_details":ctx.brief(edge["requires"])}
+            item.update(course_name=item["course_details"].get("name_th"),required_name=item["required_details"].get("name_th"))
             if op=="relations" and not ctx.matches(item["course_details" if spec.direction=="after" else "required_details"],study_scope=True):continue
+            for raw_edge in edge_group:ctx.cite("prerequisite",raw_edge)
             if op in {"same_year_relations","earlier_year_relations","progression"}:
                 item["position_pairs"]=[{"source_year":s["year"],"source_semester":s["semester"],"target_year":t["year"],"target_semester":t["semester"],"source_before_target":(s["year"],s["semester"])<(t["year"],t["semester"])} for s,t in pairs]
             if op in {"same_year_relations","earlier_year_relations"}:
@@ -4378,6 +4849,30 @@ def execute_data_multi(contexts):
     filters ของแผนถูกใช้ก่อนสร้าง set; metadata, catalog และ plan ไม่ปะปนกัน.
     """
     spec=contexts[0].spec;op=spec.operation
+    if op=="course_membership":
+        items=[execute_data_single(ctx) for ctx in contexts]
+        return {"code":spec.codes[0],"exists":any(r["exists"] for r in items),"tracks":items,"scope":"ตรวจทุกแผนที่ลงทะเบียนของหลักสูตรเป้าหมายเมื่อไม่ได้ระบุแผน"}
+    if op in {"program_metadata","plan_comparison"}:
+        metadata=[]
+        for ctx in contexts:
+            row=(ctx.snapshot.get("program") or [{}])[0];ctx.cite("program",row)
+            metadata.append({"program":ctx.target.program,"track":ctx.target.track,**{field:row.get(field) for field in spec.comparison_metrics}})
+        if op=="program_metadata":
+            return {"metadata":metadata,"difference_first_minus_second":{field:metadata[0][field]-metadata[1][field] if all(_data_number(r.get(field)) for r in metadata) else None for field in spec.comparison_metrics}}
+        positions={(r["year"],r["semester"]) for ctx in contexts for r in ctx.plan_rows()}
+        groups=(sorted(positions) if "semester" in spec.group_by else
+                [(year,None) for year in sorted({year for year,_ in positions})] if "year" in spec.group_by else [(None,None)])
+        items=[]
+        for year,semester in groups:
+            values=[]
+            for ctx in contexts:
+                records=[r for r in ctx.plan_rows() if (year is None or r["year"]==year) and (semester is None or r["semester"]==semester)]
+                for row in records:ctx.cite("study_plan",row)
+                summary=ctx.slot_summary(records)
+                values.append({"program":ctx.target.program,"track":ctx.target.track,"year":year,"semester":semester,"total_credits":summary["known_slot_credits"] if not summary["unresolved_slot_count"] else None,"summary":summary})
+            delta=values[0]["total_credits"]-values[1]["total_credits"] if all(_data_number(r["total_credits"]) for r in values) else None
+            items.append({"year":year,"semester":semester,"values":values,"difference_first_minus_second":delta})
+        return {"items":items,"metadata":metadata,"basis":"recorded_plan_slots","years_where_first_exceeds_second":[r["year"] for r in items if _data_number(r["difference_first_minus_second"]) and r["difference_first_minus_second"]>0]}
     if op=="track_comparison":
         metadata=[]
         for ctx in contexts:
@@ -4463,6 +4958,14 @@ def execute_data_multi(contexts):
             sets=[ctx.code_set(source) for ctx in contexts]
             result[source]={ctx.label:[ctx.brief(code) for code in sorted(s-set.union(*(other for index,other in enumerate(sets) if index!=i)))] for i,(ctx,s) in enumerate(zip(contexts,sets))}
         return result
+    if op=="course_sets" and spec.group_by==["year"]:
+        years=sorted({r["year"] for ctx in contexts for r in ctx.plan_rows()})
+        groups=[]
+        for year in years:
+            children=[DataContext(ctx.target,ctx.snapshot,spec.model_copy(update={"group_by":[],"years":[year]})) for ctx in contexts]
+            groups.append({"year":year,"result":execute_data_multi(children)})
+            for child,parent in zip(children,contexts):parent.evidence.update(child.evidence)
+        return {"groups":groups}
     sets=[ctx.code_set() for ctx in contexts]
     common=set.intersection(*sets)
     def records(codes):
@@ -4474,8 +4977,8 @@ def execute_data_multi(contexts):
             items=[]
             for code in sorted(common):
                 item=ctx.brief(code)
-                items.append({"code":code,"course_pages":item["pages"],"plan_pages":sorted({p for r in ctx.positions[code] for p in _stored_pages(r.get("pages"))}),
-                              "plan_records":[{"year":r["year"],"semester":r["semester"],"pages":_stored_pages(r.get("pages"))} for r in ctx.positions[code]]})
+                items.append({"code":code,"course_pages":item["pages"],"plan_pages":sorted({p for r in ctx.positions[code] for p in stored_pages(r.get("pages"))}),
+                              "plan_records":[{"year":r["year"],"semester":r["semester"],"pages":stored_pages(r.get("pages"))} for r in ctx.positions[code]]})
             result[ctx.label]={"items":items,"course_pages":sorted({p for r in items for p in r["course_pages"]}),"plan_pages":sorted({p for r in items for p in r["plan_pages"]})}
         return result
     if op=="prerequisite_diff":
@@ -4513,6 +5016,8 @@ _DATA_LABELS={"count":"จำนวนรหัส","items":"รายการ"
     "course_pages":"หน้าข้อมูลรายวิชา","plan_pages":"หน้าข้อมูลแผน","program":"หลักสูตร","track":"แผน",
     "zero_credit":"รายการ 0 หน่วยกิต","missing_credit":"รายการไม่ระบุหน่วยกิต","source":"แหล่งข้อมูล","course_record_found":"พบรายละเอียดรายวิชา",
     "graph_integrity":"ตรวจความครบของรหัสในกราฟ","course_sets":"ชุดรหัสร่วม/ต่าง","slot_summary":"สรุปช่องเรียน",
+    "requirements":"เกณฑ์หมวด","source_program":"ฐานรายวิชา","minimum_credits":"หน่วยกิตขั้นต่ำตามเอกสาร","selection_scope":"ขอบเขตการเลือกตามเล่ม","recognition_verified":"ยืนยันการนับหน่วยกิตแล้ว","basis":"แหล่งเกณฑ์","status":"สถานะ",
+    "category_requirements":"เกณฑ์หน่วยกิตรายหมวด","elective_eligibility":"ตรวจการนับวิชาเลือกเสรี",
     "lookup":"ค้นข้อมูล","graph_walk":"สายความสัมพันธ์","program_summary":"เปรียบเทียบข้อมูลแผนและหลักสูตร"}
 _DATA_LABELS.update({
     "classifications":"หมวดและประเภทตามบริบทที่บันทึก", "classification_status":"สถานะข้อมูลหมวด/ประเภท",
@@ -4565,6 +5070,9 @@ _DATA_LABELS.update({
 _DATA_LABELS.update({
     "record_summary":"รายการ จำนวน และหน่วยกิตของชุดเดียวกัน",
     "ranked_plan":"อันดับปี/เทอมตามหน่วยที่ถาม พร้อมรายวิชา",
+    "top_courses":"อันดับรายวิชาตามหน่วยกิต", "program_metadata":"เปรียบเทียบข้อมูลหลักสูตร",
+    "plan_comparison":"เปรียบเทียบหน่วยกิตตามแผน", "course_membership":"ตรวจรหัสในบัญชีหลักสูตร",
+    "plan_total_audit":"ตรวจยอดแผนเทียบยอดหลักสูตร",
     "program_tracks":"แผนที่มีในฐานข้อมูล", "track_comparison":"ผลต่างหน่วยกิตและรายวิชาในแผน", "proposed_term":"ตรวจเทอมที่เสนอจากวิชาก่อน",
     "credit_difference":"ผลต่างหน่วยกิต", "course_differences":"ส่วนต่างรายวิชา",
     "ranking_value":"ค่าที่ใช้จัดอันดับ", "ranking_measure":"หน่วยที่ใช้จัดอันดับ",
@@ -4591,6 +5099,11 @@ _DATA_LABELS.update({
 def render_data_answer(spec,result,targets,limitations):
     """แสดงข้อเท็จจริงครบจากผลคำนวณ ไม่ให้ LLM สรุปจนทิ้งรายการ/ค่าขาด."""
     lines=[f"{_DATA_LABELS.get(spec.operation,'ผลตรวจข้อมูลหลักสูตร')} — "+", ".join(f"{t.program}/{t.track}" for t in targets)]
+    if spec.operation=="relations" and spec.relation_kind=="co":
+        lines.append("ตรวจเงื่อนไขวิชาเรียนควบ (co) ที่บันทึกในฐานนี้")
+        if not result:lines.append("ไม่พบเงื่อนไขวิชาเรียนควบที่บันทึกไว้; ไม่ยืนยันสิทธิ์ลงทะเบียนหรือข้อกำหนดอื่นนอกฐาน")
+    if spec.operation=="lookup" and spec.source=="plan" and isinstance(result,dict) and result.get("placeholder_code_count"):
+        lines.append(f"พบ {result['slot_count']} ช่องตามแผน: {result['placeholder_code_count']} รหัสช่องเลือกยังไม่ระบุรายวิชาจริง; ไม่ใช่รายชื่อวิชาที่อนุมัติให้เลือกทั้งหมด")
     def show(value,depth=0,label=None):
         remaining_seconds()
         prefix="  "*depth
@@ -4610,7 +5123,10 @@ def render_data_answer(spec,result,targets,limitations):
             shown="ไม่ระบุ/สรุปไม่ได้จากข้อมูลนี้" if value is None else "ใช่" if value is True else "ไม่ใช่" if value is False else str(value)
             shown={"plan_slots":"ช่องเรียน (ทางเลือกในช่องเดียวกันนับครั้งเดียว)",
                    "distinct_real_course_codes":"รหัสวิชาจริงไม่ซ้ำ (ไม่รวม placeholder)",
-                   "exact_slot_credits":"ยอดช่องเรียนที่ระบุครบ", "program.total_credits":"ยอดหลักสูตรที่บันทึกใน program"}.get(shown,shown)
+                   "exact_slot_credits":"ยอดช่องเรียนที่ระบุครบ", "program.total_credits":"ยอดหลักสูตรที่บันทึกใน program",
+                   "verified_document_requirement":"ตรวจเกณฑ์จากเอกสารแล้ว", "curriculum_document":"ข้อกำหนดในเล่มหลักสูตร",
+                   "unknown":"ยังตรวจยืนยันไม่ได้", "free_elective":"หมวดวิชาเลือกเสรี", "specialized":"หมวดวิชาเฉพาะ",
+                   "general_education":"หมวดวิชาศึกษาทั่วไป"}.get(shown,shown)
             lines.append(prefix+(label+": " if label else "")+shown)
     show(result)
     if limitations:lines.extend(["หมายเหตุ:"]+["- "+note for note in limitations])
@@ -4664,6 +5180,7 @@ def curriculum_edition_hints(question: str) -> dict:
         rf"(?P<edition>(?:ปี\s*)?(?:พ\.?\s*ศ\.?|ค\.?\s*ศ\.?)\s*{identifier})",
         # ปีสี่หลักหลังรหัสหลักสูตร เช่น IT ปี 2560; ปีเรียนมีเพียง 1–20.
         rf"(?<![A-Za-z0-9_])[A-Za-z][A-Za-z0-9]*\s+(?P<edition>ปี\s*{identifier})",
+        rf"(?<![A-Za-z0-9_])(?:IT|DSBA|BIT|AIT|GENED)\s+(?P<edition>{identifier})",
     )
     spans = []
     for pattern in patterns:
@@ -4680,6 +5197,7 @@ def curriculum_edition_hints(question: str) -> dict:
             if year.startswith("20"):
                 edition = str(int(year) + 543) + (separator + revision if separator else "")
             spans.append({"start": start, "end": end, "edition": edition, "owner": "curriculum_edition"})
+    spans.sort(key=lambda span: span["start"])
     clean = _mask_spans(question, spans).strip()
     return {"editions": list(dict.fromkeys(span["edition"] for span in spans)),
             "spans": spans, "question": clean}
@@ -4843,13 +5361,19 @@ class QwenTextToSQL:
         self.plan_cache = AnswerCache(max_entries=256, ttl=900)
         self.short_plan_cache = AnswerCache(max_entries=64, ttl=30)
         self.graph_cache = AnswerCache(max_entries=32, ttl=900)  # ข้อมูลครบ ผูกกับ revision ของ DB.
+        self.sql_schema_cache = AnswerCache(max_entries=32, ttl=900)
         self.classifier_mode = getattr(config, "classifier_mode", "off")
         self.intent_classifier = (IntentClassifier(config.classifier_path)
                                   if self.classifier_mode != "off" and hasattr(config, "classifier_path") else None)
         self._classifier_revision = (self.classifier_mode,
                                      self.intent_classifier.version if self.intent_classifier else "disabled")
         self._prompt_version = hashlib.sha256(
-            (PLAN_PROMPT + json.dumps([CHOICE_SCHEMA, PLAN_EXAMPLES, PLAN_EXAMPLE_PAIRS, PLAN_INTENT_DESCRIPTIONS, PLAN_EXAMPLE_LIMIT,
+            (PLAN_PROMPT + SQL_PROMPT + json.dumps([CHOICE_SCHEMA, SQL_SCHEMA, SQL_PLANNER_VERSION, SQL_EXAMPLES,
+                                      getattr(config, "sql_planner_enabled", False),
+                                      getattr(config, "sql_output_tokens", 256),
+                                      getattr(config, "sql_complex_output_tokens", 512),
+                                      getattr(config, "sql_retry_output_tokens", 768),
+                                      PLAN_EXAMPLES, PLAN_EXAMPLE_PAIRS, PLAN_INTENT_DESCRIPTIONS, PLAN_EXAMPLE_LIMIT,
                                       QUESTION_WORDING_VERSION, QUESTION_WORDING_RULES,
                                       self._classifier_revision, getattr(config, "planner_example_limit", PLAN_EXAMPLE_LIMIT),
                                       getattr(config, "planner_reuse_verified_search", True),
@@ -4931,17 +5455,19 @@ class QwenTextToSQL:
     def _edition_context(self, question, program, edition):
         """เลือกฉบับจากฟอร์ม/ข้อความก่อนตรวจ cache; ชื่อในข้อความต้องเป็นฉบับที่มีจริง."""
         hints = curriculum_edition_hints(question)
-        selected = (getattr(self.config, "active_edition", "default") if edition is None else edition).strip()
+        selected = resolve_edition(self.config, program, edition)
         edition_paths(self.config, selected)  # ID จาก API ผิดต้องเป็น validation error.
         if len(hints["editions"]) > 1:
             return self, question, selected, hints, "ยังไม่รองรับการเปรียบเทียบข้ามฉบับหลักสูตร กรุณาเลือกหรือระบุฉบับเดียวต่อคำถาม"
         explicit = hints["editions"][0] if hints["editions"] else None
         if explicit:
             try:
-                edition_paths(self.config, explicit)
-            except ValueError:
-                return self, question, selected, hints, f"ไม่มีฐานข้อมูลฉบับ {explicit} ใน catalog กรุณาเลือกปี/ฉบับที่มีในเมนู"
-            selected = explicit
+                resolved = resolve_edition(self.config, program, explicit, from_year=True)
+            except ValueError as exc:
+                hints["resolution_issue"] = str(exc)
+                hints["resolution_intent"] = "clarify" if getattr(exc,"reason_code",None)=="ambiguous_edition" else "unsupported"
+                return self, question, selected, hints, str(exc)
+            selected = resolved
         service = self._edition_service(selected)
         if selected != getattr(self.config, "active_edition", "default"):
             # ตรวจรหัสหลักสูตรจาก catalog เดิมก่อนกรอง catalog ของฉบับ เพื่อให้เหตุผลตรงเรื่อง.
@@ -5102,7 +5628,8 @@ class QwenTextToSQL:
         except (requests.RequestException, ValueError):
             return False
 
-    def _chat(self, prompt: str, schema: dict, *, system_prompt: str | None = None) -> dict:
+    def _chat(self, prompt: str, schema: dict, *, system_prompt: str | None = None,
+              output_budgets: tuple[int, ...] | None = None) -> dict:
         """จุดเรียก Qwen: ใช้ prompt Model 2, JSON schema และเวลาที่ request เหลือ.
 
         เริ่ม output 128 tokens; เพิ่มเป็น 256 เฉพาะเมื่อถูกตัด ไม่ retry ปัญหาเครือข่าย.
@@ -5113,8 +5640,8 @@ class QwenTextToSQL:
         # schema อยู่ใน format แล้ว; prompt ระบุความหมาย/ข้อห้าม/ตัวอย่าง
         # 128 รองรับคำค้นไทยยาวกว่า 48; ขยายหนึ่งครั้งเฉพาะเอาต์พุตถูกตัด
         ### |-/no_think :สั่งไม่ให้โมเดลคิดยาว ต่อท้าย system prompt ใน _chat
-        budgets = (getattr(self.config, "ollama_output_tokens", 128),
-                   getattr(self.config, "ollama_output_retry_tokens", 256))
+        budgets = output_budgets or (getattr(self.config, "ollama_output_tokens", 128),
+                                    getattr(self.config, "ollama_output_retry_tokens", 256))
         for budget_index, budget in enumerate(budgets):
             seconds = min(float(self.config.request_timeout), remaining_seconds())
             if seconds < 0.2:
@@ -5155,7 +5682,7 @@ class QwenTextToSQL:
                      body.get("total_duration"), body.get("load_duration"),
                      body.get("prompt_eval_duration"), body.get("eval_duration"))
             if body.get("done_reason") == "length":
-                if budget_index == 0:
+                if budget_index + 1 < len(budgets):
                     record_qwen_retry("output_length")
                     continue
                 raise InferenceResponseError("Model output exceeded the token budget")
@@ -5188,16 +5715,253 @@ class QwenTextToSQL:
             return False
 
 
+    def _sql_soft_rejection(self, plan):
+        """Only wording/assembly failures may reach the flexible planner."""
+        if not getattr(self.config, "sql_planner_enabled", False) or plan.intent not in {"clarify", "unsupported"}:
+            return False
+        reason = plan.diagnostics.get("reason_code")
+        return reason in {"uncovered_condition", "unparsed_operation", "meaning_not_preserved",
+                          "unsupported_condition", "unsupported_capability", "missing_or_ambiguous_input"}
+
+    def _sql_can_handle(self, question, hints, lexicon):
+        if not getattr(self.config, "sql_planner_enabled", False) or lexicon is None:
+            return False
+        if sql_hard_issue(question, hints):
+            return False
+        if hints.get("category_credit_scope") == "ambiguous":
+            return False
+        if (hints.get("years") or hints.get("semesters")) and not lexicon.get("plans"):
+            return False
+        if any(not 1 <= y <= 20 for y in hints.get("years", [])) or any(not 1 <= s <= 3 for s in hints.get("semesters", [])):
+            return False
+        if any(len(set(h["codes"])) > 1 for h in hints.get("name_mentions", [])) and not hints.get("codes") and not re.search(r"คำว่า|ที่ชื่อ|ชื่อมี|รายชื่อ|รายการ|อะไรบ้าง|ไรบ้าง", question):
+            return False
+        return bool(lexicon.get("columns", {}).get("course"))
+
+    def _sql_sources(self, database, lexicon, program):
+        key = (database_revision(database.path), program == "GENED", SQL_PLANNER_VERSION)
+        sources = self.sql_schema_cache.get(key)
+        if sources is None:
+            sources = database.flexible_sources(lexicon["columns"], is_gened=program == "GENED")
+            if not lexicon.get("plans"):
+                sources.pop("qa_plan", None)
+            self.sql_schema_cache.put(key, sources)
+        return sources
+
+    def warmup_context(self):
+        """Prepare revision-aware lexicon/schema in a startup background task."""
+        warmed = 0
+        for item in self.catalog.programs():
+            for entry in item["editions"]:
+                service = self._edition_service(entry["edition"])
+                for track in entry["tracks"]:
+                    try:
+                        database = service.catalog.resolve(item["program"], track)
+                        lexicon = service.lexicon.snapshot(database)
+                        service._sql_sources(database, lexicon, item["program"])
+                        warmed += 1
+                    except (ValueError, OSError, sqlite3.Error) as exc:
+                        log.warning("Context warm-up skipped %s/%s/%s: %s", item["program"], entry["edition"], track, exc)
+        return warmed
+
+    def _sql_tool_plan(self, proposal, question, hints):
+        if proposal.sql or proposal.params:
+            raise SQLPlanError("mixed_tool_sql", "A tool request must not include SQL or SQL params")
+        args = dict(proposal.tool_args or {})
+        if set(args) - {"course_codes", "graduation_years", "prerequisite_kind"}:
+            raise SQLPlanError("unknown_tool_argument", "Unknown tool argument")
+        codes = args.get("course_codes", hints.get("codes", []))
+        known = set(hints.get("codes", [])) | {c for hit in hints.get("name_mentions", []) if len(hit["codes"]) == 1 for c in hit["codes"]}
+        if not isinstance(codes, list) or any(c not in known for c in codes):
+            raise SQLPlanError("invented_tool_operand", "Tool course codes must come from the question or a unique DB name")
+        relation = args.get("prerequisite_kind", hints.get("relation_kind", "pre"))
+        if relation != hints.get("relation_kind", "pre"):
+            raise SQLPlanError("changed_relation_kind", "Preserve prerequisite vs corequisite")
+        if proposal.result_kind in {"prerequisite_chain", "dependent_terms", "conditional_prerequisites"} and relation != "pre":
+            raise SQLPlanError("unsupported_tool_relation", "These tools implement pre relationships only; never substitute pre for co", repairable=False)
+        if proposal.result_kind in {"prerequisite_chain", "dependent_terms", "conditional_prerequisites"}:
+            if len(codes) != 1:
+                raise SQLPlanError("missing_tool_operand", "Specify one course for this relation", repairable=False)
+            relation_words = re.search(r"วิชาก่อน|ต้องผ่าน|ก่อนเรียน|ตัวต่อ|วิชาควบ|prereq|ต่อยอด|ทั้งสาย|สายวิชา", question, re.I)
+            if not relation_words:
+                raise SQLPlanError("unrequested_tool", "Question did not request a prerequisite relation")
+        if proposal.result_kind in {"draft_study_plan", "check_student_plan"} and not re.search(r"แผน|ตาราง|จบ|สำเร็จ", question):
+            raise SQLPlanError("unrequested_tool", "Question did not request study planning")
+        years = args.get("graduation_years")
+        stated_durations = {float(m[1]) for m in re.finditer(r"(?:จบ|ภายใน|ใช้เวลา|ระยะเวลา)(?:ใน)?\s*([0-9]+(?:\.[0-9]+)?)\s*ปี", question)}
+        if years is not None and (isinstance(years, bool) or not isinstance(years, (int, float)) or years not in stated_durations):
+            raise SQLPlanError("invented_duration", "Requested duration must be stated in the question")
+        if proposal.result_kind == "prerequisite_chain" and not re.search(r"ทั้งสาย|ทั้งหมด|ทุกทอด|ทุกชั้น|ทางอ้อม|ย้อน.*สาย", question):
+            raise SQLPlanError("changed_relation_depth", "A full prerequisite chain must be requested", repairable=False)
+        if proposal.result_kind == "dependent_terms" and not re.search(r"ตัวต่อ|ต่อยอด|วิชาปลายทาง|เรียน.*ต่อ", question):
+            raise SQLPlanError("changed_relation_direction", "Dependent courses must be requested", repairable=False)
+        if proposal.result_kind == "conditional_prerequisites" and not re.search(r"(?:ยัง)?ไม่ผ่าน|สอบตก", question):
+            raise SQLPlanError("changed_relation_direction", "An unpassed course must be stated", repairable=False)
+        if proposal.result_kind == "check_student_plan" and not re.search(r"ตรวจ|เช็ค|เช็ก", question):
+            raise SQLPlanError("unrequested_tool", "Plan checking must be requested", repairable=False)
+        if proposal.result_kind in {"draft_study_plan", "check_student_plan"} and re.search(r"(?:ไม่เกิน|เพดาน|สูงสุด|อย่างน้อย|ขั้นต่ำ)\s*[0-9]+|(?:ผ่านแล้ว|เรียนแล้ว)\s*[0-9]{8}", question):
+            raise SQLPlanError("unmapped_student_condition", "Student limits/completed courses must be supplied as verified student context", repairable=False)
+        if proposal.result_kind in {"prerequisite_chain", "dependent_terms", "conditional_prerequisites"} and (hints.get("years") or hints.get("semesters")):
+            raise SQLPlanError("unmapped_relation_filter", "This relation tool cannot discard requested year/term filters", repairable=False)
+        if proposal.result_kind == "draft_study_plan" and years is None:
+            raise SQLPlanError("missing_duration", "Study drafting needs the explicitly requested duration", repairable=False)
+        return QueryPlan(intent=proposal.result_kind, course_codes=codes, prerequisite_kind=relation,
+                         graduation_years=years, diagnostics={"planner": "qwen_sql", "semantic_validation": "grounded_tool_arguments"})
+
+    def _plan_sql(self, question, database, hints, lexicon, program, track, cache_key):
+        """One inference normally; at most one repair, no preceding intent inference."""
+        sources = self._sql_sources(database, lexicon, program)
+        trace = current_trace()
+        if trace is not None:
+            trace.plan_source = "qwen_sql"
+        complex_query = (len(hints.get("requested_fields", [])) >= 3 or hints.get("sort_by") is not None
+                         or bool(re.search(r"พร้อม|คำอธิบาย|แต่ละ|รวม|จำนวน|ยกเว้น|ไม่รวม", question)))
+        initial = self.config.sql_complex_output_tokens if complex_query else self.config.sql_output_tokens
+        from .sql_planner import planning_anchors
+        payload = {"question": question, **planning_anchors(question, hints), "scope": {"program": program, "track": track,
+                   "edition": self.config.active_edition}, "verified_hints": _prompt_hints(hints),
+                   "schema": {name: {"columns": value["columns"],
+                             "description": {"qa_course":"course catalogue", "qa_plan":"recorded plan rows with course fields", "qa_program":"selected programme metadata"}.get(name,"available projection")}
+                               for name, value in sources.items()},
+                    "allowed_sources": list(sources),
+                    "scope_is_not_a_column": ["program", "program_id", "edition", "track"],
+                   "examples": sql_examples(question, min(4, self.config.planner_example_limit),
+                                            hints=hints, sources=sources),
+                   "tools": {"prerequisites": bool(lexicon["columns"].get("prerequisite")),
+                             "study_plan": bool(lexicon.get("plans"))}}
+        error = None
+        error_code = None
+        for attempt in range(2):
+            if attempt:
+                record_qwen_retry("sql_validation" if not error or "budget" not in error else "sql_output_length")
+                payload["previous_error"] = error
+                # Concrete repair hints for recurring failures; never silently
+                # delete filters or permit raw tables just to obtain rows.
+                if error and "qa_* projection" in error:
+                    payload["repair_hint"] = "FROM must be one of: " + ", ".join(sources) + "; raw course/plan_item/program are not source names. Preserve all requested filters."
+                elif error and "Unknown column program" in error:
+                    payload["repair_hint"] = "program/edition/track selects the database in scope. It is not a course column or course-name filter. Use only schema columns and the required_filters."
+                elif error and "Search value must be copied" in error:
+                    payload["repair_hint"] = "Copy the complete protected name or quoted search term from THIS question. Do not split or translate it; LIKE may surround that exact term with %."
+
+            try:
+                with measure_stage("qwen"):
+                    choice = self._chat(json.dumps(payload, ensure_ascii=False), SQL_SCHEMA,
+                                        system_prompt=SQL_PROMPT,
+                                        output_budgets=(self.config.sql_retry_output_tokens if attempt else initial,))
+                proposal = SQLProposal.model_validate(choice)
+                payload["previous_proposal"] = proposal.model_dump(exclude_none=True)
+                if proposal.result_kind in {"clarify", "unsupported"}:
+                    if proposal.sql or proposal.params:
+                        raise SQLPlanError("mixed_refusal", "A clarification cannot execute SQL")
+                    if proposal.result_kind == "unsupported" and not attempt:
+                        raise SQLPlanError("premature_refusal", "Unknown wording is not unsupported: compose the query if the supplied schema supports it, otherwise identify the exact missing operation")
+                    plan = QueryPlan(intent="clarify", issue=proposal.message or "กรุณาระบุข้อมูลหรือเงื่อนไขที่ต้องการเพิ่มเติม",
+                        diagnostics={"planner": "qwen_sql", "failure_stage": "interpretation",
+                                     "reason_code": "model_unresolved_operation" if proposal.result_kind == "unsupported" else "ambiguous_input"})
+                elif proposal.result_kind not in {"rows", "count", "summary"}:
+                    plan = self._sql_tool_plan(proposal, question, hints)
+                else:
+                    verified = validate_sql(proposal, question, hints, sources)
+                    plan = QueryPlan(intent="sql_query", sql_proposal=proposal.model_dump(),
+                        diagnostics={"planner": "qwen_sql", **verified.diagnostics})
+                self.plan_cache.put(cache_key, plan.model_dump())
+                return plan
+            except (ValueError, InferenceResponseError) as exc:
+                error = str(exc)[:500]
+                error_code = getattr(exc,"code", "inference_response_error")
+                if isinstance(exc, SQLPlanError) and not exc.repairable:
+                    break
+        plan = QueryPlan(intent="clarify", issue="ยังตรวจการค้นให้รักษาเงื่อนไขครบไม่ได้: " + (error or "กรุณาระบุเงื่อนไขเพิ่มเติม"),
+                        diagnostics={"planner": "qwen_sql", "failure_stage": "sql_validation",
+                                     "reason_code": "meaning_not_verified", "validation_error_code": error_code, "validation_error": error})
+        self.short_plan_cache.put(cache_key, plan.model_dump())
+        return plan
+
+    def _execute_sql_plan(self, database, plan, question, *, program=None, track=None):
+        lexicon = self.lexicon.snapshot(database)
+        hints = question_hints(question, catalog=self.catalog, lexicon=lexicon, program=program, track=track)
+        sources = self._sql_sources(database, lexicon, program)
+        with measure_stage("compile"):
+            verified = validate_sql(plan.sql_proposal, question, hints, sources)
+        trace = current_trace()
+        if trace is not None:
+            trace.intent = "sql_query"
+            trace.planning_diagnostics.update(plan.diagnostics)
+        import sqlglot
+        evidence_fields = tuple(sqlglot.parse_one(verified.evidence_sql, read="sqlite").named_selects)
+        revision = database_revision(database.path)
+        executed, rows = database.query_flexible_records(verified.sql, verified.params,
+            sources[verified.source], verified.source, verified.output_fields, is_gened=program == "GENED")
+        with measure_stage("citations"):
+            _, evidence = database.query_flexible_records(verified.evidence_sql, verified.params,
+                sources[verified.source], verified.source, evidence_fields, is_gened=program == "GENED")
+        if database_revision(database.path) != revision:
+            raise QueryExecutionError("ข้อมูลเปลี่ยนระหว่างอ่าน กรุณาถามใหม่เพื่อใช้ข้อมูลชุดเดียวกัน")
+        # A flat SUM must not silently treat alternatives or repeated codes as slots.
+        if verified.aggregate and re.search(r"\b(?:SUM|AVG)\s*\(", verified.sql, re.I) and verified.source == "qa_plan":
+            codes = [r["code"] for r in evidence]
+            alternatives = defaultdict(set)
+            for r in evidence:
+                if r.get("alt_group"):
+                    alternatives[(r.get("year"), r.get("semester"), r["alt_group"])].add(r["code"])
+            if len(codes) != len(set(codes)) or any(len(c) > 1 for c in alternatives.values()):
+                if trace is not None: trace.planning_diagnostics.update(reason_code="ambiguous_slot_total", failure_stage="result_validation")
+                return {"question": question, "sql": "", "rows": [], "citations": [],
+                        "answer": "ชุดนี้มีวิชาซ้ำหรือทางเลือกในช่องเดียว จึงต้องระบุว่าจะรวมหน่วยกิตรายรหัสหรือช่องตามแผน ไม่ใช้ SUM ของทุกแถวแทนยอดที่ต้องเรียน"}
+        citations = []
+        seen = set()
+        for record in evidence:
+            for field, source, owner in (("course_pages", "course", "course"), ("plan_pages", "study_plan", "plan_item")):
+                pages = stored_pages(record.get(field))
+                key = (source, record.get("code"), record.get("year"), record.get("semester"), tuple(pages))
+                if pages and key not in seen:
+                    seen.add(key)
+                    citations.append({"source": source, "program": program, "track": track,
+                        "course_code": record.get("code"), "year": record.get("year") if source == "study_plan" else None,
+                        "semester": record.get("semester") if source == "study_plan" else None,
+                        "pages": pages, "evidence_source": owner})
+        with measure_stage("render"):
+            answer, result = render_sql_result(question, rows, evidence, verified)
+        limitations = ["ตรวจความหมายจากเงื่อนไขที่ยืนยันได้ ยังไม่ได้ตรวจเนื้อหา PDF โดยตรง"]
+        if verified.source == "qa_program" and not citations:
+            limitations.append("DB ไม่มีหน้าอ้างอิงของ metadata หลักสูตร")
+        return {"question": question, "sql": executed, "rows": rows,
+                "answer": answer, "citations": citations,
+                "analysis": {"kind": "sql_query", "operation": "flexible_query", "result": result,
+                             "query_params": list(verified.params),
+                             "interpretation": verified.diagnostics, "limitations": limitations}}
+
+    def _check_data_rule(self, question, *, program=None, track=None,
+                         previous: _DataRuleCheck | None = None) -> _DataRuleCheck:
+        """Reuse one request's parse only while its scope and DBs are unchanged."""
+        paths = getattr(self.config, "db_paths", {}) or {}
+        scoped_program = program.strip().upper() if program is not None else None
+        scoped_track = track.strip().lower() if track is not None else None
+        tracks = paths.get(scoped_program, {})
+        if scoped_track is None and len(tracks) == 1:
+            scoped_track = next(iter(tracks))
+        context = (normalize_question(question), scoped_program, scoped_track,
+                   getattr(self.config, "active_edition", "default"))
+        revision = self.catalog.aliases_revision() if paths else None
+        if previous is not None and previous.context == context and previous.catalog_revision == revision:
+            return previous
+        plan = data_rule(question, self.catalog, program=program, track=track,
+                         lexicon_provider=self.lexicon.snapshot)
+        return _DataRuleCheck(context, revision, plan)
+
     @timed_stage("planning")
     def _plan(self, question: str, *, program=None, track=None,
-              database=None, lexicon=None, hints=None) -> QueryPlan:
+              database=None, lexicon=None, hints=None,
+              data_rule_check: _DataRuleCheck | None = None) -> QueryPlan:
         """ใช้ plan cache/rules ก่อน Qwen; ตัวเลขมาจาก parser ไม่ให้โมเดลสร้างเอง.
 
         กฎเปรียบเทียบตรวจทั้งประโยคและสร้างแผน strict; คำถามทั่วไปผ่าน validate_plan
         และซ่อมแผนได้สองรอบภายใน deadline เมื่อยังตรวจเงื่อนไขไม่ครบ.
         """
-        composed = data_rule(question,self.catalog,program=program,track=track,lexicon_provider=self.lexicon.snapshot)
-        if composed is not None:
+        composed = self._check_data_rule(question, program=program, track=track,
+                                          previous=data_rule_check).plan
+        if composed is not None and not self._sql_soft_rejection(composed):
             trace=current_trace()
             if trace is not None:trace.plan_source="rules"
             return composed
@@ -5261,11 +6025,15 @@ class QwenTextToSQL:
             if not message:
                 validate_plan(advanced, normalized, hints=hints)
             plan = advanced.model_copy(update={"issue": message or advanced.issue, "diagnostics": diagnostics})
+            if message and self._sql_soft_rejection(plan) and self._sql_can_handle(normalized, hints, lexicon):
+                return self._plan_sql(normalized, database, hints, lexicon, program, track, key)
             (self.short_plan_cache if message else self.plan_cache).put(key, plan.model_dump())
             return plan
         refusal = preflight(normalized,program,track,allow_category=lexicon is not None,
                             lexicon=lexicon,hints=hints)
         if refusal:
+            if self._sql_can_handle(normalized, hints, lexicon):
+                return self._plan_sql(normalized, database, hints, lexicon, program, track, key)
             if trace is not None:
                 trace.plan_source = "preflight"
             unsupported_spans = re.findall(r"อาหารกลางวัน|วัน(?:จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์|เสาร์|อาทิตย์)|เวลาเปิดสอน",
@@ -5314,6 +6082,8 @@ class QwenTextToSQL:
                                             "failure_stage":"validation","reason_code":"meaning_not_preserved"})
             if trace is not None:
                 trace.plan_source="rules"
+            if self._sql_soft_rejection(plan) and self._sql_can_handle(normalized, hints, lexicon):
+                return self._plan_sql(normalized, database, hints, lexicon, program, track, key)
             (self.short_plan_cache if plan.intent in {"unsupported","clarify"} else self.plan_cache).put(key,plan.model_dump())
             return plan
         try:
@@ -5322,6 +6092,8 @@ class QwenTextToSQL:
                 rule = rule.model_copy(update={k: hints[k] for k in
                                                ("search_mode", "full_description", "ignore_spaces", "sort_by", "sort_direction")})
                 rule = finish(rule)
+                if self._sql_soft_rejection(rule) and self._sql_can_handle(normalized, hints, lexicon):
+                    return self._plan_sql(normalized, database, hints, lexicon, program, track, key)
                 if trace is not None:
                     trace.plan_source = "rules"
                 self.plan_cache.put(key, rule.model_dump())
@@ -5329,6 +6101,8 @@ class QwenTextToSQL:
         except ValueError as exc:
             error = str(exc)[:500]
         self._observe_planning(question, program, track, "fallback", error or "no_matching_rule")
+        if self._sql_can_handle(normalized, hints, lexicon):
+            return self._plan_sql(normalized, database, hints, lexicon, program, track, key)
         if trace is not None:
             trace.plan_source = "qwen"
         selected_prompt, choice_schema, capabilities, groups = planner_prompt(hints, lexicon, self.catalog, program)
@@ -5427,60 +6201,9 @@ class QwenTextToSQL:
         self.short_plan_cache.put(key, plan.model_dump())
         return plan
 
-    def make_sql(self, question: str, *, program=None, track=None, edition=None,
-                 bad_sql=None, error=None) -> str:
-        """เลือกฉบับเหมือน ask ก่อนสร้าง SQL; ไม่ให้ปีหลักสูตรกลายเป็นตัวกรองปีเรียน."""
-        with request_budget(float(self.config.request_timeout)):
-            service, clean, selected, hints, issue = self._edition_context(question, program, edition)
-            if issue:
-                raise ValueError(issue)
-            preparation = service._prepare_question(clean, program=program, track=track)
-            sql = service._make_sql_core(preparation["canonical_question"], program=program, track=track,
-                                         bad_sql=bad_sql, error=error)
-            return (f"-- ฉบับหลักสูตร: {selected}\n" + sql) if edition is not None or hints["spans"] else sql
-
-    def _make_sql_core(self, question: str, *, program=None, track=None, bad_sql=None, error=None) -> str:
-        """คืน SQL สำหรับแสดง/ตรวจสอบ; การรันใน ask ใช้ SQL + bound params แยกกัน."""
-        with request_budget(float(self.config.request_timeout)):
-            program = program.strip().upper() if program is not None else None
-            track = track.strip().lower() if track is not None else None
-            composed=data_rule(question,self.catalog,program=program,track=track,lexicon_provider=self.lexicon.snapshot)
-            if composed is not None:
-                if composed.intent != "data_query": raise ValueError(composed.issue)
-                validate_plan(composed,question,catalog=self.catalog,
-                              lexicon=self.lexicon.snapshot(self.catalog.resolve(composed.targets[0].program,composed.targets[0].track)))
-                return "\n\n".join(f"-- {target.program}/{target.track}: {composed.data_query.operation}; คำนวณด้วยโค้ดจากข้อมูลครบ\n" +
-                    CurriculumDatabase.data_snapshot_sql(self.lexicon.snapshot(self.catalog.resolve(target.program,target.track))["columns"],include_metadata=target.program!="GENED")
-                    for target in composed.targets)
-            advanced, message = advanced_rule(question)
-            if advanced is not None:
-                if message: raise ValueError(message)
-                return "-- อ่านข้อมูลครบ; กราฟ/ผลตรวจ/ร่างแผนคำนวณด้วยโค้ด\n" + CurriculumDatabase.planning_snapshot_sql(include_metadata=program!="GENED")
-            if diff_tracks_requested(question):
-                plan, message = diff_tracks_rule(question, self.catalog, program)
-                if message:
-                    raise ValueError(message)
-                # เป็น SQL สำหรับอ่านชุดรหัส; ส่วนต่างคำนวณใน Python ไม่แสร้งเป็น SQL ฐานเดียว.
-                return "\n\n".join(
-                    f"-- {target.program}/{target.track}; {plan.direction}\n{CurriculumDatabase.plan_course_codes_sql()}"
-                    for target in plan.targets)
-            if comparison_requested(question, catalog=self.catalog):
-                plan, message = comparison_rule(question, self.catalog, track, program)
-                if message:
-                    raise ValueError(message)
-                sub_plan = self._comparison_subplan(plan)
-                return "\n\n".join(
-                    f"-- {target.program}/{target.track}\n{display_sql(*compile_plan(sub_plan))}"
-                    for target in plan.targets
-                )
-            normalized = normalize_question(question)
-            plan = self._plan(normalized, program=program, track=track)
-            if plan.intent in {"unsupported","clarify"}:
-                raise ValueError(plan.issue or "คำถามนี้ยังสร้าง SQL ที่รักษาเงื่อนไขครบไม่ได้")
-            return display_sql(*compile_plan(plan))
-
     def _ask_uncached(self, database: CurriculumDatabase | None, question: str, *, program=None, track=None,
-                      prepared_plan: QueryPlan | None = None, student_context: dict | None = None) -> dict:
+                      prepared_plan: QueryPlan | None = None, student_context: dict | None = None,
+                      data_rule_check: _DataRuleCheck | None = None) -> dict:
         """ทำงานเมื่อไม่มี answer cache: plan → SQL/params → rows → renderer.
 
         คำถามไม่รองรับ/กำกวมไม่รัน SQL; ผลว่างแยกจากรหัสไม่พบและเงื่อนไขวิชาก่อน.
@@ -5488,6 +6211,8 @@ class QwenTextToSQL:
         def result(answer, sql="", rows=None, citations=None):
             return {"question": question, "sql": sql, "rows": [] if rows is None else rows,
                     "answer": answer, "citations": [] if citations is None else citations}
+        if prepared_plan is not None and prepared_plan.intent == "sql_query":
+            return self._execute_sql_plan(database, prepared_plan, question, program=program, track=track)
         if prepared_plan is not None and prepared_plan.intent=="data_query":
             return self._ask_data(prepared_plan,question)
         if prepared_plan is not None and prepared_plan.intent in ADVANCED_INTENTS:
@@ -5500,7 +6225,8 @@ class QwenTextToSQL:
         with measure_stage("planning"):
             lexicon = self.lexicon.snapshot(database)
         try:
-            plan = self._plan(question, program=program, track=track,database=database,lexicon=lexicon)
+            plan = self._plan(question, program=program, track=track, database=database,
+                              lexicon=lexicon, data_rule_check=data_rule_check)
             trace = current_trace()
             if trace is not None:
                 trace.intent = plan.intent
@@ -5516,6 +6242,8 @@ class QwenTextToSQL:
         if plan.intent == "clarify":
             self._observe_planning(question, program, track, "clarify", plan.issue or "plan_validation_incomplete")
             return result(plan.issue or "ยังตรวจเงื่อนไขคำถามให้ครบไม่ได้ กรุณาระบุรหัสวิชา หรือปีและเทอม และแยกคำถามย่อย")
+        if plan.intent == "sql_query":
+            return self._execute_sql_plan(database, plan, question, program=program, track=track)
         if plan.intent=="data_query":
             return self._ask_data(plan,question)
         if plan.intent in ADVANCED_INTENTS:
@@ -5594,11 +6322,6 @@ class QwenTextToSQL:
             raise TypeError("summarize() requires the QueryPlan used for the query")
         return render_answer(plan, rows, self.config.max_rows if max_rows is None else max_rows)
 
-    @staticmethod
-    def is_program_comparison(question: str) -> bool:
-        """API ตรวจเส้นทางเบื้องต้น; service ยืนยันสองเทอม/สองหลักสูตรภายใน deadline."""
-        return comparison_requested(question)
-
     def is_multi_database_question(self, question: str) -> bool:
         """API ใช้ก่อนเลือกฐานฟอร์ม; service ตรวจชื่อและความสามารถจริงอีกครั้ง."""
         return (diff_tracks_requested(question) or comparison_requested(question) or
@@ -5619,7 +6342,9 @@ class QwenTextToSQL:
         """
         student = student or {}
         trace = current_trace()
-        trace.intent, trace.plan_source = plan.intent, "rules"
+        trace.intent = plan.intent
+        if plan.diagnostics.get("planner") != "qwen_sql":
+            trace.plan_source = "rules"
         if plan.intent=="check_student_plan" and not student.get("student_plan"):
             trace.intent = "clarify"
             trace.planning_diagnostics.update(failure_stage="input",reason_code="missing_student_plan")
@@ -5632,10 +6357,12 @@ class QwenTextToSQL:
         key = (str(database.path), database_revision(database.path), program=="GENED")
         with measure_stage("cache"):
             snapshot = self.graph_cache.get(key)
-        sql = database.planning_snapshot_sql(include_metadata=program!="GENED")
+        columns = self.lexicon.snapshot(database)["columns"].get("plan_item", [])
+        classified = "category" in columns and "type" in columns
+        sql = database.planning_snapshot_sql(include_metadata=program!="GENED", include_classification=classified)
         if snapshot is None:
             try:
-                sql, snapshot = database.planning_snapshot(include_metadata=program!="GENED")
+                sql, snapshot = database.planning_snapshot(include_metadata=program!="GENED", include_classification=classified)
             except (ValueError, sqlite3.Error) as exc:
                 raise QueryExecutionError("ฐานนี้ไม่มีตารางครบสำหรับอ่านกราฟ/แผน") from exc
             if database_revision(database.path)==key[1]:
@@ -5647,13 +6374,13 @@ class QwenTextToSQL:
                     "answer": f"ไม่พบรหัส {plan.course_codes[0]} ในฐานหลักสูตรที่เลือก กรุณาตรวจรหัสและหลักสูตร"}
         with measure_stage("reasoning"):
             if plan.intent=="check_student_plan":
-                rows, analysis, answer = check_student_plan(plan, snapshot, student)
+                rows, analysis, answer = check_student_plan(plan, snapshot, student, rules=document_rules(program, getattr(self.config,"active_edition","default")))
                 codes={c for t in student.get("student_plan", []) for c in t["course_codes"]}
             elif plan.intent=="draft_study_plan":
                 if not snapshot["plan"]:
                     trace.intent="unsupported"
                     return {"question": question, "sql": sql, "rows": [], "citations": [], "answer": "ฐานนี้ไม่มีแผนรายปีสำหรับจัดร่าง"}
-                rows, analysis, answer = draft_study_plan(plan, snapshot, student)
+                rows, analysis, answer = draft_study_plan(plan, snapshot, student, rules=document_rules(program, getattr(self.config,"active_edition","default")))
                 codes={r["code"] for r in rows}
             elif plan.intent=="prerequisite_chain":
                 roots=plan.course_codes or sorted(c for c, positions in terms.items() if any(y==plan.target_year for y,s in positions))
@@ -5729,7 +6456,7 @@ class QwenTextToSQL:
         for attempt in range(2):
             revisions=tuple(database_revision(db.path) for db in databases)
             key=("data_query",tuple((t.program,t.edition,t.track,str(db.path),revision) for t,db,revision in zip(plan.targets,databases,revisions)),
-                 plan.data_query.model_dump_json(),normalize_question(question),ANSWER_CACHE_VERSION,self._prompt_version)
+                 plan.data_query.model_dump_json(),normalize_question(question),ANSWER_CACHE_VERSION,self._prompt_version,rules_revision())
             with measure_stage("cache"):
                 trace.answer_cache_checked=True
                 cached=self.answer_cache.get(key)
@@ -5762,7 +6489,7 @@ class QwenTextToSQL:
                     contexts.append(DataContext(target,stored["snapshot"],plan.data_query))
                     sql_parts.append(f"-- {target.program}/{target.track}\n{stored['sql']}")
                 with measure_stage("reasoning"):
-                    result=execute_data_multi(contexts) if len(contexts)>1 else execute_data_single(contexts[0])
+                    result = requirement_result(contexts[0]) if plan.data_query.operation == "category_requirements" else eligibility_result(contexts) if plan.data_query.operation == "elective_eligibility" else execute_data_multi(contexts) if len(contexts)>1 else execute_data_single(contexts[0])
                 limitations=[]
                 if any(match["match_kind"]=="substring" for match in plan.diagnostics.get("name_matches",[])):
                     limitations.append("ค้นจากข้อความย่อย/ชื่อเรียกสั้นที่พบใน DB โดยตรวจ candidate ก่อน แสดงชื่อเต็มและรหัสจริงให้ตรวจสอบ ไม่ใช้การเดาชื่อที่คล้ายกัน")
@@ -5786,6 +6513,11 @@ class QwenTextToSQL:
                     "targets":[t.model_dump() for t in plan.targets],"requested_fields":plan.data_query.requested_fields,"query":plan.data_query.model_dump(),
                     "complete":True,"total_rows":len(rows),"returned_rows":len(rows),"limitations":limitations,"labels":_DATA_LABELS,
                     "evidence_status":"partial" if limitations else "stored_pages" if citations else "no_stored_pages"}}
+                if plan.data_query.operation=="top_courses" and not result["ranking_complete"]:
+                    response["analysis"].update(complete=False,answer_completeness="partial")
+                if plan.data_query.operation in {"category_requirements", "elective_eligibility"}:
+                    complete = result.get("status") == "verified_document_requirement"
+                    response["analysis"].update(complete=complete,answer_completeness="complete" if complete else "partial")
                 remaining_seconds()
                 if tuple(database_revision(db.path) for db in databases)!=revisions:continue
                 self.answer_cache.put(key,response)
@@ -5962,6 +6694,18 @@ class QwenTextToSQL:
         ข้อความระบุฉบับมีสิทธิ์เหนือฟอร์ม แต่ข้ามฉบับยังเป็น operation ที่ไม่รองรับ.
         """
         with request_budget(float(self.config.request_timeout)):
+            from .edition_comparison import compare_editions
+            cross = compare_editions(self, question, program, track)
+            if cross is not None:
+                total = len(cross["rows"])
+                size = page_size or self.config.max_rows
+                if page is not None:
+                    if page < 1 or not 1 <= size <= 1000:raise ValueError("Invalid result page")
+                    start = (page - 1) * size
+                    cross["rows"] = cross["rows"][start:start+size]
+                    cross.update(page=page,page_size=size,total_count=total,returned_count=len(cross["rows"]),has_more=start+size<total)
+                else:cross.update(total_count=total,returned_count=total,has_more=False)
+                return cross
             with measure_stage("cache"):
                 service, clean, selected, hints, issue = self._edition_context(question, program, edition)
             trace = current_trace()
@@ -5969,7 +6713,7 @@ class QwenTextToSQL:
             previous_preparation = getattr(service._sessions, "question_preparation", None)
             try:
                 if issue:
-                    trace.plan_source, trace.intent = "preflight", "unsupported"
+                    trace.plan_source, trace.intent = "preflight", hints.get("resolution_intent","unsupported")
                     answer = {"question": question, "sql": "", "rows": [], "answer": issue, "citations": []}
                 else:
                     if service is not self or edition is not None or hints["editions"]:
@@ -5994,6 +6738,9 @@ class QwenTextToSQL:
                         del service._sessions.question_preparation
                 else:
                     service._sessions.question_preparation = previous_preparation
+            if trace.intent in {"clarify", "unsupported"} and not trace.planning_diagnostics.get("reason_code"):
+                from .query_roles import rejection_diagnostics
+                trace.planning_diagnostics.update(rejection_diagnostics(answer.get("answer", ""), trace.intent))
             answer=self._with_edition_context(answer, question, program, track, selected)
             rows=answer.get('rows',[]);total=len(rows)
             if page is not None:
@@ -6027,8 +6774,9 @@ class QwenTextToSQL:
             from .schemas import StudentContext
             student_context = StudentContext.model_validate(student_context or {}).model_dump()
             with measure_stage("cache"):
-                composed=data_rule(question,self.catalog,program=program,track=track,lexicon_provider=self.lexicon.snapshot)
-            if composed is not None:
+                data_rule_check = self._check_data_rule(question, program=program, track=track)
+                composed = data_rule_check.plan
+            if composed is not None and not self._sql_soft_rejection(composed):
                 trace.plan_source,trace.intent="rules",composed.intent
                 trace.planning_diagnostics=composed.diagnostics
                 if composed.intent in {"clarify","unsupported"}:
@@ -6072,7 +6820,7 @@ class QwenTextToSQL:
                 revision = database_revision(database.path)
                 key = (
                     str(database.path), revision, normalize_question(question), program, track,
-                    database.max_rows, getattr(self.config, "active_edition", "default"), ANSWER_CACHE_VERSION, self._prompt_version,
+                    database.max_rows, getattr(self.config, "active_edition", "default"), ANSWER_CACHE_VERSION, self._prompt_version, rules_revision(),
                     self.config.ollama_url, self.config.ollama_model,
                     json.dumps(student_context, sort_keys=True),
                     self.catalog.aliases_revision() if getattr(self.config, "db_paths", None) else None,
@@ -6108,7 +6856,7 @@ class QwenTextToSQL:
                         return cached
                 answer = self._ask_uncached(
                     database, question, program=program, track=track,
-                    student_context=student_context,
+                    student_context=student_context, data_rule_check=data_rule_check,
                 )
                 remaining_seconds()
                 if trace.intent in ADVANCED_INTENTS and database_revision(database.path) != revision:

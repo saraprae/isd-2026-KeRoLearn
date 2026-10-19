@@ -251,6 +251,30 @@ def edition_metadata(config, edition: str | None = None, program: str | None = N
     return metadata
 
 
+class AmbiguousEditionError(ValueError):
+    reason_code = "ambiguous_edition"
+
+
+def resolve_edition(config, program, edition=None, *, from_year=False):
+    """Map a program-specific human year to an edition ID; never guess revisions."""
+    active = getattr(config, "active_edition", "default")
+    value = str(active if edition is None else edition).strip()
+    mappings = {active: config.db_paths, **getattr(config, "edition_db_paths", {})}
+    program = program.strip().upper() if program else None
+    if not from_year and value in mappings:
+        return value
+    candidates = [key for key, paths in mappings.items()
+                  if (not program or program in paths)
+                  and str(edition_metadata(config, key, program).get("year")) == value]
+    if len(candidates) == 1:
+        return candidates[0]
+    if len(candidates) > 1:
+        raise AmbiguousEditionError(f"ปีหลักสูตร {value} มีหลายฉบับ กรุณาเลือกฉบับให้ชัดเจน: {', '.join(candidates)}")
+    if value in mappings and (not program or program in mappings[value]):
+        return value
+    raise ValueError(f"ไม่มีฐานข้อมูลฉบับ {value} สำหรับ {program or 'หลักสูตรที่เลือก'} ใน catalog")
+
+
 def resolve_database(lab8b: ModuleType, config, program: str | None = None,
                      track: str | None = None, edition: str | None = None) -> "CurriculumDatabase":
     """เลือกฐานด้วย mapping กลาง; API แปลง ValueError เป็น 422 โดยไม่มี circular import."""
@@ -259,7 +283,7 @@ def resolve_database(lab8b: ModuleType, config, program: str | None = None,
             raise ValueError("program is required with track/edition")
         return CurriculumDatabase(lab8b, config.db_path, config.max_rows)
     program = program.strip().upper()
-    tracks = edition_paths(config, edition).get(program)
+    tracks = edition_paths(config, resolve_edition(config, program, edition)).get(program)
     if tracks is None:
         raise ValueError(f"Unknown program or unavailable edition: {program}")
     if track is None:
@@ -580,6 +604,12 @@ class CitationDocumentCatalog:
         support = {"course": "ข้อมูลรายวิชาที่บันทึกไว้", "plan_item": "ตำแหน่งปี/เทอมและข้อมูลในแผนการเรียน",
                    "prerequisite": "ข้อมูลความสัมพันธ์วิชาก่อน/วิชาควบที่บันทึกไว้",
                    "program": "ข้อมูลหลักสูตรที่บันทึกไว้", "elective_slot": "รายการในบัญชีวิชาเลือก"}
+        reviewed = False
+        if citation.get("verified_rule_sha256") and descriptor.get("pdf"):
+            from .verified_rules import document_rules, ROOT
+            record = document_rules(program, edition)
+            reviewed = bool(record and record["sha256"] == citation["verified_rule_sha256"]
+                            and Path(descriptor["pdf"]["path"]).resolve() == (ROOT / record["pdf_path"]).resolve())
         references = []
         for page in pages:
             mapping = descriptor.get("page_mapping", {}).get(str(page), {})
@@ -595,7 +625,7 @@ class CitationDocumentCatalog:
                 "printed_page": str(printed) if printed is not None else None,
                 "section_name": mapping.get("section_name"),
                 "pdf_url": f"/api/documents/{descriptor['document_id']}#page={pdf_page}" if pdf and pdf_page else None,
-                "verification_status": "content_verified" if pdf and pdf_page and mapping.get("content_verified") is True else "metadata_only"})
+                "verification_status": "content_verified" if pdf and pdf_page and (mapping.get("content_verified") is True or reviewed) else "metadata_only"})
         identity = [descriptor.get("document_id"), citation.get("source"), actual, program, edition, track,
                     citation.get("course_code"), citation.get("year"), citation.get("semester"), pages]
         sections = {reference["section_name"] for reference in references}
@@ -603,9 +633,10 @@ class CitationDocumentCatalog:
             document_id=descriptor.get("document_id"), document_title=descriptor.get("document_title"),
             page_basis=basis, evidence_source=actual, evidence_scope=descriptor.get("evidence_scope", "unknown"),
             section_name=next(iter(sections)) if len(sections) == 1 else None,
-            supports=[support[actual]] if actual in support else ["บริบทของข้อมูลที่ใช้ตอบ ยังไม่ยืนยันแหล่งหน้าระดับฟิลด์"],
+            supports=citation.get("supports", []) if reviewed else [support[actual]] if actual in support else ["บริบทของข้อมูลที่ใช้ตอบ ยังไม่ยืนยันแหล่งหน้าระดับฟิลด์"],
             verification_status="content_verified" if references and all(r["verification_status"] == "content_verified" for r in references) else "metadata_only",
             page_references=references)
+        result.pop("verified_rule_sha256", None)
         return result
 
     def document_file(self, document_id):
@@ -747,6 +778,76 @@ class CurriculumDatabase:
         self.lab8b = lab8b
         self.path = path.resolve()
         self.max_rows = max_rows
+
+    @staticmethod
+    def flexible_sources(columns: dict, *, is_gened: bool = False) -> dict:
+        """Read-only code-owned projections, derived only from existing DB columns.
+
+        qa_plan includes course descriptions by a code-owned join; the model need
+        not invent joins. Pages retain their real owner; nothing is written to DB.
+        Schema data comes from the revision-aware lexicon cache.
+        """
+        sources = {}
+        course = set(columns.get("course", []))
+        plan = set(columns.get("plan_item", []))
+        fields = [f for f in ("code", "name_th", "name_en", "credits", "lecture_h",
+                             "lab_h", "self_h", "description_th") if f in course]
+        real = "length(c.code)=8 AND c.code NOT GLOB '*[^0-9]*'"
+        if "code" in course:
+            projection = [f'c."{f}" AS "{f}"' for f in fields]
+            if "pages" in course:
+                projection.append('c.pages AS course_pages')
+            sources["qa_course"] = {"columns": fields + (["course_pages"] if "pages" in course else []),
+                "sql": "SELECT " + ",".join(projection) + " FROM course c WHERE " + real,
+                "definition": "one row per real 8-digit course code; NULL is unknown"}
+        if {"code", "year", "semester"} <= plan and "code" in course:
+            projection = ['p.code AS code', 'p.year AS year', 'p.semester AS semester']
+            names = ["code", "year", "semester"]
+            for f in fields:
+                if f == "code":
+                    continue
+                expression = "COALESCE(p.credits,c.credits)" if f == "credits" and f in plan else f'c."{f}"'
+                projection.append(expression + f' AS "{f}"')
+                names.append(f)
+            for f in ("category", "type", "alt_group"):
+                if f in plan:
+                    projection.append(f'p."{f}" AS "{f}"')
+                    names.append(f)
+            for owner, schema, alias in (("c", course, "course_pages"), ("p", plan, "plan_pages")):
+                if "pages" in schema:
+                    projection.append(f'{owner}.pages AS {alias}')
+                    names.append(alias)
+            sources["qa_plan"] = {"columns": names,
+                "sql": "SELECT DISTINCT " + ",".join(projection) +
+                       " FROM plan_item p LEFT JOIN course c ON c.code=p.code"
+                       " WHERE length(p.code)=8 AND p.code NOT GLOB '*[^0-9]*'",
+                "definition": "real codes in recorded study plan, with year/term/category/type and course descriptions; alternatives are not slot-credit requirements"}
+        program = set(columns.get("program", []))
+        if not is_gened and {"total_credits", "years"} <= program:
+            names = [f for f in ("program_id", "name_th", "name_en", "degree", "total_credits", "years") if f in program]
+            sources["qa_program"] = {"columns": names, "sql": "SELECT " + ",".join(names) + " FROM program",
+                "definition": "recorded program metadata only, not personal graduation certification"}
+        return sources
+
+    @timed_stage("query")
+    def query_flexible_records(self, sql: str, params: tuple, source: dict,
+                               source_name: str, output_fields: tuple,
+                               *, is_gened: bool = False) -> tuple[str, list[dict]]:
+        """Execute an AST-verified SELECT with complete JSON-packed results.
+
+        The outer query has one row so max_rows does not truncate courses/evidence.
+        Only code-owned source SQL is injected, never a user-provided path/table.
+        guard_sql, readonly connection, authorizer and deadline still apply.
+        """
+        if not re.fullmatch(r"qa_(?:course|plan|program)", source_name):
+            raise ValueError("Unknown flexible source")
+        if not output_fields or any(not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", f) for f in output_fields):
+            raise ValueError("Invalid flexible result fields")
+        pairs = ",".join(f"'{f}',r.\"{f}\"" for f in output_fields)
+        wrapped = (f"WITH {source_name} AS ({source['sql']}) "
+                   f"SELECT json_group_array(json_object({pairs})) AS records FROM ({sql}) r")
+        executed, packed = self.query_from_model(wrapped, params=params, is_gened=is_gened)
+        return executed, json.loads(packed[0]["records"]) if packed else []
 
     def _require_db(self) -> None:
         if not self.path.exists():
@@ -934,16 +1035,17 @@ class CurriculumDatabase:
 
 
     @staticmethod
-    def planning_snapshot_sql(*, include_metadata: bool = True) -> str:
+    def planning_snapshot_sql(*, include_metadata: bool = True, include_classification: bool = False) -> str:
         """อ่าน course/plan/prerequisite ครบในหนึ่งแถว ก่อนจำกัดแถวคำตอบ.
 
         ใช้ SELECT ที่กำหนดเองและอ่านอย่างเดียว; guard LIMIT และ max_rows จึงไม่ตัดกราฟ.
         เก็บทั้งแถวเป็น JSON เพื่อรองรับฐานเดิมที่ไม่มี category/type/pages ได้ด้วย.
         """
+        classification = ", 'category',category,'type',type" if include_classification else ""
         return (
             "SELECT (SELECT json_group_array(json_object('code',code,'name_th',name_th,'credits',credits)) FROM course) AS courses, "
             "(SELECT json_group_array(json_object('code',code,'requires',requires,'kind',kind)) FROM prerequisite) AS edges, "
-            "(SELECT json_group_array(json_object('id',id,'code',code,'year',year,'semester',semester,'credits',credits,'alt_group',alt_group)) FROM plan_item) AS plan, "
+            "(SELECT json_group_array(json_object('id',id,'code',code,'year',year,'semester',semester,'credits',credits,'alt_group',alt_group" + classification + ")) FROM plan_item) AS plan, "
             + ("(SELECT total_credits FROM program LIMIT 1) AS total_credits" if include_metadata else "NULL AS total_credits")
         )
 
@@ -983,9 +1085,9 @@ class CurriculumDatabase:
                           for key in ("courses", "plan", "edges", "electives", "program")} | {
                               "columns": columns}
 
-    def planning_snapshot(self, *, include_metadata: bool = True) -> tuple[str, dict]:
+    def planning_snapshot(self, *, include_metadata: bool = True, include_classification: bool = False) -> tuple[str, dict]:
         """ส่งข้อมูลครบให้โค้ดเดินกราฟ/ตรวจแผน โดยไม่ให้ AI คำนวณหรือแก้ฐาน."""
-        sql, rows = self.query_from_model(self.planning_snapshot_sql(include_metadata=include_metadata))
+        sql, rows = self.query_from_model(self.planning_snapshot_sql(include_metadata=include_metadata, include_classification=include_classification))
         if len(rows) != 1:
             raise ValueError("อ่านข้อมูลสำหรับวางแผนไม่ครบ")
         data = rows[0]

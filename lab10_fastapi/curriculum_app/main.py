@@ -89,11 +89,17 @@ def configure_logging(config: Settings | None = None):
 async def lifespan(_app: FastAPI):
     """Startup เปิด logging; shutdown/exception ปิด handlers ผ่าน finally ของ context."""
     with configure_logging():
+        context_warmup = asyncio.create_task(asyncio.to_thread(model.warmup_context))
         warmup = (asyncio.create_task(asyncio.to_thread(model.warmup))
                   if settings.ollama_warmup else None)
         try:
             yield
         finally:
+            context_warmup.cancel()
+            try:
+                await context_warmup
+            except asyncio.CancelledError:
+                pass
             if warmup is not None:
                 warmup.cancel()
                 try:
@@ -248,7 +254,7 @@ def ask(request: AskRequest) -> dict:
             else select_database(request.program, request.track), request.question,
             program=request.program, track=request.track,
             edition=request.edition, page=request.page, page_size=request.page_size,
-            student_context=request.model_dump(include={"student_plan", "completed_courses", "max_credits_per_term"}),
+            student_context=request.model_dump(include={"student_plan", "completed_courses", "max_credits_per_term", "completed_grades", "approved_equivalences", "category_allocations"}),
         )
         # จับเวลาหลัง ask() จบทุกครั้ง รวมคำตอบจาก cache; ไม่เก็บเวลาเก่าใน cache.
         return {**answer, "processing_ms": round((time.perf_counter() - started) * 1000, 3)}
